@@ -23,6 +23,7 @@ Consistent resource naming and URL structure are fundamental to creating intuiti
 | Use singular for specific resources | `/order/{orderId}` | Endpoints returning a single resource use singular nouns |
 | Use kebab-case for multi-word resources | `/shipping-addresses` | Multi-word resource names should use kebab-case |
 | Use lowercase letters | `/orders` not `/Orders` | All URL paths should use lowercase letters |
+| Use descriptive identifiers | `/order/12345` not `/order/id/12345` | Avoid redundant path segments |
 
 ### HTTP Verbs Usage
 
@@ -40,12 +41,12 @@ A key distinction in our API convention is the semantic difference between plura
 
 - **Plural Endpoint (`/orders`)**: 
   - Represents a collection resource
-  - Returns `Mono<List<Order>>` or `Flux<Order>` 
+  - Returns a collection of resources (array/list)
   - Used for collection operations
 
 - **Singular Endpoint (`/order/{orderId}`)**: 
   - Represents a specific resource instance
-  - Returns `Mono<Order>` for a single resource
+  - Returns a single resource object
   - Used for instance operations
 
 This is not merely a "folder" structure - the distinction carries semantic meaning about the return type and operation scope.
@@ -147,7 +148,7 @@ Support multiple sort criteria with the `sort` parameter:
 Resource-specific filters should use intuitive parameter names:
 
 ```
-/orders?status=PROCESSING&createdAfter=2023-01-01
+/orders?status=PROCESSING&createdAfter=2024-01-01
 ```
 
 For more complex filtering, consider these approaches:
@@ -184,23 +185,41 @@ Use the verb after the resource, prefixed with an appropriate HTTP method.
 |--------------|---------|-------------------|
 | Verbs in URLs | `/getOrders` | `GET /orders` |
 | Operation names in URLs | `/orders/findByCustomer` | `GET /orders?customerId=123` |
-| Inconsistent pluralization | Mix of `/order` and `/customers` | Consistent use of plurals for collections |
+| Inconsistent pluralization | Mix of `/order` and `/customers/{id}` | Consistent use of singular for single resources, plural for collections |
 | Deep nesting | `/customers/{id}/accounts/{id}/transactions/{id}/details` | Limit nesting depth, provide alternative access paths |
 | Non-resource endpoints | `/generateReport` | `POST /reports` with appropriate request body |
 
-## Special Considerations for Reactive APIs
+## Special Considerations for Streaming APIs
 
-When designing endpoints that will return reactive types:
+When designing endpoints that support streaming or real-time data:
 
-1. Collection endpoints should consistently return `Flux<T>` or `Mono<List<T>>` depending on streaming requirements
-2. Consider providing both streaming and batch endpoints for large collections
-3. Document expected behavior for backpressure handling
+1. **Collection endpoints**: Consider providing both complete and streaming variants
+2. **Streaming protocols**: Use appropriate content types and HTTP methods
+3. **Backpressure handling**: Document expected client behavior for flow control
 
-Example designations:
+Example URL patterns:
 ```
-GET /orders         - Returns Mono<List<Order>> (complete collection)
-GET /orders/stream  - Returns Flux<Order> (streaming collection)
+GET /orders         - Returns complete collection (JSON array)
+GET /orders/stream  - Returns streaming collection (NDJSON or SSE)
 ```
+
+### Real-time and Streaming Patterns
+
+1. **Server-Sent Events**: For real-time updates, use consistent URL patterns
+   ```
+   GET /order/{orderId}/events  - SSE stream for order updates
+   ```
+
+2. **WebSocket Endpoints**: For bi-directional communication
+   ```
+   WS /order/{orderId}/ws  - WebSocket connection for order updates
+   ```
+
+3. **HTTP Streaming**: Use appropriate content types
+   ```http
+   GET /orders/stream HTTP/1.1
+   Accept: application/x-ndjson
+   ```
 
 ## Examples
 
@@ -208,18 +227,29 @@ GET /orders/stream  - Returns Flux<Order> (streaming collection)
 
 ```
 GET /customers                     - List all customers (paginated)
-GET /customers/{customerId}        - Get a specific customer
+GET /customer/{customerId}         - Get a specific customer
 POST /customers                    - Create a new customer
-PUT /customers/{customerId}        - Replace a customer
-PATCH /customers/{customerId}      - Update a customer partially
-DELETE /customers/{customerId}     - Delete a customer
+PUT /customer/{customerId}         - Replace a customer
+PATCH /customer/{customerId}       - Update a customer partially
+DELETE /customer/{customerId}      - Delete a customer
 
-GET /customers/{customerId}/orders - List orders for a customer
-POST /customers/{customerId}/orders - Create an order for a customer
+GET /customer/{customerId}/orders  - List orders for a customer
+POST /customer/{customerId}/orders - Create an order for a customer
 
 GET /orders                        - List all orders (paginated)
-GET /orders/{orderId}              - Get a specific order
-POST /orders/{orderId}/cancel      - Cancel an order (action)
+GET /order/{orderId}               - Get a specific order
+POST /order/{orderId}/cancel       - Cancel an order (action)
 ```
 
 These examples demonstrate the consistent application of the principles outlined in this guide.
+
+## Implementation Notes
+
+When implementing these URL structures:
+
+- **Framework-specific examples**: For Spring Boot/Spring WebFlux implementations, see the spring-design standards documentation
+- **REST framework compatibility**: These patterns work with any REST framework (Express.js, FastAPI, Django REST, etc.)
+- **HTTP method semantics**: Follow standard HTTP method definitions regardless of implementation technology
+- **Error handling**: Use appropriate HTTP status codes and RFC 7807 Problem Details format
+
+The principles outlined here are based on REST architectural constraints and HTTP standards, making them applicable across different programming languages and frameworks.

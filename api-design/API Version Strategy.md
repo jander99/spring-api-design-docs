@@ -46,17 +46,24 @@ Examples:
 
 ### Marking Endpoints as Deprecated
 
-1. **Documentation**: Use the `@Deprecated` annotation and OpenAPI documentation to mark deprecated endpoints
-   ```java
-   @Deprecated
-   @GetMapping("/v1/resource")
+1. **Documentation**: Mark deprecated endpoints in API documentation and OpenAPI specifications
+   ```yaml
+   # OpenAPI 3.1+ specification
+   /v1/resource:
+     get:
+       deprecated: true
+       summary: "Get resource (deprecated)"
+       description: "This endpoint is deprecated. Use /v2/resource instead."
    ```
 
-2. **Response Headers**: Include a `Deprecation` header in responses from deprecated endpoints
-   ```
+2. **Response Headers**: Include deprecation headers in responses from deprecated endpoints following RFC 8594
+   ```http
+   HTTP/1.1 200 OK
    Deprecation: true
-   Sunset: Sat, 31 Dec 2023 23:59:59 GMT
+   Sunset: Sat, 31 Dec 2025 23:59:59 GMT
    Link: </v2/resource>; rel="successor-version"
+   Warning: 299 - "This API version is deprecated and will be removed on 2025-12-31"
+   Content-Type: application/json
    ```
 
 3. **Monitoring**: Implement metrics to track usage of deprecated endpoints to inform sunset decisions
@@ -78,6 +85,18 @@ For migrating from older to newer API versions:
 
 3. **Sunsetting Phase**:
    - Return 410 Gone status with informational message for minor traffic
+   ```http
+   HTTP/1.1 410 Gone
+   Content-Type: application/problem+json
+   
+   {
+     "type": "https://example.com/problems/version-deprecated",
+     "title": "API Version Deprecated",
+     "status": 410,
+     "detail": "This API version has been removed. Please use v2.",
+     "instance": "/v1/orders/123"
+   }
+   ```
    - Eventually remove v1 implementation when traffic drops below threshold
 
 ### Support Timeframes
@@ -148,6 +167,71 @@ Add new capabilities without breaking changes:
 2. **Extended Response Data**: Add new fields to existing responses
 3. **Optional Endpoints**: Add new endpoints for new capabilities
 
+## Modern API Considerations
+
+### HTTP Standards and Best Practices
+
+1. **HTTP Problem Details**: Leverage RFC 7807 Problem Details for consistent error responses across versions
+   ```http
+   HTTP/1.1 410 Gone
+   Content-Type: application/problem+json
+   
+   {
+     "type": "https://example.com/problems/version-deprecated",
+     "title": "API Version Deprecated",
+     "status": 410,
+     "detail": "This API version has been removed. Please use v2.",
+     "instance": "/v1/orders/123"
+   }
+   ```
+
+2. **Content Negotiation**: Consider using Accept headers for minor version changes within major versions
+   ```http
+   GET /api/orders HTTP/1.1
+   Accept: application/vnd.api+json;version=1.2
+   Host: api.example.com
+   ```
+
+3. **Version Discovery**: Provide version information in response headers
+   ```http
+   HTTP/1.1 200 OK
+   API-Version: 1.0
+   API-Supported-Versions: 1.0, 1.1, 2.0
+   Content-Type: application/json
+   ```
+
+### Error Response Versioning
+
+Maintain consistent error response formats across versions while allowing for evolution:
+
+1. **Version-Specific Error Codes**: Use prefixed error codes to avoid conflicts
+   ```
+   V1_VALIDATION_ERROR vs V2_VALIDATION_ERROR
+   ```
+
+2. **Backward-Compatible Error Fields**: Ensure error response structure remains consistent
+   ```json
+   {
+     "error": {
+       "code": "VALIDATION_ERROR",
+       "message": "Request validation failed",
+       "version": "1.0"
+     }
+   }
+   ```
+
+3. **Standard Error Formats**: Use RFC 7807 Problem Details for modern APIs
+   ```json
+   {
+     "type": "https://example.com/problems/validation-error",
+     "title": "Validation Error",
+     "status": 400,
+     "detail": "Request validation failed",
+     "instance": "/v1/orders",
+     "api_version": "1.0"
+   }
+   ```
+
 ## Migration Examples
 
 ### Example 1: Adding a new field (Non-breaking)
@@ -177,4 +261,15 @@ Is the change breaking?
         Set deprecation timeline
 ```
 
-This versioning strategy ensures our microservices can evolve while providing reliable interfaces for client applications.
+This versioning strategy ensures APIs can evolve while providing reliable interfaces for client applications. These patterns align with modern HTTP standards like RFC 7807 Problem Details and provide a robust foundation for API evolution across different implementation technologies.
+
+## Implementation Notes
+
+When implementing these versioning strategies:
+
+- **Framework-specific examples**: For Spring Boot implementations, see the spring-design standards documentation
+- **OpenAPI documentation**: Use OpenAPI 3.1+ specifications to document version deprecation
+- **Monitoring tools**: Implement API usage monitoring to track version adoption
+- **Client libraries**: Provide version-aware client libraries when possible
+
+The principles outlined here apply regardless of the underlying technology stack, whether using REST frameworks in Java, Python, Node.js, or other platforms.
