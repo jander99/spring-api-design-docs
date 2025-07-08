@@ -234,7 +234,7 @@ void shouldReturnBadRequest_WhenValidationFails() throws Exception {
 - **[Project Structure and Package Organization](../project-structure/Package-Organization.md)**: Overall project structure
 - **[Controller Implementation](../controllers/README.md)**: Controller design patterns
 - **[Security Implementation](../security/README.md)**: Security-related error handling
-- **[Logging and Monitoring](../Logging and Monitoring.md)**: General logging and monitoring patterns
+- **[Logging and Monitoring](../observability/Logging and Monitoring.md)**: General logging and monitoring patterns
 
 ## Common Error Scenarios
 

@@ -31,16 +31,22 @@ com.example.{service-name}
 
 ### API Design Standards (`/api-design/`)
 Framework-agnostic HTTP/REST principles organized into:
+- **foundations/**: Core API design principles (resource naming, versioning)
 - **request-response/**: HTTP patterns, error formats, pagination, streaming
+- **security/**: Security standards and authentication patterns
+- **advanced-patterns/**: Reactive, event-driven, and streaming architectures
+- **documentation/**: OpenAPI standards, testing, and tooling
 
 ### Spring Implementation Standards (`/spring-design/`)
 Spring Boot-specific patterns organized into:
+- **architecture/**: Architectural patterns and dependency injection
 - **project-structure/**: Package organization and DDD patterns
 - **controllers/**: Web layer patterns for MVC and WebFlux
 - **error-handling/**: Exception management and RFC 7807 implementation
 - **security/**: OAuth 2.1, authorization, and security headers
 - **configuration/**: Application config, profiles, and observability
-- **testing/**: Unit, integration, and contract testing patterns
+- **testing/**: Unit, integration, and specialized testing (organized by type)
+- **observability/**: Logging, monitoring, and operational patterns
 
 ## Technology Stack
 

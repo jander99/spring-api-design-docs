@@ -28,21 +28,25 @@ Our testing strategy follows the testing pyramid approach:
 
 ## Directory Structure
 
-### Unit Testing Documentation
+### Unit Testing Documentation (`unit-testing/`)
 
-- **[Unit Testing Fundamentals](Unit-Testing-Fundamentals.md)**: Core principles, setup, libraries, and best practices
-- **[Domain Layer Testing](Domain-Layer-Testing.md)**: Testing business entities, value objects, and domain services
-- **[Application Layer Testing](Application-Layer-Testing.md)**: Testing application services and orchestration logic
-- **[Infrastructure Testing](Infrastructure-Testing.md)**: Testing repositories, API clients, and external adapters
-- **[Controller Unit Testing](Controller-Unit-Testing.md)**: Testing web controllers in isolation
-- **[Reactive Testing](Reactive-Testing.md)**: Testing reactive streams and asynchronous operations
+- **[Unit Testing Fundamentals](unit-testing/Unit-Testing-Fundamentals.md)**: Core principles, setup, libraries, and best practices
+- **[Domain Layer Testing](unit-testing/Domain-Layer-Testing.md)**: Testing business entities, value objects, and domain services
+- **[Application Layer Testing](unit-testing/Application-Layer-Testing.md)**: Testing application services and orchestration logic
+- **[Controller Unit Testing](unit-testing/Controller-Unit-Testing.md)**: Testing web controllers in isolation
 
-### Integration Testing Documentation
+### Integration Testing Documentation (`integration-testing/`)
 
-- **[Integration Testing Fundamentals](Integration-Testing-Fundamentals.md)**: Core integration testing principles and setup
-- **[Database Integration Testing](Database-Integration-Testing.md)**: Testing with real databases and repositories
-- **[API Integration Testing](API-Integration-Testing.md)**: End-to-end API testing with real HTTP requests
-- **[External Service Testing](External-Service-Testing.md)**: Testing with WireMock and external service simulation
+- **[Integration Testing Fundamentals](integration-testing/Integration-Testing-Fundamentals.md)**: Core integration testing principles and setup
+- **[Database Integration Testing](integration-testing/Database-Integration-Testing.md)**: Testing with real databases and repositories
+- **[API Integration Testing](integration-testing/API-Integration-Testing.md)**: End-to-end API testing with real HTTP requests
+- **[External Service Testing](integration-testing/External-Service-Testing.md)**: Testing with WireMock and external service simulation
+
+### Specialized Testing Documentation (`specialized-testing/`)
+
+- **[Reactive Testing](specialized-testing/Reactive-Testing.md)**: Testing reactive streams and asynchronous operations
+- **[Infrastructure Testing](specialized-testing/Infrastructure-Testing.md)**: Testing repositories, API clients, and external adapters
+- **[Contract Testing Standards](specialized-testing/Contract%20Testing%20Standards.md)**: Consumer-driven contract testing and API contract verification
 
 ## Quick Reference
 
@@ -354,11 +358,11 @@ test:
 
 ## Getting Started
 
-1. **Start with Unit Tests**: Begin with domain layer testing using the patterns in [Unit Testing Fundamentals](Unit-Testing-Fundamentals.md)
-2. **Add Integration Tests**: Follow [Integration Testing Fundamentals](Integration-Testing-Fundamentals.md) for component integration
-3. **Implement API Tests**: Use [API Integration Testing](API-Integration-Testing.md) for end-to-end scenarios
-4. **Configure External Mocks**: Set up WireMock following [External Service Testing](External-Service-Testing.md)
-5. **Add Reactive Tests**: If using WebFlux, implement patterns from [Reactive Testing](Reactive-Testing.md)
+1. **Start with Unit Tests**: Begin with domain layer testing using the patterns in [Unit Testing Fundamentals](unit-testing/Unit-Testing-Fundamentals.md)
+2. **Add Integration Tests**: Follow [Integration Testing Fundamentals](integration-testing/Integration-Testing-Fundamentals.md) for component integration
+3. **Implement API Tests**: Use [API Integration Testing](integration-testing/API-Integration-Testing.md) for end-to-end scenarios
+4. **Configure External Mocks**: Set up WireMock following [External Service Testing](integration-testing/External-Service-Testing.md)
+5. **Add Reactive Tests**: If using WebFlux, implement patterns from [Reactive Testing](specialized-testing/Reactive-Testing.md)
 
 ## Related Documentation
 

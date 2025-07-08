@@ -319,8 +319,8 @@ spec:
 ## Related Documentation
 
 - [Configuration Principles](../configuration/Configuration-Principles.md)
-- [Logging and Monitoring](../Logging and Monitoring.md)
-- [Integration Testing Fundamentals](../testing/Integration-Testing-Fundamentals.md)
+- [Logging and Monitoring](../observability/Logging and Monitoring.md)
+- [Integration Testing Fundamentals](../testing/integration-testing/Integration-Testing-Fundamentals.md)
 
 ---
 
