@@ -96,7 +96,7 @@
   - Real-world use case studies
 
 ### Document-Specific Improvements
-- [ ] **Documentation Requirements** (556 lines - needs condensing)
+- [ ] **OpenAPI Standards** (previously Documentation Requirements - now split into multiple files)
   - Reorganize into logical sections
   - Create quick reference for common tasks
   - Separate basic vs advanced documentation

@@ -1,8 +1,8 @@
-# Documentation Requirements
+# OpenAPI Standards
 
 ## Overview
 
-Comprehensive and consistent API documentation is essential for enabling rapid adoption and proper usage of APIs. This document outlines our documentation standards, with emphasis on OpenAPI specifications, example formats, and integration with tooling platforms like Swagger UI and API catalogs.
+This document outlines the OpenAPI 3.1+ standards and requirements for creating comprehensive API specifications. These standards ensure consistency, completeness, and interoperability across all API documentation.
 
 ## OpenAPI Specification Requirements
 
@@ -286,78 +286,6 @@ components:
               message: "At least one item is required"
 ```
 
-## Documentation Integration
-
-### Interactive Documentation
-
-Implement interactive documentation with these features:
-
-**Swagger UI Configuration**:
-- Interactive API exploration with "Try it out" functionality
-- Multiple API group support
-- Enhanced filtering and sorting options
-- Deep linking to specific operations
-- Custom branding and styling
-
-**Alternative Documentation Tools**:
-- **Redoc**: Clean, responsive documentation
-- **Stoplight Elements**: Modern API documentation
-- **Insomnia**: API design and testing platform
-- **Postman**: API documentation and testing
-
-**Key Documentation Features**:
-```yaml
-# Multiple API specifications
-urls:
-  - name: "Public API"
-    url: "/openapi/public.yaml"
-  - name: "Internal API"
-    url: "/openapi/internal.yaml"
-  - name: "Admin API"
-    url: "/openapi/admin.yaml"
-
-# Configuration options
-options:
-  tryItOutEnabled: true
-  filter: true
-  deepLinking: true
-  defaultModelsExpandDepth: 1
-  defaultModelExpandDepth: 1
-  operationsSorter: "alpha"
-  tagsSorter: "alpha"
-```
-
-### API Catalog Integration
-
-**Backstage Integration**:
-- Register API specifications with Backstage API catalog
-- Include metadata for service discovery and management
-- Link to related services and components
-
-```yaml
-# catalog-info.yaml
-apiVersion: backstage.io/v1alpha1
-kind: API
-metadata:
-  name: order-api
-  annotations:
-    backstage.io/techdocs-ref: dir:.
-    backstage.io/owner: order-team
-    backstage.io/api-lifecycle: production
-spec:
-  type: openapi
-  lifecycle: production
-  owner: order-team
-  definition:
-    $text: ./openapi.yaml
-```
-
-**Other API Catalog Platforms**:
-- **Kong Portal**: API documentation and developer portal
-- **Azure API Management**: Microsoft's API catalog solution
-- **AWS API Gateway**: Documentation and developer portal
-- **Postman API Network**: Public API discovery platform
-
 ## Versioning Documentation
 
 ### Version-Specific Documentation
@@ -380,148 +308,7 @@ paths:
         Use `/v2/orders` instead which provides enhanced filtering capabilities.
 ```
 
-## Streaming API Documentation
-
-### Documenting Streaming Patterns
-
-For streaming APIs, clearly document:
-
-1. **Streaming behavior**: Indicate content types and protocols used
-2. **Flow control**: Describe how backpressure is managed
-3. **Connection management**: Explain connection behavior for long-lived streams
-4. **Error handling**: Document how errors are communicated in streams
-
-Example:
-
-```yaml
-paths:
-  /orders/stream:
-    get:
-      summary: Stream orders in real-time
-      description: >
-        Returns a stream of orders as they are created or updated.
-        Uses Server-Sent Events with HTTP flow control for backpressure management.
-        Clients should implement proper connection handling for unexpected disconnects.
-        Stream will automatically reconnect on connection loss.
-      parameters:
-        - name: Last-Event-ID
-          in: header
-          description: Resume stream from specific event ID
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successful streaming operation
-          headers:
-            Cache-Control:
-              description: Prevents caching of stream
-              schema:
-                type: string
-                example: "no-cache"
-          content:
-            text/event-stream:
-              schema:
-                type: string
-                description: Server-Sent Events format
-              examples:
-                order-events:
-                  summary: Order event stream
-                  value: |
-                    id: 1
-                    event: order-created
-                    data: {"id":"ord-123","status":"CREATED"}
-                    
-                    id: 2
-                    event: order-updated
-                    data: {"id":"ord-123","status":"PROCESSING"}
-            application/x-ndjson:
-              schema:
-                type: string
-                description: Newline-delimited JSON format
-              examples:
-                order-stream:
-                  summary: NDJSON order stream
-                  value: |
-                    {"id":"ord-123","status":"CREATED"}
-                    {"id":"ord-124","status":"PROCESSING"}
-```
-
-## Documentation Validation and Testing
-
-### Validation Requirements
-
-Modern validation approaches for API documentation:
-
-- **OpenAPI Linting**: Use tools like `spectral` or `redocly` in CI/CD pipeline
-- **Schema Validation**: Ensure examples match schemas using automated testing
-- **Coverage Analysis**: Verify all endpoints are documented with 100% coverage
-- **Breaking Change Detection**: Use tools to detect API breaking changes
-
-```yaml
-# CI/CD pipeline example
-validate-docs:
-  stage: test
-  script:
-    - spectral lint openapi.yaml --ruleset .spectral.yaml
-    - redocly lint openapi.yaml
-    - openapi-diff baseline.yaml current.yaml --fail-on-incompatible
-    - openapi-generator validate -i openapi.yaml
-  artifacts:
-    reports:
-      junit: test-results.xml
-```
-
-**Recommended Validation Tools**:
-- **Spectral**: OpenAPI linting with custom rules
-- **Redocly CLI**: Comprehensive OpenAPI validation
-- **OpenAPI Diff**: Breaking change detection
-- **Swagger Parser**: Schema validation
-- **Prism**: Mock server validation
-
-### Testing Documentation
-
-Comprehensive documentation testing strategy:
-
-**Automated Testing Approaches**:
-
-```bash
-# Example test script
-#!/bin/bash
-
-# Validate OpenAPI specification
-openapi-generator validate -i openapi.yaml
-
-# Test all documented examples
-for example in examples/*.json; do
-    echo "Testing example: $example"
-    curl -X POST \
-        -H "Content-Type: application/json" \
-        -d @"$example" \
-        "$API_BASE_URL/orders" \
-        | jq . # Validate JSON response
-done
-
-# Verify response schemas
-prism mock openapi.yaml &
-PRISM_PID=$!
-newman run postman-collection.json
-kill $PRISM_PID
-```
-
-**Testing Tools and Frameworks**:
-- **Postman/Newman**: Automated API testing with collection runs
-- **Insomnia**: API testing with environment management
-- **Pact**: Consumer-driven contract testing with OpenAPI
-- **Dredd**: API testing against OpenAPI specifications
-- **Schemathesis**: Property-based testing for OpenAPI
-
-**Testing Considerations**:
-- **Contract Testing**: Ensure consumers and providers agree on API contracts
-- **Load Testing**: Verify documented rate limits and performance characteristics
-- **Security Testing**: Validate documented security requirements
-- **Example Validation**: Ensure all examples are executable and produce expected results
-
-## Example Documentation Checklist
+## Documentation Checklist
 
 For each API, ensure:
 
@@ -541,11 +328,11 @@ Implement a documentation review process as part of API design reviews:
 2. **Pre-Release Review**: Before deployment to production
 3. **Periodic Audits**: Regular reviews of documentation accuracy
 
-These documentation standards ensure that developers have the information needed to successfully integrate with and use our APIs. With OpenAPI 3.1+ specifications, modern tooling integration, and comprehensive validation approaches, these patterns provide documentation that is both developer-friendly and machine-readable.
+These OpenAPI standards ensure that developers have the information needed to successfully integrate with and use our APIs, with specifications that are both developer-friendly and machine-readable.
 
 ## Implementation Notes
 
-When implementing these documentation standards:
+When implementing these OpenAPI standards:
 
 - **Framework-specific tools**: For Spring Boot implementations using springdoc-openapi, see the spring-design standards documentation
 - **OpenAPI generators**: Use appropriate OpenAPI code generators for your technology stack

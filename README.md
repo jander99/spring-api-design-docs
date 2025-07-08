@@ -10,11 +10,21 @@ The project is organized into two main sections with focused subdirectories for 
 
 Framework-agnostic API design principles for consistent REST services:
 
+#### Core API Design
 - [API Version Strategy](api-design/API Version Strategy.md) - Guidelines for versioning APIs with URI-based patterns and deprecation policies
-- [Documentation Requirements](api-design/Documentation Requirements.md) - Standards for OpenAPI specifications and example formats
 - [Resource Naming and URL Structure](api-design/Resource Naming and URL Structure.md) - RESTful resource naming conventions and URL design principles
-- [Reactive Patterns](api-design/Reactive Patterns.md) - Event-driven architecture, backpressure handling, and non-blocking interactions
 - [Security Standards](api-design/Security Standards.md) - High-level approach to authentication, authorization, and API protection
+
+#### Documentation and Integration
+- [OpenAPI Standards](api-design/OpenAPI-Standards.md) - Standards for OpenAPI specifications and schema definitions
+- [Documentation Tools and Integration](api-design/Documentation-Tools-and-Integration.md) - Tools, generators, and integration patterns for API documentation
+- [Documentation Testing](api-design/Documentation-Testing.md) - Testing documentation accuracy and contract validation
+- [Streaming Documentation Patterns](api-design/Streaming-Documentation-Patterns.md) - Documenting streaming APIs and event-driven patterns
+
+#### Reactive and Event-Driven Patterns
+- [HTTP Streaming Patterns](api-design/HTTP-Streaming-Patterns.md) - Server-Sent Events, streaming responses, and real-time communication
+- [Event-Driven Architecture](api-design/Event-Driven-Architecture.md) - Event sourcing, CQRS, and event-driven system design
+- [Reactive Error Handling](api-design/Reactive-Error-Handling.md) - Error handling patterns for reactive and streaming APIs
 
 #### Request/Response Standards
 Comprehensive patterns for data exchange and API contract design:
@@ -150,8 +160,8 @@ Each testing approach includes both imperative (Spring MVC) and reactive (WebFlu
 | **Request/Response** | [Request/Response Standards](api-design/request-response/) | [Controller Mapping](spring-design/controllers/Request-Response-Mapping.md) |
 | **Error Handling** | [Error Response Standards](api-design/request-response/Error-Response-Standards.md) | [Error Handling](spring-design/error-handling/) |
 | **Security** | [Security Standards](api-design/Security Standards.md) | [Security Implementation](spring-design/security/) |
-| **Configuration** | [Documentation Requirements](api-design/Documentation Requirements.md) | [Configuration Management](spring-design/configuration/) |
-| **Testing** | API Design Testing | [Testing Standards](spring-design/testing/) |
+| **Configuration** | [OpenAPI Standards](api-design/OpenAPI-Standards.md) | [Configuration Management](spring-design/configuration/) |
+| **Testing** | [Documentation Testing](api-design/Documentation-Testing.md) | [Testing Standards](spring-design/testing/) |
 
 ### By Technical Focus
 
@@ -159,9 +169,11 @@ Each testing approach includes both imperative (Spring MVC) and reactive (WebFlu
 |------------|----------------------|----------------------|
 | **RESTful API Design** | [API Design Standards](api-design/) | [Controllers](spring-design/controllers/), [Error Handling](spring-design/error-handling/) |
 | **Domain-Driven Design** | [Package Organization](spring-design/project-structure/Package-Organization.md) | [Imperative Examples](spring-design/project-structure/Imperative-Examples.md), [Reactive Examples](spring-design/project-structure/Reactive-Examples.md) |
-| **Reactive Programming** | [Reactive Patterns](api-design/Reactive Patterns.md) | [Reactive Controllers](spring-design/controllers/Reactive-Controllers.md), [Reactive Testing](spring-design/testing/Reactive-Testing.md) |
+| **Reactive Programming** | [HTTP Streaming Patterns](api-design/HTTP-Streaming-Patterns.md), [Reactive Error Handling](api-design/Reactive-Error-Handling.md) | [Reactive Controllers](spring-design/controllers/Reactive-Controllers.md), [Reactive Testing](spring-design/testing/Reactive-Testing.md) |
+| **Event-Driven Architecture** | [Event-Driven Architecture](api-design/Event-Driven-Architecture.md) | [Streaming Documentation Patterns](api-design/Streaming-Documentation-Patterns.md) |
+| **API Documentation** | [OpenAPI Standards](api-design/OpenAPI-Standards.md), [Documentation Tools and Integration](api-design/Documentation-Tools-and-Integration.md) | [Documentation Testing](api-design/Documentation-Testing.md) |
 | **Security Implementation** | [Security Standards](api-design/Security Standards.md) | [Security Documentation](spring-design/security/) |
-| **Testing Strategy** | [Testing Overview](spring-design/testing/) | [Controller Testing](spring-design/controllers/Controller-Testing.md), [Security Testing](spring-design/security/Security-Testing.md) |
+| **Testing Strategy** | [Documentation Testing](api-design/Documentation-Testing.md) | [Testing Overview](spring-design/testing/), [Controller Testing](spring-design/controllers/Controller-Testing.md) |
 | **Production Readiness** | [Request/Response Standards](api-design/request-response/) | [Configuration](spring-design/configuration/), [Error Handling](spring-design/error-handling/) |
 
 ### Migration from Previous Structure
