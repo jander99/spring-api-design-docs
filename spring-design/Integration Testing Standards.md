@@ -130,24 +130,402 @@ spring:
 
 ### Repository Layer Integration Tests
 
-- Test CRUD operations against real database
-- Verify query methods return expected results
-- Test transaction behavior
-- Test database constraints and error conditions
+Test CRUD operations against real database:
+
+```java
+@DataJpaTest
+@Testcontainers
+class OrderRepositoryIntegrationTest {
+
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
+            .withDatabaseName("testdb")
+            .withUsername("test")
+            .withPassword("test");
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
+
+    @Autowired
+    private TestEntityManager entityManager;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Test
+    void shouldFindOrdersByCustomerId() {
+        // Given
+        UUID customerId = UUID.randomUUID();
+        Order order1 = createTestOrder(customerId, OrderStatus.CREATED);
+        Order order2 = createTestOrder(customerId, OrderStatus.CONFIRMED);
+        entityManager.persistAndFlush(order1);
+        entityManager.persistAndFlush(order2);
+
+        // When
+        List<Order> orders = orderRepository.findByCustomerId(customerId);
+
+        // Then
+        assertThat(orders).hasSize(2);
+        assertThat(orders).extracting(Order::getCustomerId)
+            .containsOnly(customerId);
+    }
+
+    @Test
+    void shouldFindOrdersByStatusAndDateRange() {
+        // Given
+        OffsetDateTime startDate = OffsetDateTime.now().minusDays(7);
+        OffsetDateTime endDate = OffsetDateTime.now();
+        
+        Order order1 = createTestOrder(UUID.randomUUID(), OrderStatus.CONFIRMED);
+        order1.setCreatedDate(startDate.plusDays(1));
+        
+        Order order2 = createTestOrder(UUID.randomUUID(), OrderStatus.CONFIRMED);
+        order2.setCreatedDate(startDate.minusDays(1)); // Outside range
+        
+        entityManager.persistAndFlush(order1);
+        entityManager.persistAndFlush(order2);
+
+        // When
+        Page<Order> result = orderRepository.findByStatusAndCreatedDateBetween(
+            OrderStatus.CONFIRMED, startDate, endDate, PageRequest.of(0, 10));
+
+        // Then
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getId()).isEqualTo(order1.getId());
+    }
+
+    private Order createTestOrder(UUID customerId, OrderStatus status) {
+        return Order.builder()
+            .customerId(customerId)
+            .status(status)
+            .totalAmount(BigDecimal.valueOf(100.00))
+            .items(List.of())
+            .build();
+    }
+}
+```
+
+### Reactive Repository Integration Tests
+
+```java
+@DataR2dbcTest
+@Testcontainers
+class ReactiveOrderRepositoryIntegrationTest {
+
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
+            .withDatabaseName("testdb")
+            .withUsername("test")
+            .withPassword("test");
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.r2dbc.url", () -> "r2dbc:postgresql://" + 
+            postgres.getHost() + ":" + postgres.getFirstMappedPort() + "/testdb");
+        registry.add("spring.r2dbc.username", postgres::getUsername);
+        registry.add("spring.r2dbc.password", postgres::getPassword);
+    }
+
+    @Autowired
+    private ReactiveOrderRepository orderRepository;
+
+    @Test
+    void shouldSaveAndRetrieveOrder() {
+        // Given
+        Order order = createTestOrder(UUID.randomUUID(), OrderStatus.CREATED);
+
+        // When & Then
+        StepVerifier.create(
+            orderRepository.save(order)
+                .flatMap(savedOrder -> orderRepository.findById(savedOrder.getId()))
+        )
+        .assertNext(retrievedOrder -> {
+            assertThat(retrievedOrder.getCustomerId()).isEqualTo(order.getCustomerId());
+            assertThat(retrievedOrder.getStatus()).isEqualTo(order.getStatus());
+        })
+        .verifyComplete();
+    }
+
+    @Test
+    void shouldStreamOrdersByStatus() {
+        // Given
+        Flux<Order> orders = Flux.range(1, 10)
+            .map(i -> createTestOrder(UUID.randomUUID(), OrderStatus.CREATED))
+            .flatMap(orderRepository::save);
+
+        // When & Then
+        StepVerifier.create(
+            orders.then()
+                .thenMany(orderRepository.findByStatus(OrderStatus.CREATED))
+        )
+        .expectNextCount(10)
+        .verifyComplete();
+    }
+}
+```
 
 ### Service Layer Integration Tests
 
-- Test service interactions with repositories
-- Verify transaction boundaries
-- Test service-to-service interactions
-- Mock external dependencies outside test scope
+Test service interactions with repositories and verify transaction boundaries:
+
+```java
+@SpringBootTest
+@Transactional
+@Testcontainers
+class OrderServiceIntegrationTest {
+
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15");
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
+
+    @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @MockBean
+    private PaymentService paymentService;
+
+    @MockBean
+    private InventoryService inventoryService;
+
+    @Test
+    void shouldCreateOrderWithInventoryCheck() {
+        // Given
+        OrderCreationDto orderDto = createOrderCreationDto();
+        when(inventoryService.checkAvailability(any(), anyInt())).thenReturn(true);
+        when(paymentService.processPayment(any())).thenReturn(PaymentResult.success("txn-123"));
+
+        // When
+        OrderDto result = orderService.createOrder(orderDto);
+
+        // Then
+        assertThat(result.getId()).isNotNull();
+        assertThat(result.getStatus()).isEqualTo(OrderStatus.CONFIRMED);
+        
+        // Verify order was persisted
+        Optional<Order> savedOrder = orderRepository.findById(result.getId());
+        assertThat(savedOrder).isPresent();
+        assertThat(savedOrder.get().getCustomerId()).isEqualTo(orderDto.getCustomerId());
+    }
+
+    @Test
+    void shouldRollbackOrderCreationOnPaymentFailure() {
+        // Given
+        OrderCreationDto orderDto = createOrderCreationDto();
+        when(inventoryService.checkAvailability(any(), anyInt())).thenReturn(true);
+        when(paymentService.processPayment(any()))
+            .thenThrow(new PaymentException("Payment failed"));
+
+        // When & Then
+        assertThrows(PaymentException.class, () -> orderService.createOrder(orderDto));
+        
+        // Verify no order was persisted due to rollback
+        List<Order> orders = orderRepository.findByCustomerId(orderDto.getCustomerId());
+        assertThat(orders).isEmpty();
+    }
+
+    private OrderCreationDto createOrderCreationDto() {
+        return OrderCreationDto.builder()
+            .customerId(UUID.randomUUID())
+            .items(List.of(OrderItemDto.builder()
+                .productId(UUID.randomUUID())
+                .quantity(2)
+                .build()))
+            .build();
+    }
+}
+```
 
 ### Controller Layer Integration Tests
 
-- Test API contracts
-- Verify serialization/deserialization
-- Test input validation
-- Verify security constraints
+Test API contracts and verify serialization/deserialization:
+
+```java
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Testcontainers
+class OrderControllerIntegrationTest {
+
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15");
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @MockBean
+    private PaymentService paymentService;
+
+    @Test
+    void shouldCreateOrderViaApi() {
+        // Given
+        CreateOrderRequest request = createOrderRequest();
+        when(paymentService.processPayment(any())).thenReturn(PaymentResult.success("txn-123"));
+
+        // When
+        ResponseEntity<OrderResponse> response = restTemplate.postForEntity(
+            "/v1/orders", request, OrderResponse.class);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getId()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo("CONFIRMED");
+    }
+
+    @Test
+    void shouldReturnValidationErrorForInvalidRequest() {
+        // Given
+        CreateOrderRequest invalidRequest = new CreateOrderRequest();
+        // Missing required fields
+
+        // When
+        ResponseEntity<ErrorResponse> response = restTemplate.postForEntity(
+            "/v1/orders", invalidRequest, ErrorResponse.class);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getCode()).isEqualTo("VALIDATION_ERROR");
+        assertThat(response.getBody().getDetails()).isNotEmpty();
+    }
+
+    @Test
+    void shouldReturnOrderById() {
+        // Given
+        Order savedOrder = orderRepository.save(createTestOrder());
+
+        // When
+        ResponseEntity<OrderResponse> response = restTemplate.getForEntity(
+            "/v1/orders/{orderId}", OrderResponse.class, savedOrder.getId());
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getId()).isEqualTo(savedOrder.getId());
+    }
+
+    @Test
+    void shouldReturnNotFoundForNonExistentOrder() {
+        // Given
+        UUID nonExistentId = UUID.randomUUID();
+
+        // When
+        ResponseEntity<ErrorResponse> response = restTemplate.getForEntity(
+            "/v1/orders/{orderId}", ErrorResponse.class, nonExistentId);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getCode()).isEqualTo("RESOURCE_NOT_FOUND");
+    }
+}
+```
+
+### External Service Integration Tests
+
+Test service-to-service interactions using WireMock:
+
+```java
+@SpringBootTest
+@Testcontainers
+class PaymentServiceClientIntegrationTest {
+
+    @RegisterExtension
+    static WireMockExtension wireMock = WireMockExtension.newInstance()
+        .options(wireMockConfig().port(8089))
+        .build();
+
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15");
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        @Primary
+        public PaymentServiceClient paymentServiceClient() {
+            return new PaymentServiceClient(
+                WebClient.builder().baseUrl("http://localhost:8089").build()
+            );
+        }
+    }
+
+    @Autowired
+    private PaymentServiceClient paymentServiceClient;
+
+    @Test
+    void shouldProcessPaymentSuccessfully() {
+        // Given
+        PaymentRequest request = PaymentRequest.builder()
+            .orderId(UUID.randomUUID())
+            .amount(BigDecimal.valueOf(100.00))
+            .currency("USD")
+            .build();
+
+        wireMock.stubFor(post(urlEqualTo("/v1/payments"))
+            .withRequestBody(matchingJsonPath("$.orderId"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("""
+                    {
+                        "transactionId": "txn-123",
+                        "status": "COMPLETED",
+                        "amount": 100.00
+                    }
+                    """)));
+
+        // When
+        PaymentResult result = paymentServiceClient.processPayment(request);
+
+        // Then
+        assertThat(result.getTransactionId()).isEqualTo("txn-123");
+        assertThat(result.getStatus()).isEqualTo(PaymentStatus.COMPLETED);
+        
+        wireMock.verify(postRequestedFor(urlEqualTo("/v1/payments"))
+            .withRequestBody(matchingJsonPath("$.orderId", equalTo(request.getOrderId().toString()))));
+    }
+
+    @Test
+    void shouldHandlePaymentServiceTimeout() {
+        // Given
+        PaymentRequest request = PaymentRequest.builder()
+            .orderId(UUID.randomUUID())
+            .amount(BigDecimal.valueOf(100.00))
+            .currency("USD")
+            .build();
+
+        wireMock.stubFor(post(urlEqualTo("/v1/payments"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withFixedDelay(5000))); // Longer than client timeout
+
+        // When & Then
+        assertThrows(PaymentServiceException.class, 
+            () -> paymentServiceClient.processPayment(request));
+    }
+}
+```
 
 ## Common Anti-patterns to Avoid
 

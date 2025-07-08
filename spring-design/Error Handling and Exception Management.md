@@ -135,7 +135,50 @@ public class TechnicalException extends ApplicationException {
 
 ## Error Response Structure
 
-Define a standard error response structure:
+### RFC 7807 Problem Details (Primary)
+
+Use RFC 7807 Problem Details as the primary error response format:
+
+```java
+package com.example.common.api;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
+import lombok.Data;
+
+import java.net.URI;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Map;
+
+@Data
+@Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ProblemDetail {
+    private URI type;           // RFC 7807: URI identifying the problem type
+    private String title;       // RFC 7807: Short, human-readable summary
+    private Integer status;     // RFC 7807: HTTP status code
+    private String detail;      // RFC 7807: Human-readable explanation
+    private URI instance;       // RFC 7807: URI identifying the specific occurrence
+    
+    // Extensions
+    private OffsetDateTime timestamp;
+    private String requestId;
+    private List<ValidationError> errors;  // For validation failures
+    
+    @Data
+    @Builder
+    public static class ValidationError {
+        private String field;
+        private String code;
+        private String message;
+    }
+}
+```
+
+### Legacy Error Response (Fallback)
+
+For clients requiring the legacy format, maintain compatibility:
 
 ```java
 package com.example.common.api;
@@ -150,7 +193,7 @@ import java.util.List;
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ErrorResponse {
+public class LegacyErrorResponse {
     private String code;
     private String message;
     private List<ValidationError> details;
@@ -167,6 +210,124 @@ public class ErrorResponse {
 }
 ```
 
+### Error Response Builder
+
+Create a centralized error response builder supporting both RFC 7807 and legacy formats:
+
+```java
+package com.example.common.api;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import jakarta.servlet.http.HttpServletRequest;
+import java.net.URI;
+import java.time.OffsetDateTime;
+import java.util.List;
+
+@Component
+public class ErrorResponseBuilder {
+    
+    @Value("${app.environment:development}")
+    private String environment;
+    
+    @Value("${app.error.use-rfc7807:true}")
+    private boolean useRfc7807;
+    
+    @Value("${app.error.problem-base-uri:https://api.example.com/problems}")
+    private String problemBaseUri;
+    
+    public Object buildErrorResponse(
+            String problemType,
+            String title,
+            int status,
+            String detail,
+            List<ProblemDetail.ValidationError> errors,
+            String requestId) {
+        
+        if (useRfc7807) {
+            return buildProblemDetail(problemType, title, status, detail, errors, requestId);
+        } else {
+            return buildLegacyErrorResponse(problemType, detail, errors, requestId);
+        }
+    }
+    
+    private ProblemDetail buildProblemDetail(
+            String problemType,
+            String title,
+            int status,
+            String detail,
+            List<ProblemDetail.ValidationError> errors,
+            String requestId) {
+        
+        return ProblemDetail.builder()
+            .type(URI.create(problemBaseUri + "/" + problemType))
+            .title(title)
+            .status(status)
+            .detail(sanitizeErrorMessage(detail))
+            .instance(getCurrentRequestURI())
+            .timestamp(OffsetDateTime.now())
+            .requestId(requestId)
+            .errors(errors)
+            .build();
+    }
+    
+    private LegacyErrorResponse buildLegacyErrorResponse(
+            String code,
+            String message,
+            List<ProblemDetail.ValidationError> errors,
+            String requestId) {
+        
+        List<LegacyErrorResponse.ValidationError> legacyErrors = null;
+        if (errors != null) {
+            legacyErrors = errors.stream()
+                .map(error -> LegacyErrorResponse.ValidationError.builder()
+                    .field(error.getField())
+                    .code(error.getCode())
+                    .message(error.getMessage())
+                    .build())
+                .toList();
+        }
+        
+        return LegacyErrorResponse.builder()
+            .code(code)
+            .message(sanitizeErrorMessage(message))
+            .details(legacyErrors)
+            .timestamp(OffsetDateTime.now())
+            .requestId(requestId)
+            .build();
+    }
+    
+    private String sanitizeErrorMessage(String originalMessage) {
+        if ("production".equals(environment)) {
+            // In production, return generic messages for security
+            return switch (originalMessage) {
+                case String msg when msg.contains("SQL") -> "Database error occurred";
+                case String msg when msg.contains("Connection") -> "Service temporarily unavailable";
+                case String msg when msg.contains("Authentication") -> "Authentication failed";
+                default -> "An error occurred. Please contact support.";
+            };
+        }
+        return originalMessage;
+    }
+    
+    private URI getCurrentRequestURI() {
+        try {
+            ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attrs != null) {
+                HttpServletRequest request = attrs.getRequest();
+                return URI.create(request.getRequestURI());
+            }
+        } catch (Exception e) {
+            // Fallback if request context is not available
+        }
+        return URI.create("/unknown");
+    }
+}
+```
+
 ## Exception Handling with Spring MVC
 
 ### Global Exception Handler
@@ -179,6 +340,7 @@ package com.example.common.api;
 import com.example.common.exception.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -194,19 +356,23 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @ControllerAdvice
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
     private final RequestIdProvider requestIdProvider;
+    private final ErrorResponseBuilder errorResponseBuilder;
     
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
+    public ResponseEntity<Object> handleResourceNotFoundException(
             ResourceNotFoundException ex, WebRequest request) {
         
         log.info("Resource not found: {}", ex.getMessage());
         
-        ErrorResponse errorResponse = buildErrorResponse(
-            ex.getErrorCode(), 
+        Object errorResponse = errorResponseBuilder.buildErrorResponse(
+            "resource-not-found",
+            "Resource Not Found", 
+            HttpStatus.NOT_FOUND.value(),
             ex.getMessage(),
             null,
             requestIdProvider.getRequestId()
@@ -216,21 +382,23 @@ public class GlobalExceptionHandler {
     }
     
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(
+    public ResponseEntity<Object> handleValidationException(
             ValidationException ex, WebRequest request) {
         
         log.info("Validation error: {}", ex.getMessage());
         
-        List<ErrorResponse.ValidationError> validationErrors = ex.getErrors().stream()
-            .map(error -> ErrorResponse.ValidationError.builder()
+        List<ProblemDetail.ValidationError> validationErrors = ex.getErrors().stream()
+            .map(error -> ProblemDetail.ValidationError.builder()
                 .field(error.getField())
                 .code(error.getCode())
                 .message(error.getMessage())
                 .build())
             .collect(Collectors.toList());
         
-        ErrorResponse errorResponse = buildErrorResponse(
-            ex.getErrorCode(),
+        Object errorResponse = errorResponseBuilder.buildErrorResponse(
+            "validation-error",
+            "Validation Failed",
+            HttpStatus.BAD_REQUEST.value(),
             ex.getMessage(),
             validationErrors,
             requestIdProvider.getRequestId()
@@ -240,20 +408,22 @@ public class GlobalExceptionHandler {
     }
     
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(
+    public ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex, WebRequest request) {
         
         log.info("Validation error on request arguments");
         
-        List<ErrorResponse.ValidationError> validationErrors = ex.getBindingResult()
+        List<ProblemDetail.ValidationError> validationErrors = ex.getBindingResult()
             .getFieldErrors()
             .stream()
-            .map(this::mapToValidationError)
+            .map(this::mapToProblemValidationError)
             .collect(Collectors.toList());
         
-        ErrorResponse errorResponse = buildErrorResponse(
-            "VALIDATION_ERROR",
-            "Validation failed",
+        Object errorResponse = errorResponseBuilder.buildErrorResponse(
+            "validation-error",
+            "Request Validation Failed",
+            HttpStatus.BAD_REQUEST.value(),
+            "One or more request parameters failed validation",
             validationErrors,
             requestIdProvider.getRequestId()
         );
@@ -273,7 +443,7 @@ public class GlobalExceptionHandler {
             .map(this::mapToValidationError)
             .collect(Collectors.toList());
         
-        ErrorResponse errorResponse = buildErrorResponse(
+        ErrorResponse errorResponse = errorResponseBuilder.buildErrorResponse(
             "VALIDATION_ERROR",
             "Binding failed",
             validationErrors,
@@ -289,7 +459,7 @@ public class GlobalExceptionHandler {
         
         log.warn("Business exception: {}", ex.getMessage());
         
-        ErrorResponse errorResponse = buildErrorResponse(
+        ErrorResponse errorResponse = errorResponseBuilder.buildErrorResponse(
             ex.getErrorCode(),
             ex.getMessage(),
             null,
@@ -305,7 +475,7 @@ public class GlobalExceptionHandler {
         
         log.warn("Security exception: {}", ex.getMessage());
         
-        ErrorResponse errorResponse = buildErrorResponse(
+        ErrorResponse errorResponse = errorResponseBuilder.buildErrorResponse(
             ex.getErrorCode(),
             ex.getMessage(),
             null,
@@ -337,7 +507,7 @@ public class GlobalExceptionHandler {
         
         log.error("Unhandled exception", ex);
         
-        ErrorResponse errorResponse = buildErrorResponse(
+        ErrorResponse errorResponse = errorResponseBuilder.buildErrorResponse(
             "INTERNAL_SERVER_ERROR",
             "An unexpected error occurred",
             null,
@@ -347,23 +517,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
     
-    private ErrorResponse buildErrorResponse(
-            String code, 
-            String message, 
-            List<ErrorResponse.ValidationError> details,
-            String requestId) {
-        
-        return ErrorResponse.builder()
-            .code(code)
-            .message(message)
-            .details(details)
-            .timestamp(OffsetDateTime.now())
-            .requestId(requestId)
-            .build();
-    }
-    
-    private ErrorResponse.ValidationError mapToValidationError(FieldError fieldError) {
-        return ErrorResponse.ValidationError.builder()
+    private ProblemDetail.ValidationError mapToProblemValidationError(FieldError fieldError) {
+        return ProblemDetail.ValidationError.builder()
             .field(fieldError.getField())
             .code(fieldError.getCode())
             .message(fieldError.getDefaultMessage())
@@ -374,24 +529,40 @@ public class GlobalExceptionHandler {
 
 ### Request ID Provider
 
-Implement a request ID provider for correlating errors:
+#### Common Interface
+
+Define a common interface for request ID providers:
 
 ```java
 package com.example.common.api;
 
+public interface RequestIdProvider {
+    String getRequestId();
+}
+```
+
+#### Servlet Implementation
+
+Implement a servlet-specific request ID provider:
+
+```java
+package com.example.common.api;
+
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @Component
-public class RequestIdProvider {
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+public class ServletRequestIdProvider implements RequestIdProvider {
     
     private static final String REQUEST_ID_HEADER = "X-Request-ID";
     
+    @Override
     public String getRequestId() {
         return Optional.ofNullable(RequestContextHolder.getRequestAttributes())
             .filter(ServletRequestAttributes.class::isInstance)
@@ -413,6 +584,7 @@ package com.example.common.api;
 import com.example.common.exception.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
@@ -427,27 +599,32 @@ import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Mono;
 
 import java.time.OffsetDateTime;
-import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 @Order(-2)
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
 @RequiredArgsConstructor
 public class GlobalErrorWebExceptionHandler extends AbstractErrorWebExceptionHandler {
 
-    private final RequestIdProvider requestIdProvider;
+    private final ReactiveRequestIdProvider requestIdProvider;
+    private final ErrorResponseBuilder errorResponseBuilder;
 
     public GlobalErrorWebExceptionHandler(
             ErrorAttributes errorAttributes,
             WebProperties.Resources resources,
             ApplicationContext applicationContext,
             ServerCodecConfigurer codecConfigurer,
-            RequestIdProvider requestIdProvider) {
+            ReactiveRequestIdProvider requestIdProvider,
+            ErrorResponseBuilder errorResponseBuilder) {
         
         super(errorAttributes, resources, applicationContext);
         this.setMessageReaders(codecConfigurer.getReaders());
         this.setMessageWriters(codecConfigurer.getWriters());
         this.requestIdProvider = requestIdProvider;
+        this.errorResponseBuilder = errorResponseBuilder;
     }
 
     @Override
@@ -456,115 +633,105 @@ public class GlobalErrorWebExceptionHandler extends AbstractErrorWebExceptionHan
     }
 
     private Mono<ServerResponse> renderErrorResponse(ServerRequest request) {
-        Map<String, Object> errorPropertiesMap = getErrorAttributes(
-            request, ErrorAttributeOptions.defaults());
-        
         Throwable error = getError(request);
-        HttpStatus status = determineHttpStatus(error);
-        ErrorResponse errorResponse = buildErrorResponse(error);
         
-        return ServerResponse.status(status)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(errorResponse);
-    }
-    
-    private HttpStatus determineHttpStatus(Throwable error) {
-        if (error instanceof ResourceNotFoundException) {
-            return HttpStatus.NOT_FOUND;
-        } else if (error instanceof ValidationException) {
-            return HttpStatus.BAD_REQUEST;
-        } else if (error instanceof BusinessException) {
-            return HttpStatus.CONFLICT;
-        } else if (error instanceof SecurityException) {
-            return HttpStatus.FORBIDDEN;
-        } else {
-            return HttpStatus.INTERNAL_SERVER_ERROR;
-        }
-    }
-    
-    private ErrorResponse buildErrorResponse(Throwable error) {
-        if (error instanceof ApplicationException) {
-            ApplicationException ex = (ApplicationException) error;
-            
-            if (error instanceof ValidationException) {
-                ValidationException validationEx = (ValidationException) ex;
+        return determineHttpStatus(error)
+            .zipWith(buildErrorResponse(error))
+            .flatMap(tuple -> {
+                HttpStatus status = tuple.getT1();
+                ErrorResponse errorResponse = tuple.getT2();
                 
-                return buildErrorResponseWithDetails(
-                    ex.getErrorCode(),
-                    ex.getMessage(),
-                    validationEx.getErrors(),
-                    requestIdProvider.getRequestId()
-                );
+                return ServerResponse.status(status)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(errorResponse);
+            });
+    }
+    
+    private Mono<HttpStatus> determineHttpStatus(Throwable error) {
+        return Mono.fromCallable(() -> {
+            if (error instanceof ResourceNotFoundException) {
+                return HttpStatus.NOT_FOUND;
+            } else if (error instanceof ValidationException) {
+                return HttpStatus.BAD_REQUEST;
+            } else if (error instanceof BusinessException) {
+                return HttpStatus.CONFLICT;
+            } else if (error instanceof SecurityException) {
+                return HttpStatus.FORBIDDEN;
+            } else {
+                return HttpStatus.INTERNAL_SERVER_ERROR;
             }
-            
-            return buildErrorResponse(
-                ex.getErrorCode(),
-                ex.getMessage(),
-                requestIdProvider.getRequestId()
-            );
-        }
-        
-        log.error("Unhandled exception", error);
-        
-        return buildErrorResponse(
-            "INTERNAL_SERVER_ERROR",
-            "An unexpected error occurred",
-            requestIdProvider.getRequestId()
-        );
+        });
     }
     
-    private ErrorResponse buildErrorResponse(
-            String code, String message, String requestId) {
-        
-        return ErrorResponse.builder()
-            .code(code)
-            .message(message)
-            .timestamp(OffsetDateTime.now())
-            .requestId(requestId)
-            .build();
-    }
-    
-    private ErrorResponse buildErrorResponseWithDetails(
-            String code, 
-            String message, 
-            List<ValidationException.ValidationError> validationErrors,
-            String requestId) {
-        
-        List<ErrorResponse.ValidationError> details = validationErrors.stream()
-            .map(error -> ErrorResponse.ValidationError.builder()
-                .field(error.getField())
-                .code(error.getCode())
-                .message(error.getMessage())
-                .build())
-            .collect(Collectors.toList());
-        
-        return ErrorResponse.builder()
-            .code(code)
-            .message(message)
-            .details(details)
-            .timestamp(OffsetDateTime.now())
-            .requestId(requestId)
-            .build();
+    private Mono<ErrorResponse> buildErrorResponse(Throwable error) {
+        return requestIdProvider.getRequestIdMono()
+            .flatMap(requestId -> {
+                if (error instanceof ApplicationException) {
+                    ApplicationException ex = (ApplicationException) error;
+                    
+                    if (error instanceof ValidationException) {
+                        ValidationException validationEx = (ValidationException) ex;
+                        
+                        List<ErrorResponse.ValidationError> details = validationEx.getErrors().stream()
+                            .map(validationError -> ErrorResponse.ValidationError.builder()
+                                .field(validationError.getField())
+                                .code(validationError.getCode())
+                                .message(validationError.getMessage())
+                                .build())
+                            .collect(Collectors.toList());
+                        
+                        return Mono.just(errorResponseBuilder.buildErrorResponse(
+                            ex.getErrorCode(),
+                            ex.getMessage(),
+                            details,
+                            requestId
+                        ));
+                    }
+                    
+                    return Mono.just(errorResponseBuilder.buildErrorResponse(
+                        ex.getErrorCode(),
+                        ex.getMessage(),
+                        null,
+                        requestId
+                    ));
+                }
+                
+                log.error("Unhandled exception", error);
+                
+                return Mono.just(errorResponseBuilder.buildErrorResponse(
+                    "INTERNAL_SERVER_ERROR",
+                    "An unexpected error occurred",
+                    null,
+                    requestId
+                ));
+            });
     }
 }
 ```
 
-### Reactive Request ID Provider
+#### Reactive Implementation
+
+Implement a reactive-specific request ID provider:
 
 ```java
 package com.example.common.api;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Component
-public class RequestIdProvider {
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
+public class ReactiveRequestIdProvider implements RequestIdProvider {
     
     private static final String REQUEST_ID_HEADER = "X-Request-ID";
     private static final String REQUEST_ID_ATTRIBUTE = "requestId";
     
+    @Override
     public String getRequestId() {
+        // Note: This should only be used in non-reactive contexts
+        // For reactive contexts, use getRequestIdMono()
         return Mono.deferContextual(Mono::just)
             .map(context -> context.getOrDefault(REQUEST_ID_ATTRIBUTE, "unknown"))
             .map(Object::toString)
@@ -590,6 +757,7 @@ public class RequestIdProvider {
 package com.example.common.api;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -597,10 +765,11 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
 @Component
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
 @RequiredArgsConstructor
 public class RequestIdWebFilter implements WebFilter {
     
-    private final RequestIdProvider requestIdProvider;
+    private final ReactiveRequestIdProvider requestIdProvider;
     
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
@@ -661,8 +830,8 @@ For complex validation, implement custom validators:
 ```java
 package com.example.validation;
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 import java.lang.annotation.*;
 
 @Documented
@@ -677,8 +846,8 @@ public @interface ValidOrderDate {
 
 package com.example.validation;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
 
 public class OrderDateValidator implements ConstraintValidator<ValidOrderDate, LocalDate> {
@@ -699,6 +868,11 @@ public class OrderDateValidator implements ConstraintValidator<ValidOrderDate, L
 For complex business rule validation, implement service-level validation:
 
 ```java
+import java.util.Objects;
+import java.util.stream.Collectors;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 @Service
 @RequiredArgsConstructor
 public class OrderValidator {
@@ -706,40 +880,55 @@ public class OrderValidator {
     private final ProductService productService;
     private final CustomerService customerService;
     
-    public void validateOrder(OrderCreationDto orderDto) {
-        List<ValidationException.ValidationError> errors = new ArrayList<>();
-        
-        // Validate customer exists
-        customerService.getCustomer(orderDto.getCustomerId())
-            .onErrorResume(CustomerNotFoundException.class, e -> {
-                errors.add(new ValidationException.ValidationError(
-                    "customerId", "CUSTOMER_NOT_FOUND", "Customer not found"));
-                return Mono.empty();
-            });
-        
-        // Validate products exist and have sufficient inventory
-        Flux.fromIterable(orderDto.getItems())
-            .flatMap(item -> productService.getProduct(item.getProductId())
-                .flatMap(product -> {
-                    if (product.getStock() < item.getQuantity()) {
-                        errors.add(new ValidationException.ValidationError(
-                            "items", "INSUFFICIENT_STOCK", 
-                            "Insufficient stock for product " + product.getId()));
+    public Mono<Void> validateOrder(OrderCreationDto orderDto) {
+        return Mono.defer(() -> {
+            List<Mono<ValidationException.ValidationError>> validationTasks = new ArrayList<>();
+            
+            // Validate customer exists
+            Mono<ValidationException.ValidationError> customerValidation = customerService
+                .getCustomer(orderDto.getCustomerId())
+                .then(Mono.<ValidationException.ValidationError>empty())
+                .onErrorReturn(CustomerNotFoundException.class, 
+                    new ValidationException.ValidationError(
+                        "customerId", "CUSTOMER_NOT_FOUND", "Customer not found"));
+            
+            validationTasks.add(customerValidation);
+            
+            // Validate products exist and have sufficient inventory
+            Flux<ValidationException.ValidationError> productValidations = Flux
+                .fromIterable(orderDto.getItems())
+                .flatMap(item -> productService.getProduct(item.getProductId())
+                    .flatMap(product -> {
+                        if (product.getStock() < item.getQuantity()) {
+                            return Mono.just(new ValidationException.ValidationError(
+                                "items", "INSUFFICIENT_STOCK", 
+                                "Insufficient stock for product " + product.getId()));
+                        }
+                        return Mono.<ValidationException.ValidationError>empty();
+                    })
+                    .onErrorReturn(ProductNotFoundException.class, 
+                        new ValidationException.ValidationError(
+                            "items", "PRODUCT_NOT_FOUND", 
+                            "Product not found: " + item.getProductId()))
+                );
+            
+            // Combine all validation results
+            return Flux.merge(
+                    Flux.fromIterable(validationTasks).flatMap(task -> task),
+                    productValidations
+                )
+                .collectList()
+                .flatMap(errors -> {
+                    List<ValidationException.ValidationError> nonEmptyErrors = errors.stream()
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList());
+                    
+                    if (!nonEmptyErrors.isEmpty()) {
+                        return Mono.error(new ValidationException(nonEmptyErrors));
                     }
                     return Mono.empty();
-                })
-                .onErrorResume(ProductNotFoundException.class, e -> {
-                    errors.add(new ValidationException.ValidationError(
-                        "items", "PRODUCT_NOT_FOUND", 
-                        "Product not found: " + item.getProductId()));
-                    return Mono.empty();
-                })
-            )
-            .blockLast(); // Block only for validation
-        
-        if (!errors.isEmpty()) {
-            throw new ValidationException(errors);
-        }
+                });
+        });
     }
 }
 ```

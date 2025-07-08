@@ -1,576 +1,696 @@
-# Dependency Injection and Component Management
+# Spring Boot Configuration Best Practices
 
 ## Overview
 
-Effective dependency injection (DI) and component management are critical for building maintainable, testable Spring Boot applications. This document outlines our standards for defining, organizing, and injecting components throughout microservices, with a focus on Domain-Driven Design principles.
+Spring Boot configuration is fundamental to building flexible, maintainable applications. This document outlines our standards for configuring Spring Boot applications in both imperative and reactive microservices, focusing on externalized configuration, environment-specific settings, and production readiness.
 
-## Dependency Injection Principles
+## Configuration Principles
 
-1. **Constructor Injection**: Prefer constructor injection over field or setter injection
-2. **Single Responsibility**: Components should have a single, well-defined responsibility
-3. **Interface-Based Design**: Depend on abstractions rather than concrete implementations
-4. **Explicit Dependencies**: Make dependencies explicit through constructors
-5. **Final Fields**: Use final fields for required dependencies
+1. **Externalized Configuration**: Store configuration outside of code
+2. **Environment-Specific**: Use profiles for different environments
+3. **Security-First**: Never store secrets in plain text
+4. **Type-Safe**: Use `@ConfigurationProperties` for complex configuration
+5. **Validation**: Validate configuration properties at startup
+6. **Default Values**: Provide sensible defaults for all configuration
 
-## Component Stereotypes
+## Application Properties Structure
 
-Use Spring's stereotype annotations to clearly indicate a component's role:
+### Base Configuration
 
-| Annotation | Purpose | Layer |
-|------------|---------|-------|
-| `@Component` | Generic Spring-managed component | Any layer |
-| `@Service` | Business service or domain service | Domain or Application layer |
-| `@Repository` | Data access object | Infrastructure layer |
-| `@Controller` / `@RestController` | Web controller | Interface layer |
-| `@Configuration` | Configuration class | Config layer |
+Organize configuration in a hierarchical structure:
 
-## Component Naming Conventions
+```yaml
+# application.yml
+spring:
+  application:
+    name: order-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:development}
+  
+  # Database configuration
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/orderdb}
+    username: ${DATABASE_USERNAME:orderuser}
+    password: ${DATABASE_PASSWORD:password}
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 300000
+      connection-timeout: 20000
+      
+  # JPA configuration
+  jpa:
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:validate}
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          time_zone: UTC
 
-Follow these naming conventions for components:
+# Application-specific configuration
+app:
+  security:
+    jwt:
+      issuer-uri: ${JWT_ISSUER_URI:http://localhost:8080/auth/realms/microservices}
+    cors:
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
+  
+  integration:
+    payment-service:
+      base-url: ${PAYMENT_SERVICE_URL:http://localhost:8081}
+      timeout: ${PAYMENT_SERVICE_TIMEOUT:PT30S}
+      retry-attempts: ${PAYMENT_SERVICE_RETRY:3}
+    
+    customer-service:
+      base-url: ${CUSTOMER_SERVICE_URL:http://localhost:8082}
+      timeout: ${CUSTOMER_SERVICE_TIMEOUT:PT10S}
 
-| Component Type | Naming Pattern | Example |
-|----------------|----------------|---------|
-| Service | `{Domain}Service` | `OrderService` |
-| Domain Service | `{Role}Service` | `InventoryService` |
-| Repository | `{Domain}Repository` | `OrderRepository` |
-| Repository Implementation | `{Domain}RepositoryImpl` | `OrderRepositoryImpl` |
-| Controller | `{Domain}Controller` | `OrderController` |
-| Configuration | `{Feature}Config` | `DatabaseConfig` |
+# Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true
 
-## Constructor Injection
+# Logging configuration
+logging:
+  level:
+    com.example.orderservice: ${LOG_LEVEL:INFO}
+    org.springframework.security: ${SECURITY_LOG_LEVEL:WARN}
+    org.hibernate.SQL: ${SQL_LOG_LEVEL:WARN}
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} [%X{correlationId:-}] - %msg%n"
+```
 
-### Preferred Approach
+### Environment-Specific Configuration
 
-Use constructor injection with `final` fields:
+#### Development Environment
+
+```yaml
+# application-development.yml
+spring:
+  datasource:
+    url: jdbc:h2:mem:devdb
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  
+  h2:
+    console:
+      enabled: true
+
+logging:
+  level:
+    com.example.orderservice: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+app:
+  security:
+    jwt:
+      issuer-uri: http://localhost:8080/auth/realms/dev
+  integration:
+    payment-service:
+      base-url: http://localhost:8081
+    customer-service:
+      base-url: http://localhost:8082
+```
+
+#### Test Environment
+
+```yaml
+# application-test.yml
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+  
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:test-data.sql
+
+logging:
+  level:
+    com.example.orderservice: DEBUG
+    org.springframework.test: DEBUG
+    
+app:
+  security:
+    jwt:
+      issuer-uri: http://mock-auth-server
+```
+
+#### Production Environment
+
+```yaml
+# application-production.yml
+spring:
+  datasource:
+    hikari:
+      minimum-idle: 10
+      maximum-pool-size: 50
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+logging:
+  level:
+    com.example.orderservice: INFO
+    org.springframework: WARN
+    org.hibernate: WARN
+
+management:
+  endpoint:
+    health:
+      show-details: never
+      show-components: never
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+
+app:
+  security:
+    cors:
+      allowed-origins: https://api.example.com,https://www.example.com
+```
+
+## Configuration Properties Classes
+
+### Type-Safe Configuration Properties
+
+Use `@ConfigurationProperties` for complex configuration:
 
 ```java
-@Service
-public class OrderService {
-    private final OrderRepository orderRepository;
-    private final PaymentService paymentService;
-    private final EventPublisher eventPublisher;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.bind.ConstructorBinding;
+import org.springframework.validation.annotation.Validated;
 
-    public OrderService(
-            OrderRepository orderRepository,
-            PaymentService paymentService,
-            EventPublisher eventPublisher) {
-        this.orderRepository = orderRepository;
-        this.paymentService = paymentService;
-        this.eventPublisher = eventPublisher;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import java.time.Duration;
+import java.util.List;
+
+@ConfigurationProperties(prefix = "app")
+@Validated
+public record ApplicationProperties(
+    @Valid @NotNull Security security,
+    @Valid @NotNull Integration integration
+) {
+    
+    public record Security(
+        @Valid @NotNull Jwt jwt,
+        @Valid @NotNull Cors cors
+    ) {
+        
+        public record Jwt(
+            @NotBlank String issuerUri
+        ) {}
+        
+        public record Cors(
+            @NotNull List<String> allowedOrigins
+        ) {}
     }
     
-    // Service methods
-}
-```
-
-With Lombok, simplify using `@RequiredArgsConstructor`:
-
-```java
-@Service
-@RequiredArgsConstructor
-public class OrderService {
-    private final OrderRepository orderRepository;
-    private final PaymentService paymentService;
-    private final EventPublisher eventPublisher;
-    
-    // Service methods
-}
-```
-
-### Anti-patterns to Avoid
-
-Avoid field injection:
-
-```java
-// AVOID THIS
-@Service
-public class OrderService {
-    @Autowired
-    private OrderRepository orderRepository;
-    
-    @Autowired
-    private PaymentService paymentService;
-    
-    // Service methods
-}
-```
-
-Avoid setter injection except for optional dependencies:
-
-```java
-// Avoid setter injection for required dependencies
-@Service
-public class OrderService {
-    private OrderRepository orderRepository;
-    
-    @Autowired
-    public void setOrderRepository(OrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
+    public record Integration(
+        @Valid @NotNull PaymentService paymentService,
+        @Valid @NotNull CustomerService customerService
+    ) {
+        
+        public record PaymentService(
+            @NotBlank String baseUrl,
+            @NotNull Duration timeout,
+            @Positive int retryAttempts
+        ) {}
+        
+        public record CustomerService(
+            @NotBlank String baseUrl,
+            @NotNull Duration timeout
+        ) {}
     }
-    
-    // Service methods
 }
 ```
 
-## Configuration Classes
+### Enabling Configuration Properties
 
-### Configuration Organization
-
-Organize `@Configuration` classes by functional area:
+Enable configuration properties in a configuration class:
 
 ```java
-@Configuration
-@EnableCaching
-public class CacheConfig {
-    // Cache-related beans
-}
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableAsync
-public class AsyncConfig {
-    // Async-related beans
+@EnableConfigurationProperties({
+    ApplicationProperties.class,
+    DatabaseProperties.class,
+    SecurityProperties.class
+})
+public class PropertiesConfiguration {
+    // Configuration class to enable properties
 }
 ```
 
-### Bean Definition Methods
+## Security Configuration
 
-Define beans with explicit method names that describe their purpose:
+### JWT Resource Server Configuration
 
 ```java
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
+import org.springframework.security.web.server.SecurityWebFilterChain;
+
+@Configuration
+@EnableWebFluxSecurity
+@EnableReactiveMethodSecurity
+public class SecurityConfig {
+
+    private final ApplicationProperties.Security securityProperties;
+
+    public SecurityConfig(ApplicationProperties applicationProperties) {
+        this.securityProperties = applicationProperties.security();
+    }
+
+    @Bean
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+        return http
+            .csrf(ServerHttpSecurity.CsrfSpec::disable)
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .authorizeExchange(exchanges -> exchanges
+                .pathMatchers("/actuator/health", "/actuator/info").permitAll()
+                .pathMatchers("/v1/orders/**").hasAuthority("SCOPE_orders")
+                .anyExchange().authenticated()
+            )
+            .oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwt -> jwt.jwtDecoder(jwtDecoder()))
+            )
+            .build();
+    }
+
+    @Bean
+    public ReactiveJwtDecoder jwtDecoder() {
+        return NimbusReactiveJwtDecoder
+            .withIssuerLocation(securityProperties.jwt().issuerUri())
+            .build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(securityProperties.cors().allowedOrigins());
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+}
+```
+
+### Imperative Security Configuration
+
+```java
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
+public class WebSecurityConfig {
+
+    private final ApplicationProperties.Security securityProperties;
+
+    public WebSecurityConfig(ApplicationProperties applicationProperties) {
+        this.securityProperties = applicationProperties.security();
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .authorizeHttpRequests(authz -> authz
+                .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                .requestMatchers("/v1/orders/**").hasAuthority("SCOPE_orders")
+                .anyRequest().authenticated()
+            )
+            .oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwt -> jwt.decoder(jwtDecoder()))
+            )
+            .build();
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        return NimbusJwtDecoder
+            .withIssuerLocation(securityProperties.jwt().issuerUri())
+            .build();
+    }
+}
+```
+
+## Database Configuration
+
+### Multiple DataSource Configuration
+
+```java
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+
+import javax.sql.DataSource;
+
+@Configuration
+public class DatabaseConfig {
+
+    @Bean
+    @Primary
+    @ConfigurationProperties(prefix = "spring.datasource.primary")
+    public DataSource primaryDataSource() {
+        return DataSourceBuilder.create().build();
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "spring.datasource.secondary.enabled", havingValue = "true")
+    @ConfigurationProperties(prefix = "spring.datasource.secondary")
+    public DataSource secondaryDataSource() {
+        return DataSourceBuilder.create().build();
+    }
+}
+```
+
+### R2DBC Configuration for Reactive Applications
+
+```java
+import io.r2dbc.spi.ConnectionFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration;
+import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
+import org.springframework.r2dbc.connection.R2dbcTransactionManager;
+import org.springframework.transaction.ReactiveTransactionManager;
+
+@Configuration
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
+@EnableR2dbcRepositories
+public class R2dbcConfig extends AbstractR2dbcConfiguration {
+
+    @Override
+    public ConnectionFactory connectionFactory() {
+        return connectionFactory;
+    }
+
+    @Bean
+    public ReactiveTransactionManager transactionManager(ConnectionFactory connectionFactory) {
+        return new R2dbcTransactionManager(connectionFactory);
+    }
+}
+```
+
+## External Service Configuration
+
+### WebClient Configuration
+
+```java
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.resources.ConnectionProvider;
+
+import java.time.Duration;
+
 @Configuration
 public class WebClientConfig {
-    
-    @Bean
-    public WebClient orderServiceClient(WebClient.Builder builder) {
-        return builder
-            .baseUrl("https://order-service.example.com")
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .build();
+
+    private final ApplicationProperties.Integration integrationProperties;
+
+    public WebClientConfig(ApplicationProperties applicationProperties) {
+        this.integrationProperties = applicationProperties.integration();
     }
-    
+
     @Bean
-    public WebClient customerServiceClient(WebClient.Builder builder) {
-        return builder
-            .baseUrl("https://customer-service.example.com")
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .build();
-    }
-}
-```
-
-### Configuration Properties Injection
-
-Inject configuration properties into beans:
-
-```java
-@Configuration
-public class ServiceConfig {
-    
-    @Bean
-    public PaymentGateway paymentGateway(PaymentProperties properties) {
-        return new PaymentGatewayImpl(
-            properties.getApiKey(),
-            properties.getEndpoint(),
-            properties.getTimeout()
+    public WebClient paymentServiceClient() {
+        return createWebClient(
+            integrationProperties.paymentService().baseUrl(),
+            integrationProperties.paymentService().timeout()
         );
     }
+
+    @Bean
+    public WebClient customerServiceClient() {
+        return createWebClient(
+            integrationProperties.customerService().baseUrl(),
+            integrationProperties.customerService().timeout()
+        );
+    }
+
+    private WebClient createWebClient(String baseUrl, Duration timeout) {
+        ConnectionProvider connectionProvider = ConnectionProvider.builder("custom")
+            .maxConnections(50)
+            .maxIdleTime(Duration.ofSeconds(20))
+            .maxLifeTime(Duration.ofSeconds(60))
+            .pendingAcquireTimeout(Duration.ofSeconds(60))
+            .evictInBackground(Duration.ofSeconds(120))
+            .build();
+
+        HttpClient httpClient = HttpClient.create(connectionProvider)
+            .responseTimeout(timeout);
+
+        return WebClient.builder()
+            .baseUrl(baseUrl)
+            .clientConnector(new ReactorClientHttpConnector(httpClient))
+            .build();
+    }
 }
 ```
 
-## Conditional Beans
+## Caching Configuration
 
-Use Spring's conditional annotations for flexible configurations:
+### Redis Cache Configuration
 
 ```java
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
+
+import java.time.Duration;
+
 @Configuration
-public class PaymentGatewayConfig {
-    
+@ConditionalOnProperty(name = "spring.cache.type", havingValue = "redis")
+public class CacheConfig {
+
     @Bean
-    @ConditionalOnProperty(name = "payment.gateway", havingValue = "stripe")
-    public PaymentGateway stripePaymentGateway(StripeProperties properties) {
-        return new StripePaymentGateway(properties);
+    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+        RedisCacheConfiguration configuration = RedisCacheConfiguration.defaultCacheConfig()
+            .entryTtl(Duration.ofMinutes(30))
+            .serializeValuesWith(RedisSerializationContext.SerializationPair
+                .fromSerializer(new GenericJackson2JsonRedisSerializer()));
+
+        return RedisCacheManager.builder(connectionFactory)
+            .cacheDefaults(configuration)
+            .build();
     }
-    
+}
+```
+
+## Observability Configuration
+
+### Micrometer and Tracing Configuration
+
+```java
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.config.MeterFilter;
+import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCustomizer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class ObservabilityConfig {
+
     @Bean
-    @ConditionalOnProperty(name = "payment.gateway", havingValue = "paypal")
-    public PaymentGateway paypalPaymentGateway(PayPalProperties properties) {
-        return new PayPalPaymentGateway(properties);
+    public MeterRegistryCustomizer<MeterRegistry> metricsCommonTags(
+            ApplicationProperties applicationProperties) {
+        return registry -> {
+            registry.config()
+                .commonTags(
+                    "application", applicationProperties.spring().application().name(),
+                    "environment", getActiveProfile()
+                )
+                .meterFilter(MeterFilter.deny(id -> 
+                    id.getName().startsWith("jvm.gc.pause")));
+        };
     }
-    
-    @Bean
-    @ConditionalOnMissingBean
-    public PaymentGateway mockPaymentGateway() {
-        return new MockPaymentGateway();
-    }
-}
-```
 
-## Dependency Resolution and Bean Qualifiers
-
-### Multiple Implementations
-
-When multiple beans of the same type exist, qualify them:
-
-```java
-@Service
-@Qualifier("jpaOrderRepository")
-public class JpaOrderRepositoryImpl implements OrderRepository {
-    // Implementation
-}
-
-@Service
-@Qualifier("reactiveOrderRepository")
-public class ReactiveOrderRepositoryImpl implements OrderRepository {
-    // Implementation
-}
-```
-
-And inject using the qualifier:
-
-```java
-@Service
-public class OrderService {
-    private final OrderRepository orderRepository;
-
-    public OrderService(@Qualifier("jpaOrderRepository") OrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
-    }
-    
-    // Service methods
-}
-```
-
-### Primary Beans
-
-Alternatively, mark one implementation as primary:
-
-```java
-@Service
-@Primary
-public class JpaOrderRepositoryImpl implements OrderRepository {
-    // Implementation
-}
-
-@Service
-public class ReactiveOrderRepositoryImpl implements OrderRepository {
-    // Implementation
-}
-```
-
-## Component Lifecycle Management
-
-### Initialization and Destruction
-
-Implement lifecycle methods when needed:
-
-```java
-@Service
-public class MessagingService implements InitializingBean, DisposableBean {
-    
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        // Initialize resources
-        connectToMessageBroker();
-        setupChannels();
-    }
-    
-    @Override
-    public void destroy() throws Exception {
-        // Clean up resources
-        closeChannels();
-        disconnectFromMessageBroker();
-    }
-    
-    private void connectToMessageBroker() {
-        // Implementation
-    }
-    
-    private void setupChannels() {
-        // Implementation
-    }
-    
-    private void closeChannels() {
-        // Implementation
-    }
-    
-    private void disconnectFromMessageBroker() {
-        // Implementation
-    }
-}
-
-// Alternatively, use annotations:
-@Service
-public class MessageProcessor {
-    
-    @PostConstruct
-    public void initialize() {
-        // Initialize resources
-    }
-    
-    @PreDestroy
-    public void cleanup() {
-        // Clean up resources
-    }
-}
-
-### Component Scopes
-
-By default, Spring beans are singletons. Specify a different scope when needed:
-
-```java
-@Service
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class OrderProcessor {
-    // This bean will be instantiated whenever it's injected
-}
-
-@Component
-@Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
-public class RequestContext {
-    // This bean will be scoped to the HTTP request
-    // Using proxy mode to handle injection into singletons
-}
-```
-
-## Domain Events with Spring
-
-### Event Publication
-
-Publish domain events using Spring's `ApplicationEventPublisher`:
-
-```java
-@Service
-@RequiredArgsConstructor
-public class OrderService {
-    private final OrderRepository orderRepository;
-    private final ApplicationEventPublisher eventPublisher;
-    
-    @Transactional
-    public Order createOrder(Order order) {
-        Order savedOrder = orderRepository.save(order);
-        
-        // Publish domain event
-        eventPublisher.publishEvent(new OrderCreatedEvent(savedOrder));
-        
-        return savedOrder;
+    private String getActiveProfile() {
+        // Implementation to get active profile
+        return "production";
     }
 }
 ```
 
-### Event Listeners
+## Configuration Testing
 
-Handle domain events with `@EventListener`:
-
-```java
-@Service
-@RequiredArgsConstructor
-public class InventoryService {
-    private final InventoryRepository inventoryRepository;
-    
-    @EventListener
-    @Transactional
-    public void handleOrderCreated(OrderCreatedEvent event) {
-        Order order = event.getOrder();
-        
-        // Update inventory
-        for (OrderItem item : order.getItems()) {
-            inventoryRepository.decreaseStock(
-                item.getProductId(), 
-                item.getQuantity()
-            );
-        }
-    }
-}
-```
-
-## Reactive Dependency Injection
-
-For reactive applications, inject reactive components:
+### Configuration Properties Testing
 
 ```java
-@Service
-@RequiredArgsConstructor
-public class ReactiveOrderService {
-    private final ReactiveOrderRepository orderRepository;
-    private final ReactivePaymentService paymentService;
-    
-    public Mono<Order> createOrder(Order order) {
-        return orderRepository.save(order)
-            .flatMap(savedOrder -> 
-                paymentService.processPayment(savedOrder)
-                    .thenReturn(savedOrder)
-            );
-    }
-}
-```
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 
-## Testing Components
+import static org.assertj.core.api.Assertions.assertThat;
 
-### Unit Testing
+@SpringBootTest(classes = ApplicationPropertiesTest.TestConfig.class)
+@TestPropertySource(properties = {
+    "app.security.jwt.issuer-uri=http://test-issuer",
+    "app.integration.payment-service.base-url=http://payment-test",
+    "app.integration.payment-service.timeout=PT5S",
+    "app.integration.payment-service.retry-attempts=2"
+})
+class ApplicationPropertiesTest {
 
-Test components with explicit dependency mocking:
+    @EnableConfigurationProperties(ApplicationProperties.class)
+    static class TestConfig {}
 
-```java
-@ExtendWith(MockitoExtension.class)
-public class OrderServiceTest {
-    
-    @Mock
-    private OrderRepository orderRepository;
-    
-    @Mock
-    private PaymentService paymentService;
-    
-    @Mock
-    private ApplicationEventPublisher eventPublisher;
-    
-    @InjectMocks
-    private OrderService orderService;
-    
     @Test
-    void shouldCreateOrder() {
-        // Given
-        Order order = new Order(/* ... */);
-        when(orderRepository.save(any(Order.class))).thenReturn(order);
+    void shouldBindConfigurationProperties(ApplicationProperties properties) {
+        assertThat(properties.security().jwt().issuerUri())
+            .isEqualTo("http://test-issuer");
         
-        // When
-        Order result = orderService.createOrder(order);
+        assertThat(properties.integration().paymentService().baseUrl())
+            .isEqualTo("http://payment-test");
         
-        // Then
-        assertThat(result).isEqualTo(order);
-        verify(eventPublisher).publishEvent(any(OrderCreatedEvent.class));
+        assertThat(properties.integration().paymentService().retryAttempts())
+            .isEqualTo(2);
     }
 }
 ```
 
-### Integration Testing
+## Configuration Best Practices
 
-Test component integration with `@SpringBootTest`:
+### Environment Variables vs Application Properties
+
+| Use Case | Approach | Example |
+|----------|----------|---------|
+| Environment-specific values | Environment variables | `DATABASE_URL` |
+| Default application behavior | Application properties | `spring.jpa.hibernate.ddl-auto` |
+| Secrets | External secret management | Vault, Kubernetes secrets |
+| Feature flags | Application properties with env override | `app.features.new-feature=${NEW_FEATURE:false}` |
+
+### Configuration Validation
 
 ```java
-@SpringBootTest
-public class OrderServiceIntegrationTest {
-    
-    @Autowired
-    private OrderService orderService;
-    
-    @MockBean
-    private PaymentService paymentService;
-    
-    @Test
-    void shouldCreateAndPersistOrder() {
-        // Test with real repositories but mocked external services
-    }
-}
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.URL;
+
+@ConfigurationProperties(prefix = "app.external-service")
+@Validated
+public record ExternalServiceProperties(
+    @NotBlank @URL String baseUrl,
+    @NotNull @Positive Duration timeout,
+    @NotNull @Positive Integer maxRetries,
+    @NotBlank String apiKey
+) {}
 ```
 
-## Common Patterns and Anti-patterns
-
-### Patterns to Follow
-
-| Pattern | Example | Description |
-|---------|---------|-------------|
-| Constructor injection | `private final Dependency dep;` | Makes dependencies explicit |
-| Interface-based design | `interface Service {}` | Allows for flexible implementations |
-| Single responsibility | One focused service | Services should do one thing well |
-| Domain event publication | `eventPublisher.publishEvent()` | Decouples components |
-
-### Anti-patterns to Avoid
-
-| Anti-pattern | Example | Preferred Approach |
-|--------------|---------|-------------------|
-| Field injection | `@Autowired private Service service;` | Use constructor injection |
-| Service locator | `ApplicationContext.getBean()` | Inject dependencies explicitly |
-| Static utilities | `StaticUtils.doSomething()` | Use injectable services |
-| Circular dependencies | A depends on B depends on A | Redesign component responsibilities |
-
-## Examples
-
-### Domain Service
+### Conditional Configuration
 
 ```java
-@Service
-@RequiredArgsConstructor
-public class OrderDomainService {
-    private final InventoryService inventoryService;
-    private final PricingService pricingService;
-    
-    public Order validateAndEnrichOrder(Order order) {
-        // Validate inventory
-        inventoryService.validateInventory(order.getItems());
-        
-        // Calculate prices
-        BigDecimal totalPrice = pricingService.calculateTotalPrice(order.getItems());
-        order.setTotalPrice(totalPrice);
-        
-        return order;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class ConditionalConfig {
+
+    @Bean
+    @ConditionalOnProperty(name = "app.features.async-processing", havingValue = "true")
+    public AsyncTaskExecutor asyncTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(500);
+        executor.setThreadNamePrefix("async-");
+        executor.initialize();
+        return executor;
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "app.caching.enabled", havingValue = "true", matchIfMissing = true)
+    public CacheManager cacheManager() {
+        return new ConcurrentMapCacheManager("orders", "customers");
     }
 }
 ```
 
-### Application Service
+## Common Anti-patterns to Avoid
 
-```java
-@Service
-@RequiredArgsConstructor
-public class OrderApplicationService {
-    private final OrderRepository orderRepository;
-    private final OrderDomainService orderDomainService;
-    private final ApplicationEventPublisher eventPublisher;
-    
-    @Transactional
-    public Order createOrder(OrderCreationRequest request) {
-        // Map request to domain object
-        Order order = mapToDomainOrder(request);
-        
-        // Validate and enrich
-        order = orderDomainService.validateAndEnrichOrder(order);
-        
-        // Persist
-        Order savedOrder = orderRepository.save(order);
-        
-        // Publish event
-        eventPublisher.publishEvent(new OrderCreatedEvent(savedOrder));
-        
-        return savedOrder;
-    }
-    
-    private Order mapToDomainOrder(OrderCreationRequest request) {
-        // Mapping implementation
-        return new Order(/* ... */);
-    }
-}
-```
+| Anti-pattern | Problem | Solution |
+|--------------|---------|----------|
+| Hardcoded values | No flexibility across environments | Use externalized configuration |
+| Secrets in properties files | Security vulnerability | Use secret management systems |
+| No validation | Runtime failures | Validate configuration at startup |
+| Complex @Value expressions | Hard to maintain | Use @ConfigurationProperties |
+| Profile-specific code | Coupling | Use conditional configuration |
 
-### Reactive Service
-
-```java
-@Service
-@RequiredArgsConstructor
-public class ReactiveOrderService {
-    private final ReactiveOrderRepository orderRepository;
-    private final ReactiveInventoryService inventoryService;
-    
-    public Mono<Order> createOrder(Order order) {
-        return validateInventory(order)
-            .then(orderRepository.save(order))
-            .doOnSuccess(savedOrder -> 
-                publishOrderCreatedEvent(savedOrder).subscribe()
-            );
-    }
-    
-    private Mono<Void> validateInventory(Order order) {
-        return Flux.fromIterable(order.getItems())
-            .flatMap(item -> 
-                inventoryService.checkAvailability(item.getProductId(), item.getQuantity())
-            )
-            .then();
-    }
-    
-    private Mono<Void> publishOrderCreatedEvent(Order order) {
-        // Event publication implementation
-        return Mono.empty();
-    }
-}
-```
-
-These dependency injection and component management practices ensure that our microservices remain modular, testable, and follow Domain-Driven Design principles.
+These Spring Boot configuration best practices ensure that our microservices are flexible, secure, and maintainable across different environments while following infrastructure-as-code principles.

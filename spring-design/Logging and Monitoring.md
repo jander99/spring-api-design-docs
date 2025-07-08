@@ -157,7 +157,13 @@ public class ReactiveCorrelationIdFilter implements WebFilter {
 Since MDC doesn't work naturally with reactive applications, implement a custom solution:
 
 ```java
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+import java.util.function.Function;
+
 @Component
+@Slf4j
 public class LoggingContextUtils {
     
     private static final String CORRELATION_ID_KEY = "correlationId";
@@ -174,10 +180,35 @@ public class LoggingContextUtils {
     /**
      * Log with context
      */
-    public static <T> Mono<T> logWithContext(Mono<T> mono, Consumer<String> logStatement) {
+    public static <T> Mono<T> logWithContext(Mono<T> mono, Function<String, String> messageBuilder) {
         return Mono.deferContextual(ctx -> {
             String correlationId = ctx.getOrDefault(CORRELATION_ID_KEY, "unknown").toString();
-            logStatement.accept(String.format("[correlationId=%s] %s", correlationId, logStatement));
+            String message = messageBuilder.apply(correlationId);
+            log.info(message);
+            return mono;
+        });
+    }
+    
+    /**
+     * Log debug with context
+     */
+    public static <T> Mono<T> logDebugWithContext(Mono<T> mono, Function<String, String> messageBuilder) {
+        return Mono.deferContextual(ctx -> {
+            String correlationId = ctx.getOrDefault(CORRELATION_ID_KEY, "unknown").toString();
+            String message = messageBuilder.apply(correlationId);
+            log.debug(message);
+            return mono;
+        });
+    }
+    
+    /**
+     * Log error with context
+     */
+    public static <T> Mono<T> logErrorWithContext(Mono<T> mono, Function<String, String> messageBuilder, Throwable error) {
+        return Mono.deferContextual(ctx -> {
+            String correlationId = ctx.getOrDefault(CORRELATION_ID_KEY, "unknown").toString();
+            String message = messageBuilder.apply(correlationId);
+            log.error(message, error);
             return mono;
         });
     }
@@ -248,21 +279,64 @@ public class ReactiveOrderService {
     
     public Mono<Order> createOrder(Order order) {
         return Mono.just(order)
-            .doOnNext(o -> log.info("Creating new order for customer {}", o.getCustomerId()))
+            .flatMap(o -> LoggingContextUtils.logWithContext(
+                Mono.just(o),
+                correlationId -> String.format("[%s] Creating new order for customer %s", 
+                    correlationId, o.getCustomerId())
+            ))
             .flatMap(orderRepository::save)
-            .doOnNext(savedOrder -> log.info("Order {} created successfully", savedOrder.getId()))
+            .flatMap(savedOrder -> LoggingContextUtils.logWithContext(
+                Mono.just(savedOrder),
+                correlationId -> String.format("[%s] Order %s created successfully", 
+                    correlationId, savedOrder.getId())
+            ))
             .flatMap(savedOrder -> 
                 paymentService.processPayment(savedOrder)
-                    .doOnSuccess(payment -> 
-                        log.info("Payment processed for order {}", savedOrder.getId()))
-                    .doOnError(e -> 
-                        log.error("Payment processing failed for order {}", 
-                            savedOrder.getId(), e))
-                    .thenReturn(savedOrder)
+                    .flatMap(payment -> LoggingContextUtils.logWithContext(
+                        Mono.just(savedOrder),
+                        correlationId -> String.format("[%s] Payment processed for order %s", 
+                            correlationId, savedOrder.getId())
+                    ))
+                    .onErrorResume(e -> LoggingContextUtils.logErrorWithContext(
+                        Mono.error(e),
+                        correlationId -> String.format("[%s] Payment processing failed for order %s", 
+                            correlationId, savedOrder.getId()),
+                        e
+                    ).cast(Order.class))
             )
-            .doOnError(e -> 
-                log.error("Failed to create order for customer {}", 
-                    order.getCustomerId(), e));
+            .onErrorResume(e -> LoggingContextUtils.logErrorWithContext(
+                Mono.error(e),
+                correlationId -> String.format("[%s] Failed to create order for customer %s", 
+                    correlationId, order.getCustomerId()),
+                e
+            ).cast(Order.class));
+    }
+    
+    // Alternative approach using doOnEach for reactive context-aware logging
+    public Mono<Order> createOrderAlternative(Order order) {
+        return Mono.just(order)
+            .doOnEach(signal -> {
+                if (signal.hasValue()) {
+                    String correlationId = signal.getContextView()
+                        .getOrDefault("correlationId", "unknown").toString();
+                    log.info("[{}] Creating new order for customer {}", 
+                        correlationId, signal.get().getCustomerId());
+                }
+            })
+            .flatMap(orderRepository::save)
+            .doOnEach(signal -> {
+                if (signal.hasValue()) {
+                    String correlationId = signal.getContextView()
+                        .getOrDefault("correlationId", "unknown").toString();
+                    log.info("[{}] Order {} created successfully", 
+                        correlationId, signal.get().getId());
+                }
+                if (signal.hasError()) {
+                    String correlationId = signal.getContextView()
+                        .getOrDefault("correlationId", "unknown").toString();
+                    log.error("[{}] Failed to create order", correlationId, signal.getThrowable());
+                }
+            });
     }
 }
 ```

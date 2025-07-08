@@ -647,8 +647,6 @@ public class SecurityHeadersConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .frameOptions().deny()
                 .and()
-                .xssProtection().block(true)
-                .and()
                 .referrerPolicy(ReferrerPolicy.STRICT_ORIGIN)
                 .and()
                 .permissionsPolicy(permissions -> permissions
@@ -879,7 +877,9 @@ public class CsrfConfig extends WebSecurityConfigurerAdapter {
 }
 ```
 
-### XSS Protection
+### Content Security and XSS Prevention
+
+**Note**: The `X-XSS-Protection` header is deprecated and should not be used. Instead, rely on Content Security Policy and proper output encoding.
 
 ```java
 @Configuration
@@ -962,7 +962,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
             // Layer 4: Attack Protection
             .headers()
-                .xssProtection().and()
                 .contentSecurityPolicy("default-src 'self'").and()
                 .frameOptions().deny().and()
             .and()

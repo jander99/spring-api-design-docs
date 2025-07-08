@@ -125,6 +125,12 @@ public class OrderController {
 ### Request DTO Example
 
 ```java
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+import lombok.Data;
+import java.util.List;
+import java.util.UUID;
+
 @Data
 public class CreateOrderRequest {
     
@@ -405,9 +411,12 @@ public interface ReactiveOrderApplicationService {
 
 ### Reactive Validation
 
-For reactive applications, use `@Validated` at the class level:
+For reactive applications, validation works similarly but with reactive types:
 
 ```java
+import jakarta.validation.Valid;
+import org.springframework.validation.annotation.Validated;
+
 @RestController
 @RequestMapping("/v1/orders")
 @RequiredArgsConstructor
@@ -418,8 +427,17 @@ public class ReactiveOrderController {
     
     @PostMapping
     public Mono<ResponseEntity<OrderResponse>> createOrder(
-            @Valid @RequestBody CreateOrderRequest request) {
-        // Implementation
+            @Valid @RequestBody Mono<CreateOrderRequest> request) {
+        return request
+            .flatMap(req -> {
+                // Validation happens automatically
+                OrderCreationDto dto = orderMapper.toCreationDto(req);
+                return orderService.createOrder(dto);
+            })
+            .map(orderMapper::toResponse)
+            .map(response -> ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response));
     }
 }
 ```
@@ -463,9 +481,34 @@ public class OrderController {
 
 ## Response Structure Standards
 
-Ensure all API responses follow our standard structure:
+Ensure all API responses follow the standard structure defined in the API design guide:
 
 ```java
+@Data
+@Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ApiResponse<T> {
+    private T data;
+    private Meta meta;
+    
+    @Data
+    @Builder
+    public static class Meta {
+        private OffsetDateTime timestamp;
+        private String requestId;
+        private Pagination pagination; // For collection responses
+        
+        @Data
+        @Builder
+        public static class Pagination {
+            private int page;
+            private int size;
+            private long totalElements;
+            private int totalPages;
+        }
+    }
+}
+
 @RestController
 @RequestMapping("/v1/orders")
 @RequiredArgsConstructor
@@ -473,30 +516,88 @@ public class OrderController {
 
     private final OrderApplicationService orderService;
     private final OrderMapper orderMapper;
+    private final RequestIdProvider requestIdProvider;
     
     @GetMapping
     public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         
-        Page<OrderDto> orderPage = orderService.getOrders(page, size);
+        Page<OrderDto> orderPage = orderService.getOrders(PageRequest.of(page, size));
         List<OrderResponse> orders = orderPage.getContent().stream()
             .map(orderMapper::toResponse)
             .collect(Collectors.toList());
         
-        Map<String, Object> metadata = new HashMap<>();
-        metadata.put("page", orderPage.getNumber());
-        metadata.put("size", orderPage.getSize());
-        metadata.put("totalElements", orderPage.getTotalElements());
-        metadata.put("totalPages", orderPage.getTotalPages());
+        ApiResponse.Meta.Pagination pagination = ApiResponse.Meta.Pagination.builder()
+            .page(orderPage.getNumber())
+            .size(orderPage.getSize())
+            .totalElements(orderPage.getTotalElements())
+            .totalPages(orderPage.getTotalPages())
+            .build();
+        
+        ApiResponse.Meta meta = ApiResponse.Meta.builder()
+            .timestamp(OffsetDateTime.now())
+            .requestId(requestIdProvider.getRequestId())
+            .pagination(pagination)
+            .build();
         
         ApiResponse<List<OrderResponse>> response = ApiResponse.<List<OrderResponse>>builder()
             .data(orders)
-            .metadata(metadata)
+            .meta(meta)
             .build();
         
         return ResponseEntity.ok(response);
     }
+}
+```
+
+### Response Wrapper Usage Guidelines
+
+Follow these rules for consistent response structures:
+
+#### Use ApiResponse Wrapper For:
+- **Collection endpoints**: `/v1/orders` (always include pagination)
+- **Complex operations**: Bulk operations, search results
+- **Metadata-rich responses**: When timestamp, requestId, or other metadata is needed
+
+```java
+// Collection endpoint
+@GetMapping
+public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrders(...) {
+    // Returns wrapped response with pagination
+}
+
+// Search endpoint
+@GetMapping("/search")
+public ResponseEntity<ApiResponse<List<OrderResponse>>> searchOrders(...) {
+    // Returns wrapped response with search metadata
+}
+```
+
+#### Use Direct Responses For:
+- **Single resource operations**: `/v1/orders/{id}`, POST create operations
+- **Simple operations**: Individual resource CRUD operations
+- **Delete operations**: 204 No Content responses
+
+```java
+// Single resource endpoint
+@GetMapping("/{orderId}")
+public ResponseEntity<OrderResponse> getOrder(@PathVariable UUID orderId) {
+    // Returns direct response without wrapper
+}
+
+// Create operation
+@PostMapping
+public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) {
+    // Returns direct response without wrapper
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+}
+
+// Delete operation
+@DeleteMapping("/{orderId}")
+public ResponseEntity<Void> deleteOrder(@PathVariable UUID orderId) {
+    // No content, no wrapper needed
+    return ResponseEntity.noContent().build();
 }
 ```
 
@@ -505,24 +606,50 @@ public class OrderController {
 Implement security at the controller level:
 
 ```java
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
+
 @RestController
 @RequestMapping("/v1/orders")
 @RequiredArgsConstructor
 public class OrderController {
 
     private final OrderApplicationService orderService;
-    private final SecurityService securityService;
+    private final OrderMapper orderMapper;
     
     @GetMapping("/{orderId}")
-    public ResponseEntity<OrderResponse> getOrder(@PathVariable UUID orderId) {
-        // Check authorization
-        securityService.checkOrderAccess(orderId);
+    @PreAuthorize("hasAuthority('SCOPE_orders:read')")
+    public ResponseEntity<OrderResponse> getOrder(
+            @PathVariable UUID orderId,
+            @AuthenticationPrincipal Jwt jwt) {
         
-        // Proceed with retrieving the order
-        OrderDto orderDto = orderService.getOrder(orderId);
+        // Extract user ID from JWT
+        String userId = jwt.getClaimAsString("sub");
+        
+        // Service layer handles authorization check
+        OrderDto orderDto = orderService.getOrder(orderId, userId);
         OrderResponse response = orderMapper.toResponse(orderDto);
         
         return ResponseEntity.ok(response);
+    }
+    
+    @PostMapping
+    @PreAuthorize("hasAuthority('SCOPE_orders:write')")
+    public ResponseEntity<OrderResponse> createOrder(
+            @Valid @RequestBody CreateOrderRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+        
+        String userId = jwt.getClaimAsString("sub");
+        OrderCreationDto dto = orderMapper.toCreationDto(request);
+        dto.setUserId(userId); // Set authenticated user
+        
+        OrderDto orderDto = orderService.createOrder(dto);
+        OrderResponse response = orderMapper.toResponse(orderDto);
+        
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(response);
     }
 }
 ```
@@ -697,15 +824,22 @@ public ResponseEntity<FileUploadResponse> uploadFile(
 In reactive applications:
 
 ```java
-@PostMapping("/upload")
+@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 public Mono<ResponseEntity<FileUploadResponse>> uploadFile(
         @RequestPart("file") Mono<FilePart> filePart) {
     
     return filePart
-        .flatMap(fileUploadService::storeFile)
-        .map(fileId -> FileUploadResponse.builder()
-            .fileId(fileId)
-            .build())
+        .flatMap(part -> {
+            String originalFilename = part.filename();
+            return fileUploadService.storeFile(part)
+                .map(fileId -> FileUploadResponse.builder()
+                    .fileId(fileId)
+                    .fileName(originalFilename)
+                    .contentType(part.headers().getContentType() != null 
+                        ? part.headers().getContentType().toString() 
+                        : MediaType.APPLICATION_OCTET_STREAM_VALUE)
+                    .build());
+        })
         .map(response -> ResponseEntity
             .status(HttpStatus.CREATED)
             .body(response));
@@ -717,6 +851,22 @@ public Mono<ResponseEntity<FileUploadResponse>> uploadFile(
 For handling bulk operations:
 
 ```java
+@Data
+@Builder
+public class BulkOperationResponse {
+    private int successCount;
+    private int failureCount;
+    private List<FailureDetail> failures;
+    
+    @Data
+    @Builder
+    public static class FailureDetail {
+        private int index;
+        private String error;
+        private CreateOrderRequest request;
+    }
+}
+
 @PostMapping("/bulk")
 public ResponseEntity<BulkOperationResponse> bulkCreateOrders(
         @Valid @RequestBody BulkOrderCreationRequest request) {
@@ -727,7 +877,11 @@ public ResponseEntity<BulkOperationResponse> bulkCreateOrders(
         .successCount(result.getSuccessCount())
         .failureCount(result.getFailureCount())
         .failures(result.getFailures().stream()
-            .map(this::mapToFailureResponse)
+            .map(failure -> BulkOperationResponse.FailureDetail.builder()
+                .index(failure.getIndex())
+                .error(failure.getError())
+                .request(failure.getRequest())
+                .build())
             .collect(Collectors.toList()))
         .build();
     
@@ -750,6 +904,61 @@ public class OrderControllerV1 {
 @RequestMapping("/v2/orders")
 public class OrderControllerV2 {
     // Implementation with breaking changes
+}
+```
+
+### Global Error Handling Integration
+
+Controllers should rely on global exception handlers for consistent error responses:
+
+```java
+// No try-catch blocks in controllers
+@RestController
+@RequestMapping("/v1/orders")
+@RequiredArgsConstructor
+public class OrderController {
+
+    private final OrderApplicationService orderService;
+    private final OrderMapper orderMapper;
+    
+    @PostMapping
+    public ResponseEntity<OrderResponse> createOrder(
+            @Valid @RequestBody CreateOrderRequest request) {
+        
+        // Exceptions are handled by GlobalExceptionHandler
+        OrderCreationDto creationDto = orderMapper.toCreationDto(request);
+        OrderDto orderDto = orderService.createOrder(creationDto);
+        OrderResponse response = orderMapper.toResponse(orderDto);
+        
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(response);
+    }
+}
+
+// In reactive controllers
+@RestController
+@RequestMapping("/v1/orders")
+@RequiredArgsConstructor
+public class ReactiveOrderController {
+
+    private final ReactiveOrderApplicationService orderService;
+    private final OrderMapper orderMapper;
+    
+    @PostMapping
+    public Mono<ResponseEntity<OrderResponse>> createOrder(
+            @Valid @RequestBody CreateOrderRequest request) {
+        
+        return Mono.just(request)
+            .map(orderMapper::toCreationDto)
+            .flatMap(orderService::createOrder)
+            .map(orderMapper::toResponse)
+            .map(response -> ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response))
+            // No error handling here - GlobalErrorWebExceptionHandler handles it
+            .onErrorResume(ResourceNotFoundException.class, Mono::error);
+    }
 }
 ```
 
