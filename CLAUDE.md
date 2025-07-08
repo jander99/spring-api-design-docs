@@ -1,10 +1,10 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code when working with this repository.
 
 ## Repository Overview
 
-This is a **documentation repository** for API design standards and Spring Boot microservices architecture. It contains comprehensive guidelines for building APIs and microservices using both imperative and reactive approaches. The repository does not contain executable code but serves as architectural reference documentation.
+This is a **documentation repository** for API design standards and Spring Boot microservices architecture. It contains comprehensive guidelines for building APIs and microservices using both imperative and reactive approaches. The repository contains only documentation files (`.md` format) and serves as architectural reference documentation.
 
 ## Architecture Standards
 
@@ -20,73 +20,34 @@ com.example.{service-name}
 └── config           # Application configuration
 ```
 
-### Dual Implementation Support
-- **Imperative**: Traditional Spring MVC with blocking I/O
-- **Reactive**: Spring WebFlux with non-blocking I/O
-
 ### Core Principles
 - **Hexagonal Architecture**: Separation of domain logic from external concerns
 - **API-First Development**: Define clear API contracts before implementation
 - **Security by Design**: OAuth 2.1/OIDC and resource-based authorization
+- **Dual Implementation Support**: Imperative (Spring MVC) and Reactive (WebFlux) patterns
 - **Framework-Agnostic Design**: API standards independent of implementation technology
-- **Consistent Patterns**: Same organizational patterns across all services
 
-## Key Documentation Sections
+## Documentation Structure
 
 ### API Design Standards (`/api-design/`)
-**Framework-agnostic API design principles**:
-- URI-based versioning strategy (e.g., `/v1/orders`, `/v2/orders`)
-- RESTful resource naming conventions and HTTP semantics
-- Consistent request/response formats and RFC 7807 Problem Details
-- HTTP streaming protocols and reactive patterns
-- OAuth 2.1/OIDC security standards and HTTP security headers
-- OpenAPI 3.1+ documentation requirements
+Framework-agnostic HTTP/REST principles organized into:
+- **request-response/**: HTTP patterns, error formats, pagination, streaming
 
 ### Spring Implementation Standards (`/spring-design/`)
-**Spring Boot-specific implementation patterns**:
-- Controller patterns for both Spring MVC and WebFlux
-- Domain-centric package organization
-- Dependency injection and component management
-- Exception handling and error management
-- Security implementation with Spring Security and OAuth 2.1
-- Testing standards (unit, integration, contract)
-- Logging and monitoring patterns
+Spring Boot-specific patterns organized into:
+- **project-structure/**: Package organization and DDD patterns
+- **controllers/**: Web layer patterns for MVC and WebFlux
+- **error-handling/**: Exception management and RFC 7807 implementation
+- **security/**: OAuth 2.1, authorization, and security headers
+- **configuration/**: Application config, profiles, and observability
+- **testing/**: Unit, integration, and contract testing patterns
 
 ## Technology Stack
 
-### API Design Standards (Framework-Agnostic)
-- **HTTP/REST**: Core protocol and architectural style
-- **OpenAPI 3.1+**: API specification and documentation
-- **OAuth 2.1/OIDC**: Authentication and authorization
-- **RFC 7807**: Problem Details for error responses
-- **JSON Schema**: Request/response validation
-
-### Spring Implementation Stack
-- **Spring Boot 3.x**: Core framework
-- **Spring WebFlux**: Reactive programming model
-- **Spring Security**: OAuth 2.1 implementation
-- **Micrometer**: Metrics collection
-- **springdoc-openapi v2**: OpenAPI integration
-- **Spring Cloud Contract**: Consumer-driven contract testing
-
-## Development Notes
-
-- This repository contains only documentation files (`.md` format)
-- No build scripts, package managers, or executable code
-- Serves as reference guide for implementing APIs and microservices
-- **API design standards** are framework-agnostic and focus on HTTP/REST principles
-- **Spring design standards** provide specific implementation guidance for Spring Boot
-- Code examples in API design are HTTP protocol-based
-- Framework-specific code examples are in spring-design documentation
-
-## Key Files
-
-- `README.md`: Main project overview and navigation
-- `api-design/`: Framework-agnostic API design standards and HTTP/REST conventions
-- `spring-design/`: Spring Boot-specific implementation patterns and code examples
-- `spring-design/Project Structure and Package Organization.md`: Core architectural patterns for Spring applications
+**API Standards**: HTTP/REST, OpenAPI 3.1+, OAuth 2.1/OIDC, RFC 7807, JSON Schema
+**Spring Stack**: Spring Boot 3.x, WebFlux, Spring Security, Micrometer, springdoc-openapi v2
 
 ## Important Distinction
 
-- **api-design/**: Universal principles applicable to any REST framework (Express.js, FastAPI, Django REST, Spring Boot, etc.)
-- **spring-design/**: Specific to Spring Boot implementations with concrete code examples and configuration
+- **api-design/**: Universal principles applicable to any REST framework
+- **spring-design/**: Specific to Spring Boot implementations with concrete code examples
