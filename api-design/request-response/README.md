@@ -164,8 +164,8 @@ While these standards are framework-agnostic, specific implementation guidance i
 
 - **[API Design Standards](../)**: Complete API design documentation
 - **[Spring Design Standards](../../spring-design/)**: Spring Boot-specific implementation patterns
-- **[Authentication and Authorization](../Security%20and%20Authentication.md)**: Security implementation standards
-- **[API Versioning](../API%20Versioning.md)**: Versioning strategies and patterns
+- **[Security Standards](../Security Standards.md)**: Security implementation standards
+- **[API Version Strategy](../API Version Strategy.md)**: Versioning strategies and patterns
 
 ## Usage Examples
 

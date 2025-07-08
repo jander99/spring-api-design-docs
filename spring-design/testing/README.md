@@ -363,6 +363,6 @@ test:
 ## Related Documentation
 
 - [Spring Boot Testing Reference](https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-testing)
-- [Project Structure and Package Organization](../Project%20Structure%20and%20Package%20Organization.md)
+- [Project Structure and Package Organization](../project-structure/Package-Organization.md)
 - [Error Handling Standards](../error-handling/README.md)
 - [Security Testing](../security/Security-Testing.md)

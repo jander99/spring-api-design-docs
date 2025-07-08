@@ -231,10 +231,10 @@ void shouldReturnBadRequest_WhenValidationFails() throws Exception {
 
 ## Related Documentation
 
-- **[Project Structure and Package Organization](../Project%20Structure%20and%20Package%20Organization.md)**: Overall project structure
-- **[Controller Implementation](../Controller%20Implementation%20%28Reactive%20and%20Imperative%29.md)**: Controller design patterns
-- **[Security Implementation](../Security%20Implementation.md)**: Security-related error handling
-- **[Logging and Monitoring](../Logging%20and%20Monitoring.md)**: General logging and monitoring patterns
+- **[Project Structure and Package Organization](../project-structure/Package-Organization.md)**: Overall project structure
+- **[Controller Implementation](../controllers/README.md)**: Controller design patterns
+- **[Security Implementation](../security/README.md)**: Security-related error handling
+- **[Logging and Monitoring](../Logging and Monitoring.md)**: General logging and monitoring patterns
 
 ## Common Error Scenarios
 

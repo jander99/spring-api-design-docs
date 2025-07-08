@@ -712,6 +712,6 @@ class ActuatorIntegrationTest {
 - [Configuration Principles](Configuration-Principles.md) - Core configuration concepts
 - [Environment Profiles](Environment-Profiles.md) - Environment-specific observability setup
 - [External Services](External-Services.md) - Service monitoring and health checks
-- [Logging and Monitoring](../Logging%20and%20Monitoring.md) - Detailed logging patterns
+- [Logging and Monitoring](../Logging and Monitoring.md) - Detailed logging patterns
 
 This observability configuration ensures comprehensive monitoring, tracing, and health checking for Spring Boot microservices across all environments while maintaining performance and security standards.

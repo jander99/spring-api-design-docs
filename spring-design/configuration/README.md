@@ -359,7 +359,7 @@ class ProfileConfigurationTest {
 - [Configuration Principles](Configuration-Principles.md) - Start here for core concepts
 - [Spring Boot Configuration Reference](https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html)
 - [Spring Security Configuration](../security/) - Detailed security patterns
-- [Spring Boot Testing](../Unit%20Testing%20Standards.md) - Configuration testing patterns
+- [Spring Boot Testing](../testing/Unit-Testing-Fundamentals.md) - Configuration testing patterns
 
 ## Integration Points
 
@@ -368,6 +368,6 @@ This configuration documentation integrates with other Spring Boot design areas:
 - **[Controllers](../controllers/)**: Request/response configuration patterns
 - **[Error Handling](../error-handling/)**: Error configuration and logging
 - **[Security](../security/)**: Detailed security implementation patterns
-- **[Testing](../Unit%20Testing%20Standards.md)**: Configuration testing strategies
+- **[Testing](../testing/Unit-Testing-Fundamentals.md)**: Configuration testing strategies
 
 The configuration patterns in this guide ensure that Spring Boot microservices are properly configured for all environments while maintaining security, performance, and maintainability standards.

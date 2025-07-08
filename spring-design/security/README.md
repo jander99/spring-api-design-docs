@@ -318,9 +318,9 @@ spec:
 
 ## Related Documentation
 
-- [Spring Boot Configuration Best Practices](../Spring%20Boot%20Configuration%20Best%20Practices.md)
-- [Logging and Monitoring](../Logging%20and%20Monitoring.md)
-- [Integration Testing Standards](../Integration%20Testing%20Standards.md)
+- [Configuration Principles](../configuration/Configuration-Principles.md)
+- [Logging and Monitoring](../Logging and Monitoring.md)
+- [Integration Testing Fundamentals](../testing/Integration-Testing-Fundamentals.md)
 
 ---
 
