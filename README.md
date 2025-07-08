@@ -4,41 +4,100 @@ This repository contains comprehensive guidelines and standards for building mic
 
 ## Project Structure
 
-The project is organized into three main sections:
+The project is organized into two main sections with focused subdirectories for easier navigation:
 
-### API Design
+### API Design Standards
 
-These documents outline standards for designing consistent and maintainable APIs across the microservice ecosystem.
+Framework-agnostic API design principles for consistent REST services:
 
 - [API Version Strategy](api-design/API Version Strategy.md) - Guidelines for versioning APIs with URI-based patterns and deprecation policies
 - [Documentation Requirements](api-design/Documentation Requirements.md) - Standards for OpenAPI specifications and example formats
-- [Request Response Format](api-design/Request Response Format.md) - Consistent payload structures, error handling, and pagination patterns
 - [Resource Naming and URL Structure](api-design/Resource Naming and URL Structure.md) - RESTful resource naming conventions and URL design principles
 - [Reactive Patterns](api-design/Reactive Patterns.md) - Event-driven architecture, backpressure handling, and non-blocking interactions
 - [Security Standards](api-design/Security Standards.md) - High-level approach to authentication, authorization, and API protection
 
-### Spring Design
+#### Request/Response Standards
+Comprehensive patterns for data exchange and API contract design:
+- **[Request/Response Documentation](api-design/request-response/)** - Complete guide to API request/response patterns
+  - [Content Types and Structure](api-design/request-response/Content-Types-and-Structure.md) - Standard content types and payload structures
+  - [Error Response Standards](api-design/request-response/Error-Response-Standards.md) - RFC 7807 Problem Details and error handling
+  - [Pagination and Filtering](api-design/request-response/Pagination-and-Filtering.md) - Collection response patterns and query parameters
+  - [Streaming APIs](api-design/request-response/Streaming-APIs.md) - NDJSON streaming and Server-Sent Events
 
-Implementation standards for Spring Boot applications, covering both imperative and reactive approaches.
+### Spring Implementation Standards
 
-- [Controller Implementation](spring-design/Controller Implementation (Reactive and Imperative).md) - Standards for implementing controllers with proper request/response handling
+Spring Boot-specific implementation patterns organized by functional area:
+
+#### Project Structure and Organization
+- **[Project Structure Documentation](spring-design/project-structure/)** - Comprehensive project organization patterns
+  - [Package Organization](spring-design/project-structure/Package-Organization.md) - Domain-Driven Design package structure
+  - [Imperative Examples](spring-design/project-structure/Imperative-Examples.md) - Spring MVC implementation patterns
+  - [Reactive Examples](spring-design/project-structure/Reactive-Examples.md) - WebFlux implementation patterns
+  - [Testing Structure](spring-design/project-structure/Testing-Structure.md) - Test organization and patterns
+
+#### Controller Implementation
+- **[Controllers Documentation](spring-design/controllers/)** - Complete controller implementation guide
+  - [Controller Fundamentals](spring-design/controllers/Controller-Fundamentals.md) - Core principles and patterns
+  - [Imperative Controllers](spring-design/controllers/Imperative-Controllers.md) - Spring MVC controller patterns
+  - [Reactive Controllers](spring-design/controllers/Reactive-Controllers.md) - WebFlux controller patterns
+  - [Request Response Mapping](spring-design/controllers/Request-Response-Mapping.md) - DTOs, mappers, and validation
+  - [Controller Testing](spring-design/controllers/Controller-Testing.md) - Comprehensive testing strategies
+
+#### Error Handling and Exception Management
+- **[Error Handling Documentation](spring-design/error-handling/)** - Complete error management patterns
+  - [Exception Hierarchy](spring-design/error-handling/Exception-Hierarchy.md) - Custom exception design and organization
+  - [Error Response Formats](spring-design/error-handling/Error-Response-Formats.md) - RFC 7807 Problem Details implementation
+  - [Imperative Error Handling](spring-design/error-handling/Imperative-Error-Handling.md) - Spring MVC error handling patterns
+  - [Reactive Error Handling](spring-design/error-handling/Reactive-Error-Handling.md) - WebFlux error handling patterns
+  - [Validation Standards](spring-design/error-handling/Validation-Standards.md) - Bean Validation and custom validators
+  - [Error Logging and Monitoring](spring-design/error-handling/Error-Logging-and-Monitoring.md) - Structured logging and metrics
+
+#### Security Implementation
+- **[Security Documentation](spring-design/security/)** - Comprehensive security patterns
+  - [OAuth2 Resource Server](spring-design/security/OAuth2-Resource-Server.md) - OAuth 2.1/OIDC authentication setup
+  - [Authorization Patterns](spring-design/security/Authorization-Patterns.md) - Binary resource-based authorization
+  - [Security Context Propagation](spring-design/security/Security-Context-Propagation.md) - Service-to-service security
+  - [CORS and Headers](spring-design/security/CORS-and-Headers.md) - Cross-origin policies and security headers
+  - [Rate Limiting and Protection](spring-design/security/Rate-Limiting-and-Protection.md) - Attack protection mechanisms
+  - [Security Testing](spring-design/security/Security-Testing.md) - Security testing patterns
+
+#### Configuration Management
+- **[Configuration Documentation](spring-design/configuration/)** - Complete configuration patterns
+  - [Configuration Principles](spring-design/configuration/Configuration-Principles.md) - Core configuration concepts
+  - [Environment Profiles](spring-design/configuration/Environment-Profiles.md) - Environment-specific configuration
+  - [Security Configuration](spring-design/configuration/Security-Configuration.md) - JWT and CORS configuration
+  - [Database Configuration](spring-design/configuration/Database-Configuration.md) - JPA and R2DBC setup patterns
+  - [External Services](spring-design/configuration/External-Services.md) - WebClient and service integration
+  - [Observability Configuration](spring-design/configuration/Observability-Configuration.md) - Metrics, tracing, and monitoring
+
+#### Testing Standards
+- **[Testing Documentation](spring-design/testing/)** - Complete testing strategy and patterns
+  - [Unit Testing Fundamentals](spring-design/testing/Unit-Testing-Fundamentals.md) - Core unit testing principles
+  - [Domain Layer Testing](spring-design/testing/Domain-Layer-Testing.md) - Testing business entities and services
+  - [Application Layer Testing](spring-design/testing/Application-Layer-Testing.md) - Testing application services
+  - [Infrastructure Testing](spring-design/testing/Infrastructure-Testing.md) - Testing repositories and adapters
+  - [Controller Unit Testing](spring-design/testing/Controller-Unit-Testing.md) - Testing controllers in isolation
+  - [Reactive Testing](spring-design/testing/Reactive-Testing.md) - Testing reactive streams and operations
+  - [Integration Testing Fundamentals](spring-design/testing/Integration-Testing-Fundamentals.md) - Core integration testing
+  - [Database Integration Testing](spring-design/testing/Database-Integration-Testing.md) - Testing with real databases
+  - [API Integration Testing](spring-design/testing/API-Integration-Testing.md) - End-to-end API testing
+  - [External Service Testing](spring-design/testing/External-Service-Testing.md) - Testing with external service mocks
+
+#### Additional Components
 - [Dependency Injection and Component Management](spring-design/Dependency Injection and Component Management.md) - Best practices for DI and Spring component organization
-- [Error Handling and Exception Management](spring-design/Error Handling and Exception Management.md) - Comprehensive exception handling patterns
-- [Integration Testing Standards](spring-design/Integration Testing Standards.md) - Guidelines for integration testing approaches
 - [Logging and Monitoring](spring-design/Logging and Monitoring.md) - Patterns for structured logging, metrics collection, and monitoring
-- [Project Structure and Package Organization](spring-design/Project Structure and Package Organization.md) - Domain-centric package organization following DDD principles
-- [Security Implementation](spring-design/Security Implementation.md) - Detailed security implementation with OAuth 2.0 and resource-based authorization
-- [Spring Boot Configuration Best Practices](spring-design/Spring Boot Configuration Best Practices.md) - Standards for application configuration
-- [Unit Testing Standards](spring-design/Unit Testing Standards.md) - Guidelines for effective unit testing
 - [Contract Testing Standards](spring-design/Contract Testing Standards.md) - Standards for consumer-driven contract testing
 
 ## Getting Started
 
 This repository serves as a reference guide for implementing microservices. To get started:
 
-1. Review the [Project Structure and Package Organization](spring-design/Project Structure and Package Organization.md) document to understand the overall architecture
-2. Explore the API design principles in the [Resource Naming and URL Structure](api-design/Resource Naming and URL Structure.md) document
-3. Follow the implementation patterns in the [Controller Implementation](spring-design/Controller Implementation (Reactive and Imperative).md) document
+1. **Understand the Architecture**: Review the [Package Organization](spring-design/project-structure/Package-Organization.md) document to understand the overall Domain-Driven Design structure
+2. **Choose Your Implementation Style**: Decide between [imperative](spring-design/project-structure/Imperative-Examples.md) or [reactive](spring-design/project-structure/Reactive-Examples.md) approaches based on your requirements
+3. **API Design**: Explore the framework-agnostic [API design principles](api-design/) and [request/response patterns](api-design/request-response/)
+4. **Implementation Patterns**: Follow the [controller implementation guides](spring-design/controllers/) for your chosen approach
+5. **Testing Strategy**: Implement comprehensive testing using the [testing documentation](spring-design/testing/)
+6. **Security & Configuration**: Set up [security patterns](spring-design/security/) and [configuration management](spring-design/configuration/) for production readiness
 
 ## Key Architecture Principles
 
@@ -52,18 +111,66 @@ The architecture follows these core principles:
 
 ## Technology Stack
 
-- **Spring Boot**: Core framework for both imperative and reactive services
-- **Spring WebFlux**: For reactive programming model
-- **Spring Security**: For OAuth 2.0 implementation and resource-based security
-- **Micrometer**: For metrics collection and monitoring
-- **OpenAPI 3.0**: For API documentation
-- **Spring Cloud Contract**: For consumer-driven contract testing
+### API Design Standards (Framework-Agnostic)
+- **HTTP/REST**: Core protocol and architectural style
+- **OpenAPI 3.1+**: API specification and documentation
+- **OAuth 2.1/OIDC**: Authentication and authorization
+- **RFC 7807**: Problem Details for error responses
+- **JSON Schema**: Request/response validation
+
+### Spring Implementation Stack
+- **Spring Boot 3.x**: Core framework for microservices
+- **Spring WebFlux**: Reactive programming model for high-throughput scenarios
+- **Spring Security**: OAuth 2.1 implementation and resource-based authorization
+- **Micrometer**: Metrics collection and observability
+- **springdoc-openapi v2**: OpenAPI integration for Spring Boot
+- **Spring Cloud Contract**: Consumer-driven contract testing
 
 ## Testing Approach
 
-The architecture emphasizes comprehensive testing at multiple levels:
+The architecture emphasizes comprehensive testing at multiple levels following the testing pyramid:
 
-- **Unit Testing**: For testing components in isolation
-- **Integration Testing**: For testing interactions between components
-- **Contract Testing**: For verifying service interactions according to contracts
-- **Security Testing**: For validating security implementations
+- **[Unit Testing](spring-design/testing/)**: Fast, isolated tests for individual components (domain, application, infrastructure layers)
+- **[Integration Testing](spring-design/testing/Integration-Testing-Fundamentals.md)**: Testing interactions between components with real infrastructure
+- **[API Testing](spring-design/testing/API-Integration-Testing.md)**: End-to-end testing of complete request-response cycles
+- **[Contract Testing](spring-design/Contract Testing Standards.md)**: Consumer-driven contract testing for service interactions
+- **[Security Testing](spring-design/security/Security-Testing.md)**: Comprehensive validation of security implementations
+- **[Reactive Testing](spring-design/testing/Reactive-Testing.md)**: Specialized patterns for testing reactive streams and non-blocking operations
+
+Each testing approach includes both imperative (Spring MVC) and reactive (WebFlux) implementation patterns, ensuring comprehensive coverage regardless of your chosen programming model.
+
+## Quick Navigation Guide
+
+### By Development Phase
+
+| Phase | Framework-Agnostic | Spring Implementation |
+|-------|-------------------|----------------------|
+| **API Design** | [API Design Standards](api-design/) | [Controller Implementation](spring-design/controllers/) |
+| **Project Setup** | [Resource Naming](api-design/Resource Naming and URL Structure.md) | [Project Structure](spring-design/project-structure/) |
+| **Request/Response** | [Request/Response Standards](api-design/request-response/) | [Controller Mapping](spring-design/controllers/Request-Response-Mapping.md) |
+| **Error Handling** | [Error Response Standards](api-design/request-response/Error-Response-Standards.md) | [Error Handling](spring-design/error-handling/) |
+| **Security** | [Security Standards](api-design/Security Standards.md) | [Security Implementation](spring-design/security/) |
+| **Configuration** | [Documentation Requirements](api-design/Documentation Requirements.md) | [Configuration Management](spring-design/configuration/) |
+| **Testing** | API Design Testing | [Testing Standards](spring-design/testing/) |
+
+### By Technical Focus
+
+| Focus Area | Primary Documentation | Supporting References |
+|------------|----------------------|----------------------|
+| **RESTful API Design** | [API Design Standards](api-design/) | [Controllers](spring-design/controllers/), [Error Handling](spring-design/error-handling/) |
+| **Domain-Driven Design** | [Package Organization](spring-design/project-structure/Package-Organization.md) | [Imperative Examples](spring-design/project-structure/Imperative-Examples.md), [Reactive Examples](spring-design/project-structure/Reactive-Examples.md) |
+| **Reactive Programming** | [Reactive Patterns](api-design/Reactive Patterns.md) | [Reactive Controllers](spring-design/controllers/Reactive-Controllers.md), [Reactive Testing](spring-design/testing/Reactive-Testing.md) |
+| **Security Implementation** | [Security Standards](api-design/Security Standards.md) | [Security Documentation](spring-design/security/) |
+| **Testing Strategy** | [Testing Overview](spring-design/testing/) | [Controller Testing](spring-design/controllers/Controller-Testing.md), [Security Testing](spring-design/security/Security-Testing.md) |
+| **Production Readiness** | [Request/Response Standards](api-design/request-response/) | [Configuration](spring-design/configuration/), [Error Handling](spring-design/error-handling/) |
+
+### Migration from Previous Structure
+
+If you're familiar with the previous monolithic document structure:
+
+- **Previous Controller Document** → Now split into [Controllers Directory](spring-design/controllers/)
+- **Previous Error Handling Document** → Now split into [Error Handling Directory](spring-design/error-handling/)
+- **Previous Security Document** → Now split into [Security Directory](spring-design/security/)
+- **Previous Configuration Document** → Now split into [Configuration Directory](spring-design/configuration/)
+- **Previous Testing Documents** → Now organized in [Testing Directory](spring-design/testing/)
+- **Previous Request/Response Content** → Now in [Request/Response Directory](api-design/request-response/)
