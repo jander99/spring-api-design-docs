@@ -1,57 +1,10 @@
-# Project Structure and Package Organization
+# Imperative Examples (Spring MVC)
 
-## Overview
+This document provides concrete examples of implementing the [package organization structure](./Package-Organization.md) using traditional Spring MVC with blocking I/O operations.
 
-A consistent project structure facilitates code navigation, promotes separation of concerns, and enables teams to quickly understand new services. This document outlines our standard approach to organizing Spring Boot microservices following Domain-Driven Design principles.
+## Domain Layer Examples
 
-## Core Structure Principles
-
-1. **Domain-Centric Organization**: Structure packages around business domains rather than technical layers
-2. **Bounded Contexts**: Align microservice boundaries with DDD bounded contexts
-3. **Hexagonal Architecture**: Separate domain logic from external concerns through ports and adapters
-4. **Consistent Conventions**: Apply the same organizational patterns across all microservices
-
-## Standard Project Structure
-
-### Root Package Naming
-
-Use reverse domain notation with service name:
-
-```
-com.example.{service-name}
-```
-
-Example:
-```
-com.example.orderservice
-com.example.customerservice
-```
-
-### High-Level Package Structure
-
-```
-com.example.{service-name}
-├── domain           # Domain model and business logic
-├── application      # Application services/use cases that orchestrate domain operations
-├── infrastructure   # Technical implementations of ports defined in the domain
-├── interfaces       # API controllers and external interfaces
-└── config           # Application configuration
-```
-
-## Domain Package
-
-The domain package contains core business logic and entities, independent of technical concerns:
-
-```
-domain
-├── model           # Domain entities and value objects
-├── repository      # Repository interfaces (ports)
-├── service         # Domain services
-├── event           # Domain events
-└── exception       # Domain-specific exceptions
-```
-
-Example Domain Entity:
+### Domain Entity
 
 ```java
 package com.example.orderservice.domain.model;
@@ -116,7 +69,7 @@ public class Order {
 }
 ```
 
-Example Domain Repository Interface:
+### Domain Repository Interface (Port)
 
 ```java
 package com.example.orderservice.domain.repository;
@@ -133,19 +86,9 @@ public interface OrderRepository {
 }
 ```
 
-## Application Package
+## Application Layer Examples
 
-The application package contains use cases that orchestrate domain operations:
-
-```
-application
-├── service        # Application services implementing use cases
-├── dto            # Data Transfer Objects for internal communication
-├── mapper         # Mappers between domain and DTOs
-└── exception      # Application-specific exceptions
-```
-
-Example Application Service:
+### Application Service
 
 ```java
 package com.example.orderservice.application.service;
@@ -203,23 +146,9 @@ public class OrderApplicationService {
 }
 ```
 
-## Infrastructure Package
+## Infrastructure Layer Examples
 
-The infrastructure package contains technical implementations of domain ports:
-
-```
-infrastructure
-├── repository             # Repository implementations (adapters)
-├── client                 # External service clients
-├── messaging              # Message queue producers/consumers
-├── persistence            # JPA entities and repositories
-│   ├── entity             # JPA entities 
-│   ├── repository         # Spring Data repositories
-│   └── mapper             # Mappers between domain and JPA entities
-└── security               # Security implementations
-```
-
-Example Repository Implementation:
+### Repository Implementation (Adapter)
 
 ```java
 package com.example.orderservice.infrastructure.persistence.repository;
@@ -260,7 +189,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 }
 ```
 
-Example JPA Repository:
+### JPA Repository
 
 ```java
 package com.example.orderservice.infrastructure.persistence.repository;
@@ -275,23 +204,9 @@ public interface JpaOrderRepository extends JpaRepository<OrderEntity, UUID> {
 }
 ```
 
-## Interfaces Package
+## Interface Layer Examples
 
-The interfaces package contains controllers and external interfaces:
-
-```
-interfaces
-├── rest                   # REST controllers
-│   ├── controller         # Controller classes
-│   ├── request            # Request DTOs
-│   ├── response           # Response DTOs
-│   ├── mapper             # Mappers between application DTOs and API DTOs
-│   └── advice             # Controller advice for exception handling
-├── graphql                # GraphQL resolvers (if applicable)
-└── grpc                   # gRPC service implementations (if applicable)
-```
-
-Example REST Controller:
+### REST Controller
 
 ```java
 package com.example.orderservice.interfaces.rest.controller;
@@ -337,88 +252,34 @@ public class OrderController {
 }
 ```
 
-## Config Package
+## Configuration Examples
 
-The config package contains application configuration:
-
-```
-config
-├── security              # Security configuration
-├── cache                 # Cache configuration
-├── database              # Database configuration
-├── messaging             # Messaging configuration
-└── web                   # Web configuration
-```
-
-Example Configuration:
+### Web Configuration
 
 ```java
 package com.example.orderservice.config.web;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.reactive.config.EnableWebFlux;
-import org.springframework.web.reactive.config.WebFluxConfigurer;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@EnableWebFlux
-public class WebFluxConfig implements WebFluxConfigurer {
-    // WebFlux configuration
+@EnableWebMvc
+public class WebMvcConfig implements WebMvcConfigurer {
+    // Spring MVC configuration
 }
 ```
 
-## Reactive vs. Imperative Implementations
+## Key Characteristics of Imperative Implementation
 
-For **Reactive** services (WebFlux), return reactive types in repository and service interfaces:
+1. **Blocking Operations**: Methods use standard return types like `Optional<T>`, `List<T>`, etc.
+2. **Synchronous Processing**: Operations complete before returning
+3. **Traditional Spring MVC**: Uses `@RestController`, `@RequestMapping` annotations
+4. **JPA Integration**: Standard Spring Data JPA repositories
+5. **Exception Handling**: Traditional try-catch blocks and `@ExceptionHandler`
 
-```java
-// Reactive repository interface
-public interface OrderRepository {
-    Mono<Order> findById(UUID id);
-    Mono<Order> save(Order order);
-    Mono<Void> deleteById(UUID id);
-}
-```
+## See Also
 
-For **Imperative** services (Spring MVC), use standard return types:
-
-```java
-// Imperative repository interface
-public interface OrderRepository {
-    Optional<Order> findById(UUID id);
-    Order save(Order order);
-    void deleteById(UUID id);
-}
-```
-
-## Test Structure
-
-Mirror the main structure for tests:
-
-```
-src/test/java/com/example/{service-name}
-├── domain               # Domain tests
-├── application          # Application service tests
-├── infrastructure       # Infrastructure tests
-├── interfaces           # API tests
-└── integration          # Integration tests across layers
-```
-
-## Implementation Guidelines
-
-1. **Keep the Domain Pure**: Domain models should not have framework dependencies
-2. **Rich Domain Models**: Use encapsulation and behavior-rich domain objects over anemic models
-3. **Immutable Where Possible**: Prefer immutable objects for value objects and where appropriate
-4. **Clear Boundaries**: Maintain clear separation between layers with appropriate mappers
-5. **Package Private Scope**: Use package-private visibility to enforce layer boundaries where appropriate
-
-## Anti-patterns to Avoid
-
-| Anti-pattern | Example | Preferred Approach |
-|--------------|---------|-------------------|
-| Anemic Domain Models | Entities with only getters/setters | Rich domain models with behavior |
-| Technical Layer Packaging | Packages by type (controllers, services) | Domain-centric packaging |
-| Leaky Abstractions | JPA annotations on domain models | Keep domain models pure |
-| Service Orchestration in Controllers | Business logic in controllers | Use application services |
-| Repository Method Explosion | Many specific finder methods | Consider query objects pattern |
-
-This project structure ensures a clean separation of concerns while aligning with Domain-Driven Design principles across our microservice ecosystem.
+- [Package Organization](./Package-Organization.md) - Core structure principles
+- [Reactive Examples](./Reactive-Examples.md) - WebFlux implementation examples
+- [Testing Structure](./Testing-Structure.md) - Test organization patterns
