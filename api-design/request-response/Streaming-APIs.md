@@ -1,26 +1,28 @@
 # Streaming APIs
 
-## Overview
+## What is Streaming?
 
-This document defines the standards for streaming API responses, including real-time data streaming, large dataset processing, and reactive patterns. Streaming APIs enable efficient handling of large data volumes and real-time communication.
+Streaming APIs send data in real-time or in chunks instead of all at once. This is useful when you have large amounts of data or need to send updates as they happen.
 
-## Streaming Response Formats
+## When to Use Streaming
 
-For streaming endpoints, choose the appropriate content type based on your use case:
+**Use streaming when:**
+- Exporting thousands of records
+- Sending real-time updates (like order status changes)
+- Processing large batches of data
+- Users need immediate feedback on long operations
 
-### Content Type Selection
+**Use regular pagination when:**
+- Users are browsing search results
+- Data sets are small and predictable
+- Users need to jump to specific pages
+- Results can be cached effectively
 
-| Content Type | Use Case | Benefits | Considerations |
-|--------------|----------|----------|----------------|
-| `application/x-ndjson` | Bulk data streaming | Simple JSON objects | Newline-delimited format |
-| `text/event-stream` | Real-time events | Built-in browser support | Server-Sent Events protocol |
-| `application/json` | Chunked responses | Standard JSON parsing | Requires chunked transfer encoding |
+## Main Streaming Patterns
 
-## NDJSON Streaming
+### 1. NDJSON - For Large Data Exports
 
-### Basic NDJSON Format
-
-Newline-Delimited JSON (NDJSON) streams individual JSON objects separated by newlines:
+Use `application/x-ndjson` for bulk data streaming. Each line contains one JSON object:
 
 ```http
 GET /v1/orders/stream HTTP/1.1
@@ -28,36 +30,15 @@ Accept: application/x-ndjson
 
 HTTP/1.1 200 OK
 Content-Type: application/x-ndjson
-Transfer-Encoding: chunked
 
 {"id":"order-1","status":"PROCESSING","total":99.95}
 {"id":"order-2","status":"COMPLETED","total":149.50}
-{"id":"order-3","status":"PENDING","total":75.25}
+{"type":"stream-end","totalProcessed":2}
 ```
 
-### NDJSON Standards
+### 2. Server-Sent Events (SSE) - For Real-Time Updates
 
-1. **One JSON object per line**: Each line must contain a complete, valid JSON object
-2. **No trailing commas**: Each object is self-contained
-3. **Consistent structure**: All objects should follow the same schema
-4. **Error objects**: Include error objects in the stream when processing fails
-
-### NDJSON with Metadata
-
-Include metadata objects in the stream:
-
-```json
-{"type":"metadata","totalRecords":1000,"streamId":"stream-12345"}
-{"type":"data","id":"order-1","status":"PROCESSING","total":99.95}
-{"type":"data","id":"order-2","status":"COMPLETED","total":149.50}
-{"type":"metadata","processed":2,"remaining":998}
-```
-
-## Server-Sent Events (SSE)
-
-### Basic SSE Format
-
-Server-Sent Events provide real-time updates with built-in browser support:
+Use `text/event-stream` for real-time events with built-in browser support:
 
 ```http
 GET /v1/orders/events HTTP/1.1
@@ -65,46 +46,19 @@ Accept: text/event-stream
 
 HTTP/1.1 200 OK
 Content-Type: text/event-stream
-Cache-Control: no-cache
-Connection: keep-alive
 
 id: 1
 event: order-created
-data: {"orderId":"order-123","customerId":"cust-456","status":"CREATED"}
+data: {"orderId":"order-123","status":"CREATED"}
 
 id: 2
 event: order-updated
 data: {"orderId":"order-123","status":"PROCESSING"}
-
-id: 3
-event: order-completed
-data: {"orderId":"order-123","status":"COMPLETED","completedAt":"2024-07-15T14:30:00Z"}
 ```
 
-### SSE Event Types
+### 3. Chunked JSON - For Traditional JSON Arrays
 
-Define clear event types for different scenarios:
-
-| Event Type | Description | Data Format |
-|------------|-------------|-------------|
-| `order-created` | New order created | Complete order object |
-| `order-updated` | Order status changed | Updated fields only |
-| `order-cancelled` | Order cancelled | Order ID and cancellation reason |
-| `heartbeat` | Keep connection alive | Timestamp |
-| `error` | Processing error | Error details |
-
-### SSE Standards
-
-1. **Event IDs**: Include unique sequential IDs for event replay
-2. **Event types**: Use descriptive event type names
-3. **Heartbeat**: Send periodic heartbeat events to maintain connections
-4. **Reconnection**: Support client reconnection with Last-Event-ID header
-
-## Chunked JSON Streaming
-
-### Basic Chunked Format
-
-For streaming large JSON arrays:
+Use `application/json` with chunked transfer encoding for large JSON arrays:
 
 ```http
 GET /v1/orders/export HTTP/1.1
@@ -116,249 +70,66 @@ Transfer-Encoding: chunked
 
 [
 {"id":"order-1","status":"PROCESSING"},
-{"id":"order-2","status":"COMPLETED"},
-{"id":"order-3","status":"PENDING"}
+{"id":"order-2","status":"COMPLETED"}
 ]
 ```
 
-### Chunked Streaming with Wrapper
+## Basic Implementation Steps
 
-Use a consistent wrapper format:
+1. **Choose the right pattern** based on your use case
+2. **Set proper headers** (Content-Type, Transfer-Encoding, etc.)
+3. **Handle errors gracefully** by including error objects in the stream
+4. **Implement authentication** with Bearer tokens
+5. **Add heartbeat messages** to keep connections alive
+6. **Test with load and network interruptions**
 
+## Essential Response Format
+
+### NDJSON Structure
 ```json
-{
-  "meta": {
-    "streamId": "stream-12345",
-    "timestamp": "2024-07-15T14:30:00Z"
-  },
-  "data": [
-    {"id":"order-1","status":"PROCESSING"},
-    {"id":"order-2","status":"COMPLETED"}
-  ]
-}
+{"type":"metadata","totalRecords":1000}
+{"type":"data","id":"item-1","value":"data"}
+{"type":"error","code":"PROCESSING_ERROR","recordId":"item-2"}
+{"type":"stream-end","reason":"completed","processed":999,"errors":1}
 ```
 
-## Flow Control and Backpressure
-
-### Client Capabilities
-
-Document how clients can signal flow control capabilities:
-
-```http
-GET /v1/orders/stream HTTP/1.1
-Accept: application/x-ndjson
-Prefer: respond-async
-X-Stream-Buffer-Size: 100
-X-Stream-Rate-Limit: 10/second
+### SSE Structure
 ```
-
-### Server Response Headers
-
-Include flow control information in response headers:
-
-```http
-HTTP/1.1 200 OK
-Content-Type: application/x-ndjson
-X-Stream-Rate: 10/second
-X-Stream-Buffer-Size: 100
-X-Stream-Total-Items: 10000
-```
-
-### Backpressure Handling
-
-When clients can't keep up with the stream:
-
-1. **Buffer limits**: Define maximum buffer sizes
-2. **Rate limiting**: Implement configurable rate limits
-3. **Client feedback**: Allow clients to signal processing delays
-4. **Circuit breakers**: Implement circuit breakers for failing clients
-
-## Error Handling in Streams
-
-### NDJSON Error Objects
-
-Include error objects in NDJSON streams:
-
-```json
-{"type":"error","code":"PROCESSING_ERROR","message":"Failed to process record","recordId":"order-123"}
-{"type":"data","id":"order-124","status":"COMPLETED"}
-```
-
-### SSE Error Events
-
-Send error events in SSE streams:
-
-```
-id: 10
-event: error
-data: {"type":"https://example.com/problems/stream-error","title":"Stream Processing Error","status":500}
-
-id: 11
-event: stream-end
-data: {"reason":"error","timestamp":"2024-07-15T14:30:00Z"}
-```
-
-### Stream Termination
-
-Handle graceful stream termination:
-
-```json
-{"type":"stream-end","reason":"completed","totalProcessed":1000,"errors":2}
-```
-
-## Authentication and Authorization
-
-### Bearer Token Authentication
-
-```http
-GET /v1/orders/stream HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Accept: application/x-ndjson
-```
-
-### Token Refresh in Long-Running Streams
-
-For long-running streams with token expiration:
-
-1. **Token refresh events**: Send token refresh notifications
-2. **Graceful reconnection**: Support seamless reconnection with new tokens
-3. **Partial stream resumption**: Allow clients to resume from last processed record
-
-```
-event: token-refresh-required
-data: {"expiresIn":300,"refreshUrl":"/v1/auth/refresh"}
-```
-
-## Streaming API Examples
-
-### Order Export Stream
-
-**GET /v1/orders/export?format=ndjson&since=2024-01-01**
-
-```http
-HTTP/1.1 200 OK
-Content-Type: application/x-ndjson
-X-Total-Records: 10000
-X-Stream-Rate: 100/second
-
-{"type":"metadata","query":{"since":"2024-01-01"},"totalRecords":10000}
-{"type":"data","id":"order-1","customerId":"cust-123","total":99.95,"createdDate":"2024-01-15T10:30:00Z"}
-{"type":"data","id":"order-2","customerId":"cust-456","total":149.50,"createdDate":"2024-01-16T14:22:00Z"}
-{"type":"progress","processed":2,"remaining":9998}
-```
-
-### Real-Time Order Updates
-
-**GET /v1/orders/live?customerId=cust-123**
-
-```http
-HTTP/1.1 200 OK
-Content-Type: text/event-stream
-Cache-Control: no-cache
-
 id: 1
-event: order-created
-data: {"orderId":"order-789","customerId":"cust-123","status":"CREATED","items":[]}
+event: data-event
+data: {"id":"item-1","value":"data"}
 
 id: 2
-event: order-item-added
-data: {"orderId":"order-789","itemId":"item-456","quantity":2,"price":25.99}
-
-id: 3
-event: order-submitted
-data: {"orderId":"order-789","status":"PENDING","submittedAt":"2024-07-15T14:30:00Z"}
+event: error
+data: {"type":"processing-error","message":"Failed to process item"}
 ```
 
-### Bulk Data Processing Stream
+## Quick Reference
 
-**POST /v1/orders/bulk-process**
+| Pattern | Content Type | Best For | Browser Support |
+|---------|-------------|----------|----------------|
+| NDJSON | `application/x-ndjson` | Bulk data exports | Manual parsing |
+| SSE | `text/event-stream` | Real-time updates | Built-in EventSource |
+| Chunked JSON | `application/json` | Large JSON arrays | Standard JSON parsing |
 
-Request:
-```json
-{
-  "operation": "status-update",
-  "filters": {"status": "PENDING"},
-  "updates": {"status": "PROCESSING"}
-}
-```
+## Learn More
 
-Response:
-```http
-HTTP/1.1 200 OK
-Content-Type: application/x-ndjson
+### Complete Examples
+- [Order Export Stream](../examples/streaming/order-export-stream.md) - Bulk data export with progress tracking
+- [Real-Time Order Updates](../examples/streaming/real-time-order-updates.md) - Live dashboard updates
+- [Bulk Data Processing](../examples/streaming/bulk-data-processing.md) - Batch operations with feedback
 
-{"type":"metadata","operation":"status-update","totalRecords":500}
-{"type":"success","recordId":"order-1","updatedFields":["status"],"timestamp":"2024-07-15T14:30:01Z"}
-{"type":"success","recordId":"order-2","updatedFields":["status"],"timestamp":"2024-07-15T14:30:01Z"}
-{"type":"error","recordId":"order-3","error":"INVALID_STATUS_TRANSITION","message":"Cannot transition from COMPLETED to PROCESSING"}
-{"type":"summary","processed":500,"successful":499,"errors":1}
-```
+### Detailed Specifications
+- [NDJSON Specification](../reference/streaming/ndjson-specification.md) - Complete NDJSON format guide
+- [SSE Specification](../reference/streaming/sse-specification.md) - Server-Sent Events details
+- [Flow Control](../reference/streaming/flow-control.md) - Backpressure and performance tuning
 
-## Performance Considerations
-
-### Streaming Optimization
-
-1. **Batch processing**: Process records in batches to reduce overhead
-2. **Connection pooling**: Manage connection pools for database queries
-3. **Memory management**: Implement proper memory management for large streams
-4. **Compression**: Use GZIP compression for text-based streams
-
-### Monitoring and Metrics
-
-Track streaming API performance:
-
-- **Stream duration**: How long streams remain active
-- **Throughput**: Records per second
-- **Error rates**: Percentage of failed records
-- **Client disconnections**: Frequency of client drops
-- **Buffer utilization**: Memory and queue usage
-
-## Implementation Guidelines
-
-### Framework Support
-
-Different frameworks provide varying levels of streaming support:
-
-- **Express.js**: Use Response.write() for manual streaming
-- **FastAPI**: StreamingResponse with generators
-- **Django**: StreamingHttpResponse for chunked responses
-- **Spring Boot**: See spring-design documentation for WebFlux reactive streams
-
-### Client Considerations
-
-Provide guidance for client implementations:
-
-1. **Connection handling**: Implement proper connection management
-2. **Error recovery**: Handle network interruptions gracefully
-3. **Buffer management**: Implement client-side buffering
-4. **Processing queues**: Use queues for processing streamed data
-
-### Testing Streaming APIs
-
-1. **Load testing**: Test with high-volume streams
-2. **Network simulation**: Test with network delays and interruptions
-3. **Client behavior**: Test various client consumption patterns
-4. **Resource monitoring**: Monitor server resources during streaming
+### Troubleshooting
+- [Common Issues](../troubleshooting/streaming/common-issues.md) - Solutions for typical problems
+- [Testing Strategies](../troubleshooting/streaming/testing-strategies.md) - How to test streaming APIs
 
 ## Related Documentation
 
 - [Content Types and Structure](Content-Types-and-Structure.md) - Basic request/response patterns
 - [Error Response Standards](Error-Response-Standards.md) - Error handling patterns
 - [Pagination and Filtering](Pagination-and-Filtering.md) - Alternative patterns for large datasets
-
-## Use Cases
-
-### When to Use Streaming APIs
-
-- **Large datasets**: Exporting thousands of records
-- **Real-time updates**: Live order status updates
-- **Bulk operations**: Processing large batches of data
-- **Event sourcing**: Streaming event logs
-- **Data synchronization**: Syncing data between systems
-
-### When to Use Traditional Pagination
-
-- **Interactive browsing**: User-facing search results
-- **Small datasets**: Collections with predictable sizes
-- **Random access**: Users need to jump to specific pages
-- **Caching**: Results can be effectively cached
