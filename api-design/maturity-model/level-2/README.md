@@ -73,6 +73,7 @@ DELETE /products/123                 # Returns 204 No Content
 |------|---------|-----------------|
 | 200 | OK | Successful GET, PUT |
 | 201 | Created | Successful POST |
+| 202 | Accepted | Async operation started |
 | 204 | No Content | Successful DELETE |
 | 400 | Bad Request | Invalid input |
 | 401 | Unauthorized | Missing auth |
