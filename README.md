@@ -13,8 +13,8 @@ Framework-agnostic API design principles organized into focused categories for e
 #### 🏗️ Foundations
 Core principles for building consistent RESTful APIs:
 - **[Foundations Documentation](api-design/foundations/)** - Essential API design principles
-  - [API Version Strategy](api-design/foundations/API Version Strategy.md) - URI-based versioning with deprecation policies
-  - [Resource Naming and URL Structure](api-design/foundations/Resource Naming and URL Structure.md) - RESTful naming conventions and URL design
+  - [API Version Strategy](api-design/foundations/API-Version-Strategy.md) - URI-based versioning with deprecation policies
+  - [Resource Naming and URL Structure](api-design/foundations/Resource-Naming-and-URL-Structure.md) - RESTful naming conventions and URL design
 
 #### 🔄 Request/Response Patterns
 Comprehensive patterns for data exchange and API contract design:
@@ -27,7 +27,7 @@ Comprehensive patterns for data exchange and API contract design:
 #### 🔐 Security Standards
 Authentication, authorization, and API protection:
 - **[Security Documentation](api-design/security/)** - Comprehensive security patterns
-  - [Security Standards](api-design/security/Security Standards.md) - High-level approach to authentication, authorization, and API protection
+  - [Security Standards](api-design/security/Security-Standards.md) - High-level approach to authentication, authorization, and API protection
 
 #### 🚀 Advanced Patterns
 Sophisticated patterns for reactive and event-driven architectures:
@@ -59,7 +59,7 @@ Foundation patterns for organizing Spring Boot applications:
 #### 🎯 Architecture Patterns
 Core architectural patterns for Spring applications:
 - **[Architecture Documentation](spring-design/architecture/)** - Essential architectural patterns
-  - [Dependency Injection and Component Management](spring-design/architecture/Dependency Injection and Component Management.md) - Best practices for DI and Spring component organization
+  - [Dependency Injection and Component Management](spring-design/architecture/Dependency-Injection-and-Component-Management.md) - Best practices for DI and Spring component organization
 
 #### 🎮 Controller Implementation
 Complete controller implementation guide for both paradigms:
@@ -103,7 +103,7 @@ Complete configuration patterns for all environments:
 #### 📊 Observability and Monitoring
 Patterns for production-ready monitoring and observability:
 - **[Observability Documentation](spring-design/observability/)** - Complete observability patterns
-  - [Logging and Monitoring](spring-design/observability/Logging and Monitoring.md) - Patterns for structured logging, metrics collection, and monitoring
+  - [Logging and Monitoring](spring-design/observability/Logging-and-Monitoring.md) - Patterns for structured logging, metrics collection, and monitoring
 
 #### 🧪 Testing Standards
 Comprehensive testing strategy organized by testing type:
@@ -121,7 +121,7 @@ Comprehensive testing strategy organized by testing type:
   - **Specialized Testing** - Advanced testing patterns
     - [Infrastructure Testing](spring-design/testing/specialized-testing/Infrastructure-Testing.md) - Testing repositories and adapters
     - [Reactive Testing](spring-design/testing/specialized-testing/Reactive-Testing.md) - Testing reactive streams and operations
-    - [Contract Testing Standards](spring-design/testing/specialized-testing/Contract Testing Standards.md) - Consumer-driven contract testing
+    - [Contract Testing Standards](spring-design/testing/specialized-testing/Contract-Testing-Standards.md) - Consumer-driven contract testing
 
 ## Getting Started
 
@@ -195,10 +195,41 @@ The architecture emphasizes comprehensive testing at multiple levels following t
 - **[Specialized Testing](spring-design/testing/specialized-testing/)**: Advanced testing patterns
   - [Infrastructure Testing](spring-design/testing/specialized-testing/Infrastructure-Testing.md) - Testing repositories and adapters
   - [Reactive Testing](spring-design/testing/specialized-testing/Reactive-Testing.md) - Testing reactive streams and operations
-  - [Contract Testing Standards](spring-design/testing/specialized-testing/Contract Testing Standards.md) - Consumer-driven contract testing
+  - [Contract Testing Standards](spring-design/testing/specialized-testing/Contract-Testing-Standards.md) - Consumer-driven contract testing
   - [Security Testing](spring-design/security/Security-Testing.md) - Comprehensive validation of security implementations
 
 Each testing approach includes both imperative (Spring MVC) and reactive (WebFlux) implementation patterns, ensuring comprehensive coverage regardless of your chosen programming model.
+
+## Supporting Resources
+
+The documentation now includes comprehensive supporting materials:
+
+### 📁 **Examples Directories**
+Detailed code examples and implementation guides:
+- **[Testing Examples](examples/testing/)** - Complete CI/CD setups and test scripts
+- **[Event-Driven Examples](api-design/advanced-patterns/examples/event-driven/)** - Full event processing implementations
+- **[Pagination Examples](api-design/request-response/examples/pagination/)** - Complete pagination patterns
+- **[Streaming Examples](api-design/examples/streaming/)** - Real-time data streaming implementations  
+- **[Versioning Examples](api-design/examples/versioning/)** - API migration scenarios
+- **[Documentation Tool Examples](api-design/documentation/examples/documentation-tools/)** - Complete setup configurations
+
+### 📚 **Reference Directories**
+Comprehensive technical specifications:
+- **[Testing Reference](reference/testing/)** - Tool comparisons and quality metrics
+- **[Event-Driven Reference](api-design/advanced-patterns/reference/event-driven/)** - Detailed patterns and configurations
+- **[Pagination Reference](api-design/request-response/reference/pagination/)** - Advanced filtering and cursor patterns
+- **[Streaming Reference](api-design/reference/streaming/)** - NDJSON and SSE specifications
+- **[Versioning Reference](api-design/reference/versioning/)** - Comprehensive deprecation policies
+- **[Documentation Tools Reference](api-design/documentation/reference/documentation-tools/)** - Detailed tool comparisons
+
+### 🔧 **Troubleshooting Directories**
+Common issues and solutions:
+- **[Testing Troubleshooting](troubleshooting/testing/)** - Validation and CI/CD issues
+- **[Event-Driven Troubleshooting](api-design/advanced-patterns/troubleshooting/event-driven/)** - Event processing problems
+- **[Pagination Troubleshooting](api-design/request-response/troubleshooting/pagination/)** - Performance and edge cases
+- **[Streaming Troubleshooting](api-design/troubleshooting/streaming/)** - Connection and testing issues
+- **[Versioning Troubleshooting](api-design/troubleshooting/versioning/)** - Migration and compatibility problems
+- **[Documentation Tools Troubleshooting](api-design/documentation/troubleshooting/documentation-tools/)** - Integration and setup issues
 
 ## Quick Navigation Guide
 
@@ -208,7 +239,7 @@ Each testing approach includes both imperative (Spring MVC) and reactive (WebFlu
 |-------|-------------------|----------------------|
 | **Foundation** | [API Foundations](api-design/foundations/) | [Architecture Patterns](spring-design/architecture/) |
 | **API Design** | [API Design Standards](api-design/) | [Controller Implementation](spring-design/controllers/) |
-| **Project Setup** | [Resource Naming](api-design/foundations/Resource Naming and URL Structure.md) | [Project Structure](spring-design/project-structure/) |
+| **Project Setup** | [Resource Naming](api-design/foundations/Resource-Naming-and-URL-Structure.md) | [Project Structure](spring-design/project-structure/) |
 | **Request/Response** | [Request/Response Standards](api-design/request-response/) | [Controller Mapping](spring-design/controllers/Request-Response-Mapping.md) |
 | **Error Handling** | [Error Response Standards](api-design/request-response/Error-Response-Standards.md) | [Error Handling](spring-design/error-handling/) |
 | **Security** | [Security Standards](api-design/security/) | [Security Implementation](spring-design/security/) |

@@ -2,34 +2,36 @@
 
 ## Overview
 
-This document defines the standards for pagination, filtering, and sorting in collection responses. These patterns ensure consistent behavior across all APIs that return multiple resources.
+This document defines the essential patterns for pagination, filtering, and sorting in collection responses. These patterns ensure consistent behavior across all APIs that return multiple resources.
 
-## Pagination Response Structure
+## Core Concepts
 
-Paginated responses must include these metadata fields:
+### Pagination Types
+
+1. **Offset-based pagination**: Uses page numbers and sizes (best for small datasets)
+2. **Cursor-based pagination**: Uses tokens for position (best for large datasets)
+
+### Standard Response Structure
+
+All paginated responses follow this structure:
 
 ```json
 {
   "data": [...],
   "meta": {
     "pagination": {
-      "page": 0,          // Current page (0-indexed)
-      "size": 20,         // Items per page
-      "totalElements": 54, // Total items across all pages
-      "totalPages": 3     // Total number of pages
+      "page": 0,
+      "size": 20,
+      "totalElements": 54,
+      "totalPages": 3
     }
   }
 }
 ```
 
-### Pagination Standards
+## Basic Pagination
 
-1. **Zero-indexed pages**: Start page numbering from 0
-2. **Default page size**: Use 20 items per page as default
-3. **Maximum page size**: Limit maximum page size (e.g., 100 items)
-4. **Total counts**: Always include total element and page counts
-
-### Pagination Query Parameters
+### Query Parameters
 
 | Parameter | Description | Default | Example |
 |-----------|-------------|---------|---------|
@@ -37,9 +39,28 @@ Paginated responses must include these metadata fields:
 | `size` | Items per page | 20 | `?size=50` |
 | `sort` | Sorting criteria | none | `?sort=createdDate,desc` |
 
-## Filtering Response Structure
+### Standards
 
-When filters are applied, include them in the metadata:
+- Start page numbering from 0
+- Default page size: 20 items
+- Maximum page size: 100 items
+- Always include total counts
+
+## Basic Filtering
+
+### Common Filter Patterns
+
+| Filter Type | Parameter Pattern | Example |
+|-------------|-------------------|---------|
+| Equality | `field=value` | `?status=ACTIVE` |
+| Date range | `field[After/Before]=date` | `?createdAfter=2024-01-01` |
+| Numeric range | `field[Gt/Lt]=number` | `?totalGt=100` |
+| Multiple values | `field=value1,value2` | `?status=ACTIVE,PENDING` |
+| Text search | `search=text` | `?search=customer+name` |
+
+### Filter Response
+
+Always echo back applied filters:
 
 ```json
 {
@@ -54,70 +75,30 @@ When filters are applied, include them in the metadata:
 }
 ```
 
-### Filter Standards
+## Quick Implementation Guide
 
-1. **Applied filters**: Always echo back applied filters in the response
-2. **Filter validation**: Validate filter values and return appropriate errors
-3. **Filter combinations**: Support multiple filters with AND logic by default
-4. **Date formats**: Use ISO 8601 format for date/time filters
+### Step 1: Define Query Parameters
+- Accept `page`, `size`, and `sort` parameters
+- Validate parameter types and ranges
+- Set reasonable defaults and limits
 
-### Common Filter Patterns
+### Step 2: Apply Filters
+- Parse filter parameters
+- Validate filter values against allowed options
+- Combine filters with AND logic by default
 
-| Filter Type | Parameter Pattern | Example |
-|-------------|-------------------|---------|
-| Equality | `field=value` | `?status=ACTIVE` |
-| Date range | `field[After/Before]=date` | `?createdAfter=2024-01-01` |
-| Numeric range | `field[Gt/Lt]=number` | `?totalGt=100` |
-| Multiple values | `field=value1,value2` | `?status=ACTIVE,PENDING` |
-| Text search | `search=text` | `?search=customer+name` |
+### Step 3: Build Response
+- Include filtered data in `data` array
+- Add pagination metadata in `meta.pagination`
+- Echo applied filters in `meta.filters`
 
-## Sorting Response Structure
+### Step 4: Handle Edge Cases
+- Return empty arrays for no results
+- Validate page numbers don't exceed total pages
+- Provide clear error messages for invalid parameters
 
-When sorting is applied, include sort criteria in the metadata:
+## Essential Response Format
 
-```json
-{
-  "data": [...],
-  "meta": {
-    "pagination": { ... },
-    "sort": [
-      {"field": "createdDate", "direction": "DESC"},
-      {"field": "total", "direction": "ASC"}
-    ]
-  }
-}
-```
-
-### Sorting Standards
-
-1. **Multiple sort fields**: Support multiple sort criteria
-2. **Sort direction**: Use `ASC` and `DESC` for direction values
-3. **Default sorting**: Define sensible default sort order for each endpoint
-4. **Sort validation**: Validate sortable fields and return errors for invalid fields
-
-### Sort Query Parameter Format
-
-Support flexible sort parameter formats:
-
-```
-# Single field, ascending (default)
-?sort=createdDate
-
-# Single field, descending
-?sort=createdDate,desc
-
-# Multiple fields
-?sort=status,asc&sort=createdDate,desc
-
-# Alternative comma-separated format
-?sort=status,asc,createdDate,desc
-```
-
-## Complete Collection Response Example
-
-**GET /v1/orders?status=PROCESSING&page=0&size=2&sort=createdDate,desc**
-
-Response:
 ```json
 {
   "data": [
@@ -127,13 +108,6 @@ Response:
       "total": 149.50,
       "status": "PROCESSING",
       "createdDate": "2024-04-14T10:22:00Z"
-    },
-    {
-      "id": "order-12345",
-      "customerId": "cust-12345",
-      "total": 99.95,
-      "status": "PROCESSING",
-      "createdDate": "2024-04-14T09:15:00Z"
     }
   ],
   "meta": {
@@ -148,243 +122,33 @@ Response:
     },
     "sort": [
       {"field": "createdDate", "direction": "DESC"}
-    ],
-    "timestamp": "2024-07-15T14:32:22Z",
-    "requestId": "req-12345"
+    ]
   }
 }
 ```
 
-## Advanced Filtering Patterns
+## Performance Tips
 
-### Complex Filter Queries
-
-For more sophisticated filtering, consider supporting query expressions:
-
-```
-# Range queries
-?createdDate[gte]=2024-01-01&createdDate[lt]=2024-02-01
-
-# IN queries
-?status[in]=ACTIVE,PENDING,PROCESSING
-
-# NOT queries
-?status[not]=CANCELLED
-
-# Text search with operators
-?customerName[contains]=smith
-?email[startsWith]=admin
-```
-
-### Filter Response with Applied Filters
-
-```json
-{
-  "data": [...],
-  "meta": {
-    "pagination": { ... },
-    "filters": {
-      "status": {
-        "operator": "in",
-        "values": ["ACTIVE", "PENDING"]
-      },
-      "createdDate": {
-        "operator": "gte",
-        "value": "2024-01-01"
-      },
-      "customerName": {
-        "operator": "contains",
-        "value": "smith"
-      }
-    }
-  }
-}
-```
-
-## Search and Full-Text Queries
-
-### Simple Search
-
-```
-GET /v1/orders?search=customer+smith
-```
-
-Response includes search metadata:
-```json
-{
-  "data": [...],
-  "meta": {
-    "pagination": { ... },
-    "search": {
-      "query": "customer smith",
-      "fields": ["customerName", "customerEmail", "notes"]
-    }
-  }
-}
-```
-
-### Advanced Search
-
-For complex search requirements:
-
-```json
-{
-  "data": [...],
-  "meta": {
-    "pagination": { ... },
-    "search": {
-      "query": "customer smith",
-      "operator": "and",
-      "fields": ["customerName", "customerEmail"],
-      "highlight": true
-    }
-  }
-}
-```
-
-## Empty Result Handling
-
-### No Results Found
-
-```json
-{
-  "data": [],
-  "meta": {
-    "pagination": {
-      "page": 0,
-      "size": 20,
-      "totalElements": 0,
-      "totalPages": 0
-    },
-    "filters": {
-      "status": "NONEXISTENT_STATUS"
-    }
-  }
-}
-```
-
-### Page Beyond Results
-
-When requesting a page beyond available data:
-
-```json
-{
-  "data": [],
-  "meta": {
-    "pagination": {
-      "page": 50,
-      "size": 20,
-      "totalElements": 10,
-      "totalPages": 1
-    }
-  }
-}
-```
-
-## Performance Considerations
-
-### Efficient Pagination
-
-1. **Limit deep pagination**: Consider cursor-based pagination for large datasets
-2. **Index optimization**: Ensure database indexes support common filter and sort combinations
-3. **Count queries**: For performance, consider making total counts optional for large datasets
-
-### Cursor-Based Pagination
-
-For high-performance scenarios:
-
-```json
-{
-  "data": [...],
-  "meta": {
-    "cursor": {
-      "current": "eyJpZCI6IjEyMzQ1IiwiZGF0ZSI6IjIwMjQtMDctMTUifQ==",
-      "hasNext": true,
-      "hasPrevious": false
-    }
-  }
-}
-```
-
-Query parameters:
-```
-?cursor=eyJpZCI6IjEyMzQ1IiwiZGF0ZSI6IjIwMjQtMDctMTUifQ==&size=20
-```
-
-## Error Handling
-
-### Invalid Filter Values
-
-```http
-HTTP/1.1 400 Bad Request
-Content-Type: application/problem+json
-
-{
-  "type": "https://example.com/problems/invalid-filter",
-  "title": "Invalid Filter Value",
-  "status": 400,
-  "detail": "The provided filter value is not valid",
-  "instance": "/v1/orders",
-  "errors": [
-    {
-      "field": "status",
-      "code": "INVALID_VALUE",
-      "message": "Status must be one of: PENDING, PROCESSING, COMPLETED, CANCELLED",
-      "providedValue": "INVALID_STATUS"
-    }
-  ]
-}
-```
-
-### Invalid Sort Fields
-
-```http
-HTTP/1.1 400 Bad Request
-Content-Type: application/problem+json
-
-{
-  "type": "https://example.com/problems/invalid-sort-field",
-  "title": "Invalid Sort Field",
-  "status": 400,
-  "detail": "The specified sort field is not supported",
-  "instance": "/v1/orders",
-  "errors": [
-    {
-      "field": "sort",
-      "code": "UNSUPPORTED_SORT_FIELD",
-      "message": "Field 'invalidField' is not available for sorting",
-      "supportedFields": ["id", "createdDate", "total", "status"]
-    }
-  ]
-}
-```
-
-## Implementation Guidelines
-
-### Query Parameter Validation
-
-1. **Type validation**: Ensure proper types for numeric and date parameters
-2. **Range validation**: Validate page numbers and sizes are within acceptable ranges
-3. **Field validation**: Verify filter and sort fields exist and are queryable
-4. **Value validation**: Check filter values against allowed enums/ranges
-
-### Database Optimization
-
-1. **Indexed fields**: Ensure commonly filtered and sorted fields are indexed
-2. **Composite indexes**: Create composite indexes for common filter combinations
-3. **Query optimization**: Monitor and optimize slow queries from pagination endpoints
-
-### Framework Integration
-
-These pagination patterns work with any REST framework:
-
-- **Express.js**: Use query parameter parsing middleware
-- **FastAPI**: Pydantic models for query parameter validation
-- **Django REST Framework**: DRF pagination classes and filter backends
-- **Spring Boot**: See spring-design documentation for specific implementation patterns
+- Use cursor-based pagination for large datasets
+- Index commonly filtered and sorted fields
+- Consider making total counts optional for performance
+- Limit maximum page sizes to prevent resource exhaustion
 
 ## Related Documentation
 
+### Detailed Examples
+- [Complete Examples](examples/pagination/complete-examples.md) - Full code examples and use cases
+- [Framework Integration](examples/pagination/framework-integration.md) - Implementation patterns for specific frameworks
+
+### Advanced Patterns
+- [Complex Filtering](reference/pagination/advanced-patterns.md) - Advanced query operators and search patterns
+- [Cursor Pagination](reference/pagination/cursor-pagination.md) - High-performance pagination for large datasets
+
+### Troubleshooting
+- [Common Issues](troubleshooting/pagination/common-issues.md) - Error handling and edge cases
+- [Performance Problems](troubleshooting/pagination/performance-problems.md) - Optimization strategies
+
+### API Design Standards
 - [Content Types and Structure](Content-Types-and-Structure.md) - Basic request/response patterns
 - [Error Response Standards](Error-Response-Standards.md) - Error handling patterns
 - [Streaming APIs](Streaming-APIs.md) - Alternative patterns for large datasets

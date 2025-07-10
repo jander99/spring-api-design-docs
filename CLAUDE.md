@@ -48,6 +48,33 @@ Spring Boot-specific patterns organized into:
 - **testing/**: Unit, integration, and specialized testing (organized by type)
 - **observability/**: Logging, monitoring, and operational patterns
 
+### Modular Supporting Structure
+The documentation uses a modular approach with supporting directories:
+
+#### **Examples Directories** (`/examples/`, `/*/examples/`)
+Complete implementation examples and setup guides:
+- **Root examples/**: Cross-cutting examples (testing, CI/CD)
+- **Topic-specific examples/**: Detailed code implementations for specific areas
+- **Framework integration**: Real-world usage patterns and configurations
+
+#### **Reference Directories** (`/reference/`, `/*/reference/`)
+Comprehensive technical specifications and comparisons:
+- **Tool comparisons**: Feature matrices and selection criteria
+- **Detailed specifications**: Complete technical references
+- **Advanced patterns**: Complex implementation details
+
+#### **Troubleshooting Directories** (`/troubleshooting/`, `/*/troubleshooting/`)
+Common issues, solutions, and debugging guides:
+- **Problem-solution pairs**: Specific issues with actionable solutions
+- **Debugging strategies**: Systematic approaches to problem-solving
+- **Prevention techniques**: Best practices to avoid common pitfalls
+
+### Documentation Philosophy
+- **Main files**: Concise, scannable content at high school reading level
+- **Supporting files**: Detailed implementations for different skill levels
+- **Progressive disclosure**: Core concepts accessible, depth available on demand
+- **Modular maintenance**: Easy to update specific sections without affecting core docs
+
 ## Technology Stack
 
 **API Standards**: HTTP/REST, OpenAPI 3.1+, OAuth 2.1/OIDC, RFC 7807, JSON Schema
