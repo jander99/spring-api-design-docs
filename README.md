@@ -2,6 +2,23 @@
 
 This repository contains comprehensive guidelines and standards for building microservices using Spring Boot, with a focus on both imperative (Spring MVC) and reactive (Spring WebFlux) implementation approaches. The architecture follows Domain-Driven Design principles and provides detailed patterns for consistent implementation across services.
 
+## 🎯 Richardson Maturity Model - Find Your API's Level
+
+**New!** Assess your API's maturity and get a personalized improvement roadmap:
+
+<div align="center">
+
+| 📍 **Where is Your API?** | 🚀 **Quick Assessment** |
+|---------------------------|-------------------------|
+| [**Level 0** - Single endpoint, RPC-style](api-design/maturity-model/level-0/) | [Take 5-minute assessment](api-design/maturity-model/assessment-guide.md) |
+| [**Level 1** - Multiple resources](api-design/maturity-model/level-1/) | [View maturity levels](api-design/maturity-model/) |
+| [**Level 2** - HTTP verbs (Industry Standard)](api-design/maturity-model/level-2/) | [See improvement paths](api-design/maturity-model/#quick-assessment) |
+| [**Level 3** - HATEOAS (True REST)](api-design/maturity-model/level-3/) | [Check best practices](api-design/maturity-model/level-3/best-practices.md) |
+
+</div>
+
+Most modern APIs are at Level 2, and that's perfectly fine! Use our guide to understand where you are and decide if moving up makes sense for your use case.
+
 ## Project Structure
 
 The project is organized into two main sections with focused subdirectories for easier navigation:
@@ -9,6 +26,12 @@ The project is organized into two main sections with focused subdirectories for 
 ### API Design Standards
 
 Framework-agnostic API design principles organized into focused categories for easier navigation:
+
+#### 🎯 Maturity Assessment
+Understand and improve your API's REST maturity level:
+- **[Richardson Maturity Model](api-design/maturity-model/)** - Assess your API's level and improvement path
+  - [Level Assessment Guide](api-design/maturity-model/assessment-guide.md) - 5-minute API maturity test
+  - [Level-by-Level Guides](api-design/maturity-model/) - Detailed documentation for each maturity level
 
 #### 🏗️ Foundations
 Core principles for building consistent RESTful APIs:
@@ -237,6 +260,7 @@ Common issues and solutions:
 
 | Phase | Framework-Agnostic | Spring Implementation |
 |-------|-------------------|----------------------|
+| **Assessment** | [Maturity Model](api-design/maturity-model/) | - |
 | **Foundation** | [API Foundations](api-design/foundations/) | [Architecture Patterns](spring-design/architecture/) |
 | **API Design** | [API Design Standards](api-design/) | [Controller Implementation](spring-design/controllers/) |
 | **Project Setup** | [Resource Naming](api-design/foundations/Resource-Naming-and-URL-Structure.md) | [Project Structure](spring-design/project-structure/) |
