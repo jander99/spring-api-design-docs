@@ -43,12 +43,7 @@ Consistent request and response formats are crucial for creating predictable, us
 ## Key Design Principles
 
 ### Framework Agnostic
-All patterns are based on HTTP and JSON standards, working with any REST framework:
-- Express.js
-- FastAPI
-- Django REST Framework
-- Spring Boot
-- And others
+All patterns are based on HTTP and JSON standards, working with any REST framework.
 
 ### Consistency First
 - Standardized field naming conventions
@@ -138,7 +133,7 @@ All patterns are based on HTTP and JSON standards, working with any REST framewo
 ### Validation Integration
 Modern APIs should integrate validation with RFC 7807 Problem Details:
 - JSON Schema validation
-- Framework-specific validation libraries
+- Standard validation patterns
 - Consistent error response formats
 
 ### Security Considerations
@@ -155,10 +150,7 @@ Modern APIs should integrate validation with RFC 7807 Problem Details:
 
 ## Framework Integration
 
-While these standards are framework-agnostic, specific implementation guidance is available:
-
-- **Spring Boot**: See `../spring-design/` documentation for detailed Spring-specific patterns
-- **Other frameworks**: Apply these HTTP/JSON patterns using framework-specific implementations
+These standards are framework-agnostic and can be implemented using any REST framework's standard features.
 
 ## Related Documentation
 

@@ -217,12 +217,11 @@ Additional security considerations for modern APIs:
 
 When implementing these security standards:
 
-- **Framework-specific examples**: For Spring Boot/Spring Security implementations, see the spring-design standards documentation
-- **OAuth 2.1 libraries**: Use well-maintained OAuth 2.1/OIDC libraries for your platform
+- **OAuth 2.1 libraries**: Use well-maintained OAuth 2.1/OIDC libraries
 - **JWT validation**: Implement proper JWT validation including signature verification and claims validation
 - **Security headers**: Configure security headers at the web server or application level
 - **Monitoring**: Implement security event logging and monitoring
 
-These security standards are based on industry best practices and modern authentication protocols (OAuth 2.1, OpenID Connect), making them applicable across different programming languages and frameworks.
+These security standards are based on industry best practices and modern authentication protocols (OAuth 2.1, OpenID Connect), making them universally applicable.
 
 This security standards document provides a foundation for consistent security implementation across all APIs in our ecosystem, aligned with modern authentication standards and HTTP security best practices.

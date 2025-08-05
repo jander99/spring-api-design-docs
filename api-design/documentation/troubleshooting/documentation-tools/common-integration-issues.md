@@ -204,7 +204,7 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Node.js
+      - name: Setup environment
         uses: actions/setup-node@v3
         with:
           node-version: '18'
@@ -213,7 +213,7 @@ jobs:
 
 **Debugging:**
 - Check workflow permissions
-- Verify Node.js version compatibility
+- Verify tooling version compatibility
 - Test build locally first
 - Check for missing dependencies
 
@@ -464,7 +464,7 @@ openssl s_client -connect api-docs.example.com:443 -servername api-docs.example.
 ### Debugging Tools
 - Browser Developer Tools
 - Network tab for API calls
-- Console for JavaScript errors
+- Console for script errors
 - Lighthouse for performance
 - OpenAPI validators
 

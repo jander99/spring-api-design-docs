@@ -334,10 +334,9 @@ These OpenAPI standards ensure that developers have the information needed to su
 
 When implementing these OpenAPI standards:
 
-- **Framework-specific tools**: For Spring Boot implementations using springdoc-openapi, see the spring-design standards documentation
-- **OpenAPI generators**: Use appropriate OpenAPI code generators for your technology stack
-- **Documentation hosting**: Deploy documentation to accessible locations (GitHub Pages, Netlify, internal portals)
+- **OpenAPI generators**: Use appropriate OpenAPI code generators
+- **Documentation hosting**: Deploy documentation to accessible locations
 - **Version management**: Maintain documentation versions alongside API versions
 - **Automation**: Integrate documentation generation and validation into CI/CD pipelines
 
-These standards work with any REST API framework and are based on OpenAPI specifications and industry-standard tooling, making them applicable across different programming languages and platforms.
+These standards work with any REST API framework and are based on OpenAPI specifications and industry-standard tooling.

@@ -198,11 +198,10 @@ Response:
 
 When implementing these request/response formats:
 
-- **Framework-specific examples**: For Spring Boot implementations, see the spring-design standards documentation
-- **Validation libraries**: Use JSON Schema validation or framework-specific validation that produces RFC 7807 responses
+- **Validation**: Use JSON Schema validation or standard validation patterns that produce RFC 7807 responses
 - **Content negotiation**: Implement proper Accept header handling for different response formats
 
-These patterns work with any REST framework (Express.js, FastAPI, Django REST Framework, Spring Boot, etc.) and are based on HTTP and JSON standards.
+These patterns are based on HTTP and JSON standards and work with any REST framework.
 
 ## Related Documentation
 

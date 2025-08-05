@@ -1,6 +1,6 @@
 # Complete Pagination Examples
 
-This document provides comprehensive code examples for implementing pagination, filtering, and sorting in collection APIs.
+This document provides comprehensive examples for implementing pagination, filtering, and sorting in collection APIs.
 
 ## Complete Collection Response
 
@@ -100,9 +100,27 @@ Response:
 }
 ```
 
-### Date Range Filtering
+### Multiple Values (IN Filter)
 ```
-GET /v1/orders?createdAfter=2024-01-01&createdBefore=2024-12-31
+GET /v1/orders?status=ACTIVE,PROCESSING
+```
+
+Response:
+```json
+{
+  "data": [...],
+  "meta": {
+    "pagination": { ... },
+    "filters": {
+      "status": "ACTIVE,PROCESSING"
+    }
+  }
+}
+```
+
+### Date Range Filter
+```
+GET /v1/orders?createdAfter=2024-01-01&createdBefore=2024-03-31
 ```
 
 Response:
@@ -113,44 +131,7 @@ Response:
     "pagination": { ... },
     "filters": {
       "createdAfter": "2024-01-01",
-      "createdBefore": "2024-12-31"
-    }
-  }
-}
-```
-
-### Multiple Value Filtering
-```
-GET /v1/orders?status=ACTIVE,PENDING,PROCESSING
-```
-
-Response:
-```json
-{
-  "data": [...],
-  "meta": {
-    "pagination": { ... },
-    "filters": {
-      "status": "ACTIVE,PENDING,PROCESSING"
-    }
-  }
-}
-```
-
-### Numeric Range Filtering
-```
-GET /v1/orders?totalGt=100&totalLt=500
-```
-
-Response:
-```json
-{
-  "data": [...],
-  "meta": {
-    "pagination": { ... },
-    "filters": {
-      "totalGt": "100",
-      "totalLt": "500"
+      "createdBefore": "2024-03-31"
     }
   }
 }
@@ -160,7 +141,7 @@ Response:
 
 ### Simple Text Search
 ```
-GET /v1/orders?search=customer+smith
+GET /v1/orders?search=urgent
 ```
 
 Response:
@@ -170,16 +151,15 @@ Response:
   "meta": {
     "pagination": { ... },
     "search": {
-      "query": "customer smith",
-      "fields": ["customerName", "customerEmail", "notes"]
+      "query": "urgent"
     }
   }
 }
 ```
 
-### Advanced Search with Metadata
+### Complex Search Query
 ```
-GET /v1/orders?search=customer+smith&searchFields=customerName,customerEmail
+GET /v1/orders?search="customer email"&searchFields=customerName,customerEmail
 ```
 
 Response:
@@ -189,23 +169,17 @@ Response:
   "meta": {
     "pagination": { ... },
     "search": {
-      "query": "customer smith",
-      "operator": "and",
-      "fields": ["customerName", "customerEmail"],
-      "highlight": true
+      "query": "customer email",
+      "fields": ["customerName", "customerEmail"]
     }
   }
 }
 ```
 
-## Empty Results Examples
+## Empty Collection Response
 
-### No Results Found
-```
-GET /v1/orders?status=NONEXISTENT_STATUS
-```
+When no results match the query:
 
-Response:
 ```json
 {
   "data": [],
@@ -217,7 +191,40 @@ Response:
       "totalPages": 0
     },
     "filters": {
-      "status": "NONEXISTENT_STATUS"
+      "status": "CANCELLED",
+      "createdAfter": "2024-12-01"
+    },
+    "timestamp": "2024-07-15T14:32:22Z",
+    "requestId": "req-empty-12345"
+  }
+}
+```
+
+## Edge Cases
+
+### Last Page with Partial Results
+```
+GET /v1/orders?page=26&size=2
+```
+
+Response (54 total items, last page):
+```json
+{
+  "data": [
+    {
+      "id": "order-54321",
+      "customerId": "cust-99999",
+      "total": 75.00,
+      "status": "COMPLETED",
+      "createdDate": "2024-01-01T08:00:00Z"
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 26,
+      "size": 2,
+      "totalElements": 54,
+      "totalPages": 27
     }
   }
 }
@@ -225,48 +232,52 @@ Response:
 
 ### Page Beyond Available Results
 ```
-GET /v1/orders?page=50&size=20
-```
-
-Response (when only 10 total items exist):
-```json
-{
-  "data": [],
-  "meta": {
-    "pagination": {
-      "page": 50,
-      "size": 20,
-      "totalElements": 10,
-      "totalPages": 1
-    }
-  }
-}
-```
-
-## Combined Examples
-
-### Complex Query with Multiple Filters
-```
-GET /v1/orders?status=ACTIVE,PROCESSING&createdAfter=2024-01-01&totalGt=50&search=premium&page=1&size=10&sort=total,desc
+GET /v1/orders?page=100&size=20
 ```
 
 Response:
 ```json
 {
+  "data": [],
+  "meta": {
+    "pagination": {
+      "page": 100,
+      "size": 20,
+      "totalElements": 54,
+      "totalPages": 3
+    }
+  }
+}
+```
+
+## Complex Query Example
+
+Combining all features:
+
+### Request
+```
+GET /v1/orders?status=ACTIVE,PROCESSING&createdAfter=2024-01-01&search=priority&page=1&size=10&sort=total,desc&sort=createdDate,asc
+```
+
+### Response
+```json
+{
   "data": [
     {
-      "id": "order-98765",
-      "customerId": "cust-premium-123",
-      "total": 299.99,
+      "id": "order-78901",
+      "customerId": "cust-45678",
+      "total": 250.00,
       "status": "PROCESSING",
       "createdDate": "2024-02-15T14:30:00Z",
-      "items": [
-        {
-          "name": "Premium Product",
-          "price": 299.99,
-          "quantity": 1
-        }
-      ]
+      "description": "Priority shipping requested"
+    },
+    {
+      "id": "order-67890",
+      "customerId": "cust-34567",
+      "total": 175.50,
+      "status": "ACTIVE",
+      "createdDate": "2024-03-01T09:00:00Z",
+      "description": "High priority order"
     }
   ],
   "meta": {
@@ -278,15 +289,14 @@ Response:
     },
     "filters": {
       "status": "ACTIVE,PROCESSING",
-      "createdAfter": "2024-01-01",
-      "totalGt": "50"
+      "createdAfter": "2024-01-01"
     },
     "search": {
-      "query": "premium",
-      "fields": ["customerName", "notes", "items.name"]
+      "query": "priority"
     },
     "sort": [
-      {"field": "total", "direction": "DESC"}
+      {"field": "total", "direction": "DESC"},
+      {"field": "createdDate", "direction": "ASC"}
     ],
     "timestamp": "2024-07-15T14:32:22Z",
     "requestId": "req-complex-12345"
@@ -294,179 +304,28 @@ Response:
 }
 ```
 
-## Framework Integration Examples
+## Performance Optimization Patterns
 
-### Express.js Implementation
-```javascript
-app.get('/v1/orders', async (req, res) => {
-  const {
-    page = 0,
-    size = 20,
-    sort,
-    status,
-    createdAfter,
-    search
-  } = req.query;
+### Efficient Count Strategies
 
-  // Validate parameters
-  const pageNum = parseInt(page);
-  const pageSize = Math.min(parseInt(size), 100);
-  
-  // Build query
-  const query = {};
-  if (status) query.status = { $in: status.split(',') };
-  if (createdAfter) query.createdDate = { $gte: new Date(createdAfter) };
-  if (search) query.$text = { $search: search };
+For large datasets, consider making counts optional:
+- Add `includeCount=false` parameter to skip counting
+- Use estimated counts for approximate totals
+- Cache count results for frequently accessed queries
 
-  // Execute query with pagination
-  const [data, total] = await Promise.all([
-    Order.find(query)
-      .sort(parseSort(sort))
-      .skip(pageNum * pageSize)
-      .limit(pageSize),
-    Order.countDocuments(query)
-  ]);
+### Index Optimization
 
-  // Build response
-  res.json({
-    data,
-    meta: {
-      pagination: {
-        page: pageNum,
-        size: pageSize,
-        totalElements: total,
-        totalPages: Math.ceil(total / pageSize)
-      },
-      filters: { status, createdAfter },
-      search: search ? { query: search } : undefined
-    }
-  });
-});
-```
+Ensure database indexes support common query patterns:
+- Composite indexes for multi-field filters
+- Text indexes for search functionality
+- Sort field indexes for performance
 
-### FastAPI Implementation
-```python
-from fastapi import FastAPI, Query
-from pydantic import BaseModel
-from typing import Optional, List
+### Cursor-Based Pagination
 
-class PaginationMeta(BaseModel):
-    page: int
-    size: int
-    totalElements: int
-    totalPages: int
-
-class ResponseMeta(BaseModel):
-    pagination: PaginationMeta
-    filters: Optional[dict] = None
-    search: Optional[dict] = None
-
-class PaginatedResponse(BaseModel):
-    data: List[dict]
-    meta: ResponseMeta
-
-@app.get("/v1/orders", response_model=PaginatedResponse)
-async def get_orders(
-    page: int = Query(0, ge=0),
-    size: int = Query(20, ge=1, le=100),
-    status: Optional[str] = None,
-    createdAfter: Optional[str] = None,
-    search: Optional[str] = None
-):
-    # Build query
-    query = {}
-    if status:
-        query['status'] = {'$in': status.split(',')}
-    if createdAfter:
-        query['createdDate'] = {'$gte': createdAfter}
-    if search:
-        query['$text'] = {'$search': search}
-    
-    # Execute query
-    total = await Order.count_documents(query)
-    orders = await Order.find(query).skip(page * size).limit(size).to_list()
-    
-    return PaginatedResponse(
-        data=orders,
-        meta=ResponseMeta(
-            pagination=PaginationMeta(
-                page=page,
-                size=size,
-                totalElements=total,
-                totalPages=(total + size - 1) // size
-            ),
-            filters={'status': status, 'createdAfter': createdAfter} if status or createdAfter else None,
-            search={'query': search} if search else None
-        )
-    )
-```
-
-## Performance Optimization Examples
-
-### Efficient Count Queries
-```javascript
-// Instead of counting all results
-const total = await Order.countDocuments(query);
-
-// Use estimated counts for large datasets
-const total = await Order.estimatedDocumentCount();
-
-// Or make counts optional
-const includeCount = req.query.includeCount === 'true';
-const total = includeCount ? await Order.countDocuments(query) : null;
-```
-
-### Indexed Query Optimization
-```javascript
-// Ensure indexes support common query patterns
-db.orders.createIndex({ status: 1, createdDate: -1 });
-db.orders.createIndex({ customerId: 1, status: 1 });
-db.orders.createIndex({ "$**": "text" }); // For text search
-```
-
-### Cursor-Based Pagination Example
-```javascript
-// Cursor-based pagination for large datasets
-app.get('/v1/orders/cursor', async (req, res) => {
-  const { cursor, size = 20 } = req.query;
-  
-  let query = {};
-  if (cursor) {
-    const decoded = Buffer.from(cursor, 'base64').toString();
-    const { id, date } = JSON.parse(decoded);
-    query = {
-      $or: [
-        { createdDate: { $lt: new Date(date) } },
-        { createdDate: new Date(date), _id: { $gt: id } }
-      ]
-    };
-  }
-  
-  const orders = await Order.find(query)
-    .sort({ createdDate: -1, _id: 1 })
-    .limit(parseInt(size) + 1);
-  
-  const hasNext = orders.length > size;
-  const data = hasNext ? orders.slice(0, -1) : orders;
-  
-  const nextCursor = hasNext ? 
-    Buffer.from(JSON.stringify({
-      id: data[data.length - 1]._id,
-      date: data[data.length - 1].createdDate
-    })).toString('base64') : null;
-  
-  res.json({
-    data,
-    meta: {
-      cursor: {
-        current: cursor,
-        next: nextCursor,
-        hasNext
-      }
-    }
-  });
-});
-```
+For very large datasets or real-time data, consider cursor-based pagination:
+- More efficient for deep pagination
+- Stable results for changing data
+- Better performance characteristics
 
 ## Related Documentation
 
