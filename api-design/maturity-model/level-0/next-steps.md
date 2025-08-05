@@ -48,23 +48,16 @@ Level 1: POST /users/123
 ## Step 3: Gradual Migration Strategy
 
 ### Phase 1: Dual Support (Recommended)
-```javascript
-// Support both patterns initially
-app.post('/api', oldHandler);     // Keep existing
-app.post('/users', newHandler);   // Add new
-app.post('/users/:id', newHandler); // Add new
-```
+- Support both patterns initially
+- Keep existing `/api` endpoint operational
+- Add new resource-based endpoints
+- Route requests to appropriate handlers
 
 ### Phase 2: Route Forwarding
-```javascript
-// Forward old calls to new endpoints
-app.post('/api', (req, res) => {
-  if (req.body.method === 'getUser') {
-    return res.redirect(307, `/users/${req.body.params.userId}`);
-  }
-  // ... other methods
-});
-```
+- Forward old endpoint calls to new resource endpoints
+- Map method names to resource URLs
+- Preserve request/response compatibility
+- Use HTTP 307 redirects to maintain request body
 
 ### Phase 3: Deprecation
 - Add deprecation headers

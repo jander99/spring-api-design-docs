@@ -82,4 +82,4 @@ For comprehensive guidance, see:
 
 ## Implementation Notes
 
-These principles apply to any REST API framework. For Spring Boot-specific examples, see the spring-design documentation.
+These principles apply to any REST API framework, regardless of implementation technology or programming language.

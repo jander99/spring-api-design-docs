@@ -53,71 +53,32 @@ DELETE /users/123  → Delete user
 ## Step 3: Refactoring Examples
 
 ### Before (Level 1):
-```javascript
-// All operations through POST
-app.post('/users/:id', (req, res) => {
-  switch(req.body.action) {
-    case 'get':
-      const user = getUser(req.params.id);
-      res.json({success: true, data: user});
-      break;
-    case 'update':
-      updateUser(req.params.id, req.body.data);
-      res.json({success: true});
-      break;
-    case 'delete':
-      deleteUser(req.params.id);
-      res.json({success: true});
-      break;
-  }
-});
-```
+- All operations go through POST
+- Actions specified in request body
+- Generic success/error responses
+- Single handler for all operations
 
 ### After (Level 2):
-```javascript
-// GET for retrieval
-app.get('/users/:id', (req, res) => {
-  const user = getUser(req.params.id);
-  if (!user) return res.status(404).json({error: 'User not found'});
-  res.status(200).json(user);
-});
-
-// PUT for updates
-app.put('/users/:id', (req, res) => {
-  const updated = updateUser(req.params.id, req.body);
-  if (!updated) return res.status(404).json({error: 'User not found'});
-  res.status(200).json(updated);
-});
-
-// DELETE for removal
-app.delete('/users/:id', (req, res) => {
-  const deleted = deleteUser(req.params.id);
-  if (!deleted) return res.status(404).json({error: 'User not found'});
-  res.status(204).send();
-});
-```
+- GET for retrieval operations
+- PUT for update operations
+- DELETE for removal operations
+- POST only for creation
+- Specific HTTP status codes
+- Separate handlers per HTTP method
 
 ## Step 4: Migration Strategy
 
 ### Phase 1: Add New Methods (Week 1-2)
-```javascript
-// Support both patterns
-app.post('/users/:id', oldHandler);  // Keep existing
-app.get('/users/:id', newHandler);   // Add new
-app.put('/users/:id', newHandler);   // Add new
-app.delete('/users/:id', newHandler); // Add new
-```
+- Support both old POST-based and new HTTP verb patterns
+- Keep existing endpoints operational
+- Add new HTTP method handlers
+- Ensure backward compatibility
 
 ### Phase 2: Redirect Old Calls (Week 3-4)
-```javascript
-app.post('/users/:id', (req, res) => {
-  if (req.body.action === 'get') {
-    res.setHeader('X-Deprecated', 'Use GET method instead');
-    return newGetHandler(req, res);
-  }
-  // ... handle other actions
-});
-```
+- Add deprecation headers to old endpoints
+- Forward POST-based calls to appropriate HTTP method handlers
+- Log usage of deprecated patterns
+- Monitor migration progress
 
 ### Phase 3: Deprecate POST Actions (Week 5-6)
 - Add deprecation warnings
@@ -127,96 +88,68 @@ app.post('/users/:id', (req, res) => {
 
 ## Step 5: Implementation Checklist
 
-### Quick Wins First:
-- [ ] Implement GET for all read operations
-- [ ] Add 404 for missing resources
-- [ ] Use 201 for successful creation
-- [ ] Return 204 for successful deletion
+### Technical Changes:
+- [ ] Implement GET endpoints for read operations
+- [ ] Implement POST endpoints for create operations
+- [ ] Implement PUT/PATCH endpoints for updates
+- [ ] Implement DELETE endpoints for removal
+- [ ] Add proper status code responses
+- [ ] Remove action field from requests
+- [ ] Update error handling
 
-### Standard Patterns:
-- [ ] GET `/resources` → List all (200)
-- [ ] GET `/resources/{id}` → Get one (200/404)
-- [ ] POST `/resources` → Create new (201)
-- [ ] PUT `/resources/{id}` → Update (200/404)
-- [ ] DELETE `/resources/{id}` → Delete (204/404)
+### Documentation Updates:
+- [ ] Update API documentation
+- [ ] Create migration guide
+- [ ] Document status codes
+- [ ] Update client examples
 
-### Response Updates:
-- [ ] Remove success flags (use status codes)
-- [ ] Standardize error format
-- [ ] Add Location header for 201
-- [ ] Remove response body from 204
+### Communication:
+- [ ] Notify all API consumers
+- [ ] Provide migration timeline
+- [ ] Offer support during transition
+- [ ] Share best practices
 
-## 📝 Complete Transformation Example
+## Step 6: Testing Strategy
 
-### User Registration Flow:
+### Test Coverage Needed:
+- Each HTTP method per resource
+- All status code scenarios
+- Error handling paths
+- Backward compatibility
+- Client SDK updates
 
-**Level 1 (Current):**
-```bash
-POST /users
-{
-  "action": "create",
-  "data": {
-    "email": "user@example.com",
-    "password": "secret"
-  }
-}
-
-Response: 200 OK
-{
-  "success": true,
-  "userId": 123
-}
+### Test Scenarios:
+```
+✓ GET /users/123 returns 200 with user data
+✓ GET /users/999 returns 404 not found
+✓ POST /users returns 201 with new user
+✓ PUT /users/123 returns 200 with updated user
+✓ DELETE /users/123 returns 204 no content
 ```
 
-**Level 2 (Target):**
-```bash
-POST /users
-{
-  "email": "user@example.com",
-  "password": "secret"
-}
-
-Response: 201 Created
-Location: /users/123
-{
-  "id": 123,
-  "email": "user@example.com"
-}
-```
-
-## 🚫 Common Mistakes to Avoid
-
-### ❌ Don't:
-- Use POST for everything
-- Return 200 for all responses
-- Put actions in URLs (`/users/delete/123`)
-- Ignore idempotency
-- Mix REST levels
-
-### ✅ Do:
-- Use appropriate HTTP methods
-- Return specific status codes
-- Keep URLs resource-focused
-- Make GET, PUT, DELETE idempotent
-- Maintain consistency
-
-## 📊 Success Metrics
+## 🎉 Success Criteria
 
 You've reached Level 2 when:
-- [ ] Each HTTP method has clear purpose
-- [ ] Status codes accurately reflect outcomes
-- [ ] No actions in request bodies
-- [ ] GET requests are cacheable
-- [ ] Errors use standard HTTP codes
+- ✅ All CRUD operations use correct HTTP methods
+- ✅ Responses use appropriate status codes
+- ✅ No actions in request bodies
+- ✅ GET requests are safe and idempotent
+- ✅ DELETE requests are idempotent
+- ✅ Errors return proper HTTP status codes
 
-## 🎉 Level 2 Benefits You'll Enjoy
+## 📚 Resources
 
-1. **Caching**: GET requests cached automatically
-2. **Tools**: Standard REST clients work perfectly
-3. **Debugging**: Clear semantics in logs
-4. **Security**: Method-based authorization
-5. **Performance**: Optimized based on methods
+- HTTP Methods: RFC 7231
+- Status Codes: RFC 7231
+- REST Best Practices
+- API Design Guidelines
 
-## Next: Welcome to Industry Standard!
+## Next Steps
 
-Once you implement HTTP verbs and status codes, you'll be at Level 2 - where most successful APIs live. Check the [Level 2 Guide](../level-2/) to validate your implementation!
+Once you've successfully implemented Level 2:
+1. Stabilize your API at this level
+2. Gather metrics and feedback
+3. Consider if Level 3 (Hypermedia) adds value
+4. Focus on other improvements (performance, security, documentation)
+
+**Remember:** Level 2 is the industry standard. Most successful APIs operate at this level!

@@ -6,6 +6,8 @@ This file provides guidance to Claude Code when working with this repository.
 
 This is a **documentation repository** for API design standards and Spring Boot microservices architecture. It contains comprehensive guidelines for building APIs and microservices using both imperative and reactive approaches. The repository contains only documentation files (`.md` format) and serves as architectural reference documentation.
 
+**Important**: The API design section (`/api-design/`) is completely language-agnostic and contains no programming language-specific code examples. It focuses purely on HTTP/REST principles, patterns, and standards that apply universally to any implementation technology.
+
 ## Architecture Standards
 
 ### Domain-Driven Design Structure
@@ -29,14 +31,16 @@ com.example.{service-name}
 
 ## Documentation Structure
 
-### API Design Standards (`/api-design/`)
-Framework-agnostic HTTP/REST principles organized into:
+### API Design Standards (`/api-design/`) - Language Agnostic
+Universal HTTP/REST principles with no programming language dependencies:
 - **maturity-model/**: Richardson Maturity Model assessment framework for API evaluation
 - **foundations/**: Core API design principles (resource naming, versioning)
 - **request-response/**: HTTP patterns, error formats, pagination, streaming
 - **security/**: Security standards and authentication patterns
 - **advanced-patterns/**: Reactive, event-driven, and streaming architectures
 - **documentation/**: OpenAPI standards, testing, and tooling
+
+**Note**: All API design documentation uses only JSON, YAML, and HTTP examples. No programming language code is included.
 
 ### Spring Implementation Standards (`/spring-design/`)
 Spring Boot-specific patterns organized into:
@@ -53,10 +57,10 @@ Spring Boot-specific patterns organized into:
 The documentation uses a modular approach with supporting directories:
 
 #### **Examples Directories** (`/examples/`, `/*/examples/`)
-Complete implementation examples and setup guides:
+Complete examples and setup guides:
 - **Root examples/**: Cross-cutting examples (testing, CI/CD)
-- **Topic-specific examples/**: Detailed code implementations for specific areas
-- **Framework integration**: Real-world usage patterns and configurations
+- **Topic-specific examples/**: Configuration and pattern examples
+- **API design examples**: HTTP/JSON/YAML examples only, no code
 
 #### **Reference Directories** (`/reference/`, `/*/reference/`)
 Comprehensive technical specifications and comparisons:
@@ -101,8 +105,8 @@ When working with API design topics, consider the user's likely maturity level a
 
 ## Important Distinction
 
-- **api-design/**: Universal principles applicable to any REST framework
-- **spring-design/**: Specific to Spring Boot implementations with concrete code examples
+- **api-design/**: Universal principles applicable to any REST framework (language-agnostic, no code)
+- **spring-design/**: Specific to Spring Boot implementations with concrete Java code examples
 
 ## Maintenance Guidelines
 

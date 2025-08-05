@@ -247,9 +247,8 @@ These examples demonstrate the consistent application of the principles outlined
 
 When implementing these URL structures:
 
-- **Framework-specific examples**: For Spring Boot/Spring WebFlux implementations, see the spring-design standards documentation
-- **REST framework compatibility**: These patterns work with any REST framework (Express.js, FastAPI, Django REST, etc.)
+- **REST framework compatibility**: These patterns work with any REST framework
 - **HTTP method semantics**: Follow standard HTTP method definitions regardless of implementation technology
 - **Error handling**: Use appropriate HTTP status codes and RFC 7807 Problem Details format
 
-The principles outlined here are based on REST architectural constraints and HTTP standards, making them applicable across different programming languages and frameworks.
+The principles outlined here are based on REST architectural constraints and HTTP standards, making them universally applicable.

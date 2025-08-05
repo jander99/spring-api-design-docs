@@ -331,7 +331,6 @@ data: {"orderId": "order-123", "status": "PROCESSING"}
 
 When implementing these streaming patterns:
 
-- **Framework-specific examples**: For Spring WebFlux implementations, see the spring-design standards documentation
 - **HTTP standards**: Follow HTTP/1.1 and HTTP/2 specifications for streaming
 - **Protocol Selection**: Choose appropriate protocol (HTTP streaming, SSE, WebSocket) based on use case
 - **Security**: Implement proper authentication and authorization for streaming endpoints

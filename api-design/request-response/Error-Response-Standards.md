@@ -290,12 +290,7 @@ For multi-language support:
 
 ## Framework Integration
 
-These error standards work with any REST framework:
-
-- **Express.js**: Use middleware for RFC 7807 error handling
-- **FastAPI**: Custom exception handlers with Pydantic models
-- **Django REST Framework**: Custom exception handlers and serializers
-- **Spring Boot**: See spring-design documentation for specific implementation patterns
+These error standards work with any REST framework through standard HTTP response mechanisms and JSON formatting.
 
 ## Related Documentation
 

@@ -120,7 +120,7 @@ Manage complex business processes across multiple services:
 
 ## Implementation Notes
 
-- **Framework-specific examples**: For Spring WebFlux implementations, see the spring-design standards documentation
 - **Event schema evolution**: Design events with schema versioning in mind
 - **Idempotency**: Ensure event processing is idempotent to handle duplicates
 - **Ordering**: Consider event ordering requirements and implement accordingly
+- **Framework agnostic**: These patterns work with any event processing framework

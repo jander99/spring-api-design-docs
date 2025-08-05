@@ -379,7 +379,6 @@ Track error-related metrics:
 
 When implementing reactive error handling:
 
-- **Framework-specific examples**: For Spring WebFlux implementations, see the spring-design standards documentation
 - **Error boundaries**: Implement proper error boundaries to prevent cascading failures
 - **Monitoring**: Implement comprehensive monitoring for error scenarios
 - **Testing**: Test error scenarios thoroughly, including edge cases
