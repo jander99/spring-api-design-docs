@@ -1,5 +1,14 @@
 # Content Types and Structure
 
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 3 minutes | **🟡 Level:** Intermediate
+> 
+> **📋 Prerequisites:** HTTP fundamentals, basic API experience  
+> **🎯 Key Topics:** REST, Architecture, Data
+> 
+> **📊 Complexity:** 13.7 grade level • 3.2% technical density • difficult
+
 ## Overview
 
 This document defines the standard content types and payload structures for API requests and responses. These patterns ensure consistent data exchange across all microservices in our ecosystem.

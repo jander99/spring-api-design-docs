@@ -1,5 +1,14 @@
 # OpenAPI Standards
 
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 5 minutes | **🔴 Level:** Advanced
+> 
+> **📋 Prerequisites:** Strong API background, experience with complex systems  
+> **🎯 Key Topics:** Architecture, Documentation
+> 
+> **📊 Complexity:** 22.1 grade level • 2.2% technical density • very difficult
+
 ## Overview
 
 This document outlines the OpenAPI 3.1+ standards and requirements for creating comprehensive API specifications. These standards ensure consistency, completeness, and interoperability across all API documentation.

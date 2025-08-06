@@ -1,5 +1,14 @@
 # API Design Foundations
 
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 1 minute | **🟢 Level:** Beginner
+> 
+> **📋 Prerequisites:** Basic HTTP knowledge  
+> **🎯 Key Topics:** API Design
+> 
+> **📊 Complexity:** 11.5 grade level • 3.9% technical density • fairly difficult
+
 ## Overview
 
 This directory contains the fundamental principles and standards for API design that form the foundation of all our microservices. These guidelines establish the core patterns for resource naming, URL structure, and versioning strategies that ensure consistency and maintainability across our API ecosystem.

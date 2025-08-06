@@ -1,5 +1,14 @@
 # Request/Response Format Standards
 
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 3 minutes | **🔴 Level:** Advanced
+> 
+> **📋 Prerequisites:** Strong API background, experience with complex systems  
+> **🎯 Key Topics:** Authentication, REST, Architecture
+> 
+> **📊 Complexity:** 19.8 grade level • 3.0% technical density • very difficult
+
 This directory contains comprehensive documentation for API request and response format standards. These documents provide framework-agnostic guidelines for consistent data exchange across microservices.
 
 ## Overview

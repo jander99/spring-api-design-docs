@@ -1,5 +1,14 @@
 # API Versioning Strategy
 
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 2 minutes | **🔴 Level:** Advanced
+> 
+> **📋 Prerequisites:** Strong API background, experience with complex systems  
+> **🎯 Key Topics:** Documentation
+> 
+> **📊 Complexity:** 14.1 grade level • 2.3% technical density • difficult
+
 ## Why Version Your APIs?
 
 APIs need to evolve to meet changing business requirements while maintaining compatibility for existing users. Versioning allows you to:

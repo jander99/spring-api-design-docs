@@ -1,5 +1,14 @@
 # Pagination and Filtering
 
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 2 minutes | **🔴 Level:** Advanced
+> 
+> **📋 Prerequisites:** Strong API background, experience with complex systems  
+> **🎯 Key Topics:** Data, Architecture
+> 
+> **📊 Complexity:** 17.2 grade level • 1.5% technical density • very difficult
+
 ## Overview
 
 This document defines the essential patterns for pagination, filtering, and sorting in collection responses. These patterns ensure consistent behavior across all APIs that return multiple resources.

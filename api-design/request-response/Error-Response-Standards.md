@@ -1,5 +1,14 @@
 # Error Response Standards
 
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 6 minutes | **🔴 Level:** Advanced
+> 
+> **📋 Prerequisites:** Strong API background, experience with complex systems  
+> **🎯 Key Topics:** Data, Architecture
+> 
+> **📊 Complexity:** 14.6 grade level • 2.3% technical density • difficult
+
 ## Overview
 
 Consistent error handling is crucial for creating predictable, debuggable APIs. This document outlines the standards for error responses, including HTTP status codes, error formats, and the RFC 7807 Problem Details standard.

@@ -1,5 +1,14 @@
 # Security Standards
 
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 5 minutes | **🔴 Level:** Advanced
+> 
+> **📋 Prerequisites:** Strong API background, experience with complex systems  
+> **🎯 Key Topics:** Authentication, Security, Architecture
+> 
+> **📊 Complexity:** 16.4 grade level • 2.5% technical density • very difficult
+
 ## Overview
 
 Security is a fundamental aspect of API design that must be implemented consistently across all microservices. This document outlines our high-level approach to authentication, authorization, and API protection.

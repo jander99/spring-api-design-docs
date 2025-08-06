@@ -1,5 +1,14 @@
 # API Documentation Standards
 
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 1 minute | **🔴 Level:** Advanced
+> 
+> **📋 Prerequisites:** Strong API background, experience with complex systems  
+> **🎯 Key Topics:** Documentation
+> 
+> **📊 Complexity:** 16.4 grade level • 1.9% technical density • very difficult
+
 ## Overview
 
 This directory contains comprehensive standards and guidelines for creating, maintaining, and testing API documentation. These standards ensure consistency, completeness, and interoperability across all API documentation while supporting both development and consumer experiences.
