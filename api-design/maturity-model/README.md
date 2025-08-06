@@ -1,5 +1,14 @@
 # Richardson Maturity Model - API Assessment Guide
 
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 2 minutes | **🟢 Level:** Beginner
+> 
+> **📋 Prerequisites:** Basic HTTP knowledge  
+> **🎯 Key Topics:** REST
+> 
+> **📊 Complexity:** 7.8 grade level • 1.2% technical density • easy
+
 ## 🗺️ Find Your API's Maturity Level
 
 The Richardson Maturity Model (RMM) provides a way to grade your REST API's maturity. Use this guide to identify where your API currently stands and discover the path to improvement.

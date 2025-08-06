@@ -1,5 +1,14 @@
 # Resource Naming & URL Structure
 
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 6 minutes | **🔴 Level:** Advanced
+> 
+> **📋 Prerequisites:** Strong API background, experience with complex systems  
+> **🎯 Key Topics:** Architecture, Data
+> 
+> **📊 Complexity:** 15.6 grade level • 1.6% technical density • difficult
+
 ## Overview
 
 Consistent resource naming and URL structure are fundamental to creating intuitive, maintainable APIs across our microservices ecosystem. This document establishes standards for designing RESTful and Reactive API endpoints with predictable patterns that enhance discoverability and usability.

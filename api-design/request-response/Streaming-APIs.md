@@ -1,5 +1,14 @@
 # Streaming APIs
 
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 3 minutes | **🟡 Level:** Intermediate
+> 
+> **📋 Prerequisites:** Basic REST API knowledge  
+> **🎯 Key Topics:** Data, Architecture
+> 
+> **📊 Complexity:** 9.4 grade level • 1.6% technical density • fairly difficult
+
 ## What is Streaming?
 
 Streaming APIs send data in real-time or in chunks instead of all at once. This is useful when you have large amounts of data or need to send updates as they happen.

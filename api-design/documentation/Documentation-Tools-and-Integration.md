@@ -1,5 +1,14 @@
 # Documentation Tools and Integration
 
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 2 minutes | **🟡 Level:** Intermediate
+> 
+> **📋 Prerequisites:** Basic REST API knowledge  
+> **🎯 Key Topics:** Documentation
+> 
+> **📊 Complexity:** 16.0 grade level • 0.7% technical density • difficult
+
 ## Overview
 
 This guide covers the essential tools and integration strategies for creating, hosting, and maintaining API documentation. Choose the right tools for your needs and integrate them into your development workflow.

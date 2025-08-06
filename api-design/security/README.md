@@ -1,5 +1,14 @@
 # API Security Standards
 
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 1 minute | **🟡 Level:** Intermediate
+> 
+> **📋 Prerequisites:** HTTP fundamentals, basic API experience  
+> **🎯 Key Topics:** Authentication, Architecture
+> 
+> **📊 Complexity:** 15.1 grade level • 6.5% technical density • very difficult
+
 ## Overview
 
 This directory contains comprehensive security standards and guidelines for protecting APIs across our microservices ecosystem. These standards establish consistent approaches to authentication, authorization, and API protection that ensure security by design.

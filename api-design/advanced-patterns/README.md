@@ -1,5 +1,14 @@
 # Advanced API Patterns
 
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 1 minute | **🟡 Level:** Intermediate
+> 
+> **📋 Prerequisites:** HTTP fundamentals, basic API experience  
+> **🎯 Key Topics:** Architecture
+> 
+> **📊 Complexity:** 12.4 grade level • 3.2% technical density • difficult
+
 ## Overview
 
 This directory contains advanced architectural patterns and specialized techniques for building sophisticated, scalable APIs. These patterns support event-driven architectures, streaming protocols, reactive programming, and complex data flow scenarios.
