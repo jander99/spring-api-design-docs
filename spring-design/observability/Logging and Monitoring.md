@@ -89,7 +89,7 @@ Implement correlation ID filter:
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CorrelationIdFilter implements Filter {
     
-    private static final String CORRELATION_ID_HEADER = "X-Correlation-ID";
+    private static final String CORRELATION_ID_HEADER = "X-Request-ID";
     private static final String CORRELATION_ID_MDC_KEY = "correlationId";
     
     @Override
@@ -128,7 +128,7 @@ Implement correlation ID filter for WebFlux:
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ReactiveCorrelationIdFilter implements WebFilter {
     
-    private static final String CORRELATION_ID_HEADER = "X-Correlation-ID";
+    private static final String CORRELATION_ID_HEADER = "X-Request-ID";
     private static final String CORRELATION_ID_ATTR = "correlationId";
     
     @Override
@@ -1130,5 +1130,16 @@ public class OrderMetricsService {
     }
 }
 ```
+
+## Related Documentation
+
+### API Design Standards (Language-Agnostic)
+- [API Observability Standards](../../api-design/advanced-patterns/API-Observability-Standards.md) - Protocol-level observability patterns and HTTP standards
+
+### Spring Implementation  
+- [Observability Configuration](../configuration/Observability-Configuration.md) - Configuration patterns for metrics and tracing
+- [Error Logging and Monitoring](../error-handling/Error-Logging-and-Monitoring.md) - Error handling observability
+- [Infrastructure Testing](../testing/specialized-testing/Infrastructure-Testing.md) - Testing observability components
+- [Security Context Propagation](../security/Security-Context-Propagation.md) - Security context in traces
 
 These logging and monitoring practices ensure comprehensive operational visibility into our microservices, enabling effective troubleshooting, performance analysis, and business intelligence.

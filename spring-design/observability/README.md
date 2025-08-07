@@ -196,7 +196,11 @@ management:
 
 ## Related Documentation
 
+### API Design Standards (Language-Agnostic)
+- [API Observability Standards](../../api-design/advanced-patterns/API-Observability-Standards.md) - Protocol-level observability patterns
+
+### Spring Implementation
 - [Observability Configuration](../configuration/Observability-Configuration.md)
-- [Error Logging and Monitoring](../error-handling/Error-Logging-and-Monitoring.md)
+- [Error Logging and Monitoring](../error-handling/Error-Logging-and-Monitoring.md)  
 - [Infrastructure Testing](../testing/specialized-testing/Infrastructure-Testing.md)
 - [Security Context Propagation](../security/Security-Context-Propagation.md)

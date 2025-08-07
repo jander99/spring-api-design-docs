@@ -3,7 +3,7 @@
 ## Missing Documentation (High Priority)
 
 ### New Documents Needed - API Design (Language-Agnostic)
-- [ ] **API Observability Standards** ⭐ NEW
+- [x] **API Observability Standards** ⭐ NEW ✅ COMPLETE
   - Health check endpoint standards (`/health`, `/ready`, `/live`)
   - Metrics endpoint patterns (`/metrics`, `/prometheus`)
   - OpenTelemetry header propagation standards
@@ -67,6 +67,7 @@
   - URL structure for multi-tenant APIs
 
 ### ✅ Completed Documentation
+- [x] **API Observability Standards** (Language-agnostic) - Complete in `/api-design/advanced-patterns/API-Observability-Standards.md`
 - [x] **Observability Standards** (Spring-specific) - Complete in `/spring-design/observability/`
 - [x] **API Testing Standards** - Complete in `/spring-design/testing/` with comprehensive coverage
 - [x] **Event-Driven Architecture** - Complete in `/api-design/advanced-patterns/`

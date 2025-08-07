@@ -30,33 +30,40 @@ Use appropriate HTTP status codes for different error scenarios:
 
 ## Error Response Structure
 
-All error responses should follow this structure:
+All error responses must follow RFC 7807 Problem Details standard with Content-Type `application/problem+json`:
 
 ```json
 {
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "The request contains invalid parameters",
-    "details": [
-      {
-        "field": "email",
-        "code": "INVALID_FORMAT",
-        "message": "Email address is not properly formatted"
-      }
-    ]
-  },
-  "meta": {
-    "timestamp": "2024-07-15T14:32:22Z",
-    "requestId": "req-12345"
-  }
+  "type": "https://example.com/problems/validation-error",
+  "title": "Validation Error",
+  "status": 400,
+  "detail": "The request contains invalid parameters",
+  "instance": "/api/orders/123",
+  "invalid_params": [
+    {
+      "name": "email",
+      "reason": "Email address is not properly formatted"
+    }
+  ]
 }
 ```
 
-## Error Code Standards
+### RFC 7807 Standard Fields
 
-1. **Unique Error Codes**: Define unique, descriptive error codes
-2. **Domain Prefixes**: Prefix error codes with domain area (e.g., `ORD_` for order-related errors)
-3. **Versioned Error Codes**: Maintain backward compatibility of error codes across versions
+| Field | Required | Description |
+|-------|----------|-------------|
+| `type` | Optional | URI identifying the problem type (defaults to "about:blank") |
+| `title` | Optional | Human-readable summary of the problem type |
+| `status` | Optional | HTTP status code for convenience |
+| `detail` | Optional | Human-readable explanation specific to this occurrence |
+| `instance` | Optional | URI reference identifying the specific occurrence |
+
+## Problem Type Standards
+
+1. **Problem Type URIs**: Define unique URIs for each problem type (e.g., `https://api.example.com/problems/validation-error`)
+2. **Domain-Specific Types**: Organize problem types by domain area
+3. **Stable Identifiers**: Maintain stable problem type URIs across API versions
+4. **Extension Fields**: Use additional fields for context-specific information
 
 ### Common Error Code Patterns
 

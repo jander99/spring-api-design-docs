@@ -2,9 +2,9 @@
 
 ## 🎯 Goal: Use HTTP Properly
 
-Transform your resource-based API to use HTTP methods and status codes correctly.
+Use HTTP methods and status codes the right way.
 
-## Step 1: Map Operations to HTTP Methods
+## Step 1: Use HTTP Methods
 
 ### Current State (Level 1):
 ```
@@ -20,7 +20,7 @@ PUT    /users/123  → Update user
 DELETE /users/123  → Delete user
 ```
 
-### 🔄 Operation Mapping Guide:
+### How to Map Operations:
 
 | Your Current Action | HTTP Method | Purpose |
 |---------------------|-------------|---------|
@@ -66,9 +66,9 @@ DELETE /users/123  → Delete user
 - Specific HTTP status codes
 - Separate handlers per HTTP method
 
-## Step 4: Migration Strategy
+## Step 4: How to Switch
 
-### Phase 1: Add New Methods (Week 1-2)
+### Phase 1: Add New Methods
 - Support both old POST-based and new HTTP verb patterns
 - Keep existing endpoints operational
 - Add new HTTP method handlers
