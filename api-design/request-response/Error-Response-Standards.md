@@ -30,7 +30,7 @@ Use appropriate HTTP status codes for different error scenarios:
 
 ## Error Response Structure
 
-All error responses must follow RFC 7807 Problem Details standard with content type `application/problem+json`:
+All error responses must follow RFC 7807 Problem Details standard with Content-Type `application/problem+json`:
 
 ```json
 {
