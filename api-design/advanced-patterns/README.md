@@ -27,6 +27,10 @@ Specialized documentation patterns for streaming APIs and real-time data flows. 
 ### [Reactive-Error-Handling.md](Reactive-Error-Handling.md)
 Advanced error handling patterns for reactive and streaming APIs. Includes strategies for managing errors in asynchronous operations, stream failures, and distributed system fault tolerance.
 
+### [API-Observability-Standards.md](API-Observability-Standards.md) ⭐ NEW
+**⏱️ 10 min read • 🔴 Advanced**  
+Comprehensive framework for API observability including health checks, metrics exposure, distributed tracing, and operational monitoring. Defines language-agnostic standards for implementing the three pillars of observability in REST APIs.
+
 ## Navigation
 
 - [← Back to API Design](../README.md)
