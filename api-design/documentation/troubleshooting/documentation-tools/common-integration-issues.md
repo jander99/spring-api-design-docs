@@ -1,16 +1,16 @@
 # Common Integration Issues and Solutions
 
-This guide covers frequent problems encountered when integrating documentation tools and their solutions.
+This guide covers common problems with documentation tools and how to fix them.
 
 ## Swagger UI Issues
 
-### Problem: Swagger UI Not Loading
-**Symptoms:**
+### Swagger UI Won't Load
+**What you see:**
 - Blank page or loading spinner
-- Console errors about missing resources
-- CORS errors in browser
+- Browser shows missing file errors
+- CORS errors
 
-**Solutions:**
+**How to fix:**
 ```bash
 # Check if OpenAPI spec is valid
 swagger-codegen validate -i openapi.yaml
@@ -22,19 +22,19 @@ curl -I -H "Origin: http://localhost:3000" http://api.example.com/openapi.yaml
 ls -la openapi.yaml
 ```
 
-**Common Fixes:**
-- Ensure OpenAPI spec is valid JSON/YAML
-- Add CORS headers to API server
+**Quick fixes:**
+- Check OpenAPI file is valid
+- Fix CORS headers
 - Check file paths and permissions
-- Verify CDN resources are accessible
+- Check CDN files work
 
 ### Problem: Authentication Not Working
-**Symptoms:**
+**What you see:**
 - API calls fail with 401/403 errors
 - Authorization header not sent
 - OAuth flow redirects fail
 
-**Solutions:**
+**How to fix:**
 ```yaml
 # Correct OAuth2 configuration
 securitySchemes:
@@ -56,12 +56,12 @@ securitySchemes:
 4. Test auth flow manually
 
 ### Problem: Large API Spec Performance
-**Symptoms:**
+**What you see:**
 - Slow loading times
 - Browser freezing
 - Memory issues
 
-**Solutions:**
+**How to fix:**
 ```yaml
 # Split large specs into multiple files
 # main.yaml
@@ -88,12 +88,12 @@ components:
 ## Redoc Issues
 
 ### Problem: Styling Conflicts
-**Symptoms:**
+**What you see:**
 - Broken layout
 - Missing styles
 - Overlapping elements
 
-**Solutions:**
+**How to fix:**
 ```html
 <!-- Isolate Redoc styles -->
 <div class="redoc-container">
@@ -121,12 +121,12 @@ components:
 - Use CSS-in-JS if needed
 
 ### Problem: Custom Themes Not Applied
-**Symptoms:**
+**What you see:**
 - Default theme still showing
 - Custom colors not applied
 - Font changes ignored
 
-**Solutions:**
+**How to fix:**
 ```json
 // Custom theme configuration
 {
@@ -163,12 +163,12 @@ components:
 ## GitHub Pages Deployment Issues
 
 ### Problem: 404 Errors After Deployment
-**Symptoms:**
+**What you see:**
 - Main page loads but assets return 404
 - Relative links broken
 - Images not displaying
 
-**Solutions:**
+**How to fix:**
 ```yaml
 # Fix base URL in GitHub Actions
 - name: Deploy to GitHub Pages
@@ -180,19 +180,19 @@ components:
     destination_dir: docs
 ```
 
-**Common Fixes:**
+**Quick fixes:**
 - Use absolute paths for assets
 - Configure base URL correctly
 - Check repository settings
 - Verify branch protection rules
 
 ### Problem: Build Fails in Actions
-**Symptoms:**
+**What you see:**
 - GitHub Actions workflow fails
 - Build step errors
 - Permission denied errors
 
-**Solutions:**
+**How to fix:**
 ```yaml
 # Add proper permissions
 jobs:
@@ -220,12 +220,12 @@ jobs:
 ## Backstage Integration Issues
 
 ### Problem: API Not Appearing in Catalog
-**Symptoms:**
+**What you see:**
 - API registered but not visible
 - Catalog shows empty results
 - Discovery errors in logs
 
-**Solutions:**
+**How to fix:**
 ```yaml
 # Correct catalog-info.yaml structure
 apiVersion: backstage.io/v1alpha1
@@ -252,12 +252,12 @@ spec:
 - Test with minimal catalog entry
 
 ### Problem: TechDocs Not Building
-**Symptoms:**
+**What you see:**
 - Documentation pages show 404
 - Build fails with MkDocs errors
 - Missing documentation in portal
 
-**Solutions:**
+**How to fix:**
 ```yaml
 # mkdocs.yml configuration
 site_name: My API Documentation
@@ -279,12 +279,12 @@ nav:
 ## CI/CD Pipeline Issues
 
 ### Problem: OpenAPI Validation Fails
-**Symptoms:**
+**What you see:**
 - Pipeline fails at validation step
 - Spec lint errors
 - Invalid OpenAPI format
 
-**Solutions:**
+**How to fix:**
 ```bash
 # Use multiple validators
 # Spectral for advanced linting
@@ -304,12 +304,12 @@ redocly lint openapi.yaml
 - Malformed examples
 
 ### Problem: Documentation Not Updating
-**Symptoms:**
+**What you see:**
 - Changes not reflected in docs
 - Caching issues
 - Stale content
 
-**Solutions:**
+**How to fix:**
 ```yaml
 # Force cache invalidation
 - name: Deploy documentation
@@ -330,12 +330,12 @@ redocly lint openapi.yaml
 ## Authentication and Authorization Issues
 
 ### Problem: OAuth Flow Broken
-**Symptoms:**
+**What you see:**
 - Redirect loops
 - Token not persisting
 - PKCE errors
 
-**Solutions:**
+**How to fix:**
 ```javascript
 // Correct OAuth configuration
 const swaggerUIBundle = SwaggerUIBundle({
@@ -359,12 +359,12 @@ const swaggerUIBundle = SwaggerUIBundle({
 - CORS configuration errors
 
 ### Problem: API Keys Not Working
-**Symptoms:**
+**What you see:**
 - Authentication header missing
 - API key format incorrect
 - Security scheme not applied
 
-**Solutions:**
+**How to fix:**
 ```yaml
 # Correct API key security scheme
 components:
@@ -392,12 +392,12 @@ paths:
 ## Performance and Scalability Issues
 
 ### Problem: Slow Documentation Loading
-**Symptoms:**
+**What you see:**
 - Long page load times
 - High bandwidth usage
 - Poor user experience
 
-**Solutions:**
+**How to fix:**
 ```nginx
 # Nginx configuration for documentation
 server {
@@ -423,12 +423,12 @@ server {
 - Optimize images
 
 ### Problem: High Memory Usage
-**Symptoms:**
+**What you see:**
 - Browser crashes
 - Slow rendering
 - Memory leaks
 
-**Solutions:**
+**How to fix:**
 ```javascript
 // Implement pagination for large APIs
 const swaggerUIBundle = SwaggerUIBundle({

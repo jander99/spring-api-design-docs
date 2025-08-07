@@ -1,31 +1,31 @@
 # API Deprecation Policies Reference
 
-This document provides comprehensive guidance on API deprecation policies, including detailed timelines, HTTP headers, and implementation strategies.
+This document shows how to deprecate APIs properly. It covers timelines, HTTP headers, and implementation.
 
 ## Deprecation Timeline Policies
 
-### Standard Support Timeframes
+### Support Times
 
 #### Minimum Support Duration
 - **Public APIs**: 12 months after deprecation notice
 - **Partner APIs**: 6 months after deprecation notice  
 - **Internal APIs**: 3 months after deprecation notice
 
-#### Extended Support Considerations
-- **High-traffic endpoints**: 18-24 months for endpoints with >10k daily requests
-- **Critical integrations**: Case-by-case negotiation with key customers
-- **Security vulnerabilities**: Immediate deprecation with 30-day sunset for critical issues
+#### Extended Support
+- **High-traffic endpoints**: 18-24 months for endpoints with over 10,000 daily requests
+- **Critical integrations**: Negotiate with important customers case by case
+- **Security vulnerabilities**: Deprecate immediately, remove in 30 days for critical issues
 
-### Traffic-Based Support Decisions
+### Support Based on Usage
 
-#### Usage Thresholds
+#### Traffic Levels
 - **Low traffic** (<100 requests/day): Standard minimum support
 - **Medium traffic** (100-1000 requests/day): Extended support consideration
 - **High traffic** (>1000 requests/day): Mandatory extended support
 
-#### Monitoring Requirements
-- Track daily request counts per deprecated endpoint
-- Monitor unique client identifiers accessing deprecated endpoints
+#### What to Monitor
+- Count daily requests to each deprecated endpoint
+- Track which clients use deprecated endpoints
 - Measure error rates and response times for deprecated endpoints
 
 ## HTTP Deprecation Headers
@@ -36,17 +36,17 @@ This document provides comprehensive guidance on API deprecation policies, inclu
 ```http
 Deprecation: true
 ```
-- **Required**: Must be present on all deprecated endpoint responses
+- **Required**: Add to all deprecated endpoint responses
 - **Format**: Boolean value (true/false)
-- **Purpose**: Machine-readable deprecation indicator
+- **Purpose**: Shows machines the endpoint is deprecated
 
 #### Sunset Header
 ```http
 Sunset: Sat, 31 Dec 2025 23:59:59 GMT
 ```
 - **Required**: Must specify exact sunset date/time
-- **Format**: HTTP-date format (RFC 7231)
-- **Purpose**: Indicates when the endpoint will be removed
+- **Format**: HTTP date format
+- **Purpose**: Shows when the endpoint will be removed
 
 #### Link Header for Successor
 ```http
