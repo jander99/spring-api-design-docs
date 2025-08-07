@@ -29,14 +29,14 @@ Consistent resource naming and URL structure are fundamental to creating intuiti
 |---------|---------|-------------|
 | Use nouns for resources | `/orders`, `/customers` | Resources represent entities, not actions |
 | Use plural for collections | `/orders` | Endpoints returning multiple resources use plural nouns |
-| Use singular for specific resources | `/order/{orderId}` | Endpoints returning a single resource use singular nouns |
+| Use consistent plural resources | `/orders/{orderId}` | All resource endpoints use plural nouns for consistency |
 | Use kebab-case for multi-word resources | `/shipping-addresses` | Multi-word resource names should use kebab-case |
 | Use lowercase letters | `/orders` not `/Orders` | All URL paths should use lowercase letters |
-| Use descriptive identifiers | `/order/12345` not `/order/id/12345` | Avoid redundant path segments |
+| Use descriptive identifiers | `/orders/12345` not `/orders/id/12345` | Avoid redundant path segments |
 
 ### HTTP Verbs Usage
 
-| HTTP Verb | Collection (`/orders`) | Specific Item (`/order/{orderId}`) |
+| HTTP Verb | Collection (`/orders`) | Specific Item (`/orders/{orderId}`) |
 |-----------|------------------------|-----------------------------------|
 | GET | Retrieve list of orders | Retrieve specific order |
 | POST | Create new order | N/A (use PUT or PATCH for the specific resource) |
@@ -46,14 +46,14 @@ Consistent resource naming and URL structure are fundamental to creating intuiti
 
 ### Important Distinction
 
-A key distinction in our API convention is the semantic difference between plural and singular resource endpoints:
+A key distinction in our API convention is the semantic difference between collection and specific resource endpoints:
 
 - **Plural Endpoint (`/orders`)**: 
   - Represents a collection resource
   - Returns a collection of resources (array/list)
   - Used for collection operations
 
-- **Singular Endpoint (`/order/{orderId}`)**: 
+- **Specific Resource (`/orders/{orderId}`)**: 
   - Represents a specific resource instance
   - Returns a single resource object
   - Used for instance operations
