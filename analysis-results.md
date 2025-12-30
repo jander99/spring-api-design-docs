@@ -24,7 +24,7 @@ Intermediate: 16 documents (31.4%)
 2. common-issues.md - 14 minutes (Advanced)
 3. common-problems.md - 10 minutes (Advanced)
 4. advanced-patterns.md - 10 minutes (Advanced)
-5. Reactive-Error-Handling.md - 9 minutes (Intermediate)
+5. reactive-error-handling.md - 9 minutes (Intermediate)
 
 
 === Spring Design Section Analysis ===
@@ -41,9 +41,9 @@ Advanced: 50 documents (98.0%)
 Intermediate: 1 documents (2.0%)
 
 === Most Complex Documents ===
-1. Rate-Limiting-and-Protection.md - Grade 27.3 (Advanced)
-2. Security-Testing.md - Grade 26.4 (Advanced)
-3. CORS-and-Headers.md - Grade 24.6 (Advanced)
+1. rate-limiting-and-protection.md - Grade 27.3 (Advanced)
+2. security-testing.md - Grade 26.4 (Advanced)
+3. cors-and-headers.md - Grade 24.6 (Advanced)
 4. Logging and Monitoring.md - Grade 24.1 (Advanced)
 5. Security-Configuration.md - Grade 24.0 (Advanced)
 

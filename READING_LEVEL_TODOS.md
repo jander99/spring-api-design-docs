@@ -50,19 +50,19 @@ These documents need to be broken down for better digestibility:
 
 ### Language Simplification for Frequently-Used Docs
 
-- [ ] **Simplify Resource Naming and URL Structure.md** (Grade 15.6, 6 min)
+- [ ] **Simplify resource-naming-and-url-structure.md** (Grade 15.6, 6 min)
   - Target Grade Level: 12.0
   - Shorter sentences (currently avg 18 words)
   - More concrete examples upfront
   - Break long paragraphs
 
-- [ ] **Improve Error-Response-Standards.md** (Grade 16.4, 6 min)
+- [ ] **Improve error-response-standards.md** (Grade 16.4, 6 min)
   - Target Grade Level: 13.0
   - Lead with simple RFC 7807 example
   - Progressive complexity (basic → advanced)
   - Visual error response structure
 
-- [ ] **Streamline Security Standards.md** (Grade 17.2, 5 min)
+- [ ] **Streamline security-standards.md** (Grade 17.2, 5 min)
   - Target Grade Level: 14.0
   - Create "Security Checklist" section
   - Simplify OAuth explanation

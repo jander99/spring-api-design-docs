@@ -8,7 +8,7 @@ This directory contains architectural guidelines and patterns for building Sprin
 
 ### Core Architecture Documentation
 
-- **[Dependency Injection and Component Management](Dependency%20Injection%20and%20Component%20Management.md)**: Comprehensive guide to Spring's dependency injection patterns, component scanning, configuration management, and best practices for managing application dependencies and lifecycle.
+- **[Dependency Injection and Component Management](dependency-injection-and-component-management.md)**: Comprehensive guide to Spring's dependency injection patterns, component scanning, configuration management, and best practices for managing application dependencies and lifecycle.
 
 ## Key Architecture Principles
 
@@ -87,7 +87,7 @@ public class DatabaseConfig {
 
 ## Related Documentation
 
-- [Project Structure and Package Organization](../project-structure/Package-Organization.md)
-- [Configuration Principles](../configuration/Configuration-Principles.md)
+- [Project Structure and Package Organization](../project-structure/package-organization.md)
+- [Configuration Principles](../configuration/configuration-principles.md)
 - [Security Configuration](../security/README.md)
 - [Error Handling Standards](../error-handling/README.md)

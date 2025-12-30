@@ -224,5 +224,5 @@ http_server_requests_seconds{method="GET",status="200",uri="/orders",quantile="0
 
 ## Related Documentation
 
-- [API Observability Standards](../../API-Observability-Standards.md)
+- [API Observability Standards](../../api-observability-standards.md)
 - [Health Check Examples](health-check-example.md)

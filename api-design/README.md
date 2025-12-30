@@ -32,8 +32,8 @@ Use this documentation when you need to:
 | If you want to... | Start here |
 |-------------------|------------|
 | Assess your API maturity | [Richardson Maturity Model](maturity-model/README.md) |
-| Name resources and URLs | [Resource Naming](foundations/Resource%20Naming%20and%20URL%20Structure.md) |
-| Version your API | [API Version Strategy](foundations/API%20Version%20Strategy.md) |
+| Name resources and URLs | [Resource Naming](foundations/resource-naming-and-url-structure.md) |
+| Version your API | [API Version Strategy](foundations/api-version-strategy.md) |
 
 ### Core Topics
 

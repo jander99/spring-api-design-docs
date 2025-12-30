@@ -13,7 +13,7 @@ This section covers how to protect your APIs. Security is critical for every API
 
 ## Files
 
-### [Security Standards.md](Security%20Standards.md)
+### [Security Standards](security-standards.md)
 **How to secure your API**
 
 Covers:

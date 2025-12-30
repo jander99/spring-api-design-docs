@@ -26,7 +26,7 @@ Based on our documentation philosophy, we've established these readability ceili
 3. **api-design/security/README.md** - Grade 14.8 ❌
 
 ### Main Documentation Exceeding Grade 14 Ceiling
-- **API-Observability-Standards.md** - Grade 14.4 (Borderline acceptable)
+- **api-observability-standards.md** - Grade 14.4 (Borderline acceptable)
 - Additional scanning needed for complete assessment
 
 ### Reference/Troubleshooting Exceeding Grade 16 Ceiling

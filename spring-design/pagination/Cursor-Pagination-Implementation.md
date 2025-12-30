@@ -589,4 +589,4 @@ List<Order> findFirstPage(Pageable pageable);
 ## Related Documentation
 
 - [Cursor Pagination Concepts](../../api-design/request-response/reference/pagination/cursor-pagination.md) - Language-agnostic cursor pagination guide
-- [Pagination and Filtering](../../api-design/request-response/Pagination-and-Filtering.md) - General pagination standards
+- [Pagination and Filtering](../../api-design/request-response/pagination-and-filtering.md) - General pagination standards

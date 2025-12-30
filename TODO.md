@@ -67,7 +67,7 @@
   - URL structure for multi-tenant APIs
 
 ### ✅ Completed Documentation
-- [x] **API Observability Standards** (Language-agnostic) - Complete in `/api-design/advanced-patterns/API-Observability-Standards.md`
+- [x] **API Observability Standards** (Language-agnostic) - Complete in `/api-design/advanced-patterns/api-observability-standards.md`
 - [x] **Observability Standards** (Spring-specific) - Complete in `/spring-design/observability/`
 - [x] **API Testing Standards** - Complete in `/spring-design/testing/` with comprehensive coverage
 - [x] **Event-Driven Architecture** - Complete in `/api-design/advanced-patterns/`
@@ -105,12 +105,12 @@
 
 ### Document-Specific Improvements
 - [x] **OpenAPI Standards** ✅ COMPLETE
-  - Already reorganized in `/api-design/documentation/OpenAPI-Standards.md`
+  - Already reorganized in `/api-design/documentation/openapi-standards.md`
   - Has logical sections and practical examples
   - Includes security documentation and versioning
 
 - [x] **API Version Strategy** ✅ COMPLETE
-  - Well-documented in `/api-design/foundations/API Version Strategy.md`
+  - Well-documented in `/api-design/foundations/api-version-strategy.md`
   - Examples in `/api-design/examples/versioning/`
   - Deprecation policies in `/api-design/reference/versioning/`
 

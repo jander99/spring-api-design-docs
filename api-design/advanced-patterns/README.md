@@ -13,27 +13,27 @@ This section covers advanced patterns for complex APIs. Use these when you need 
 
 ## Files
 
-### [Event-Driven-Architecture.md](Event-Driven-Architecture.md)
+### [Event-Driven Architecture](event-driven-architecture.md)
 **Building event-based systems**
 
 Covers event types, routing, and async processing.
 
-### [HTTP-Streaming-Patterns.md](HTTP-Streaming-Patterns.md)
+### [HTTP Streaming Patterns](http-streaming-patterns.md)
 **Streaming data over HTTP**
 
 Covers SSE, WebSockets, and real-time delivery.
 
-### [Streaming-Documentation-Patterns.md](Streaming-Documentation-Patterns.md)
+### [Streaming Documentation Patterns](streaming-documentation-patterns.md)
 **Documenting streaming APIs**
 
 Covers how to document async and streaming endpoints.
 
-### [Reactive-Error-Handling.md](Reactive-Error-Handling.md)
+### [Reactive Error Handling](reactive-error-handling.md)
 **Handling errors in reactive APIs**
 
 Covers error patterns for async and streaming systems.
 
-### [API-Observability-Standards.md](API-Observability-Standards.md)
+### [API Observability Standards](api-observability-standards.md)
 **Monitoring your APIs**
 
 Covers health checks, metrics, and distributed tracing.

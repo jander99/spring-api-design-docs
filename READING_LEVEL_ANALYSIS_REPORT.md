@@ -35,9 +35,9 @@ These documents are nearly impossible for junior engineers:
 5. **next-steps.md** - Grade 25.4 (varies)
 
 **Spring Design Section:**
-1. **Rate-Limiting-and-Protection.md** - Grade 27.3
-2. **Security-Testing.md** - Grade 26.4
-3. **CORS-and-Headers.md** - Grade 24.6
+1. **rate-limiting-and-protection.md** - Grade 27.3
+2. **security-testing.md** - Grade 26.4
+3. **cors-and-headers.md** - Grade 24.6
 4. **Logging and Monitoring.md** - Grade 24.1
 5. **Security-Configuration.md** - Grade 24.0
 
@@ -67,9 +67,9 @@ These documents are too long for effective learning:
 
 #### 2. **Simplify Language in Core Guides**
 Target these frequently-accessed documents for language simplification:
-- **Resource Naming and URL Structure.md** (Grade 15.6, 6 min)
-- **Error-Response-Standards.md** (Grade 16.4, 6 min) 
-- **Security Standards.md** (Grade 17.2, 5 min)
+- **resource-naming-and-url-structure.md** (Grade 15.6, 6 min)
+- **error-response-standards.md** (Grade 16.4, 6 min) 
+- **security-standards.md** (Grade 17.2, 5 min)
 
 #### 3. **Create Beginner-Friendly Entry Points**
 We need more Beginner-level content:

@@ -47,11 +47,11 @@ Most modern APIs are at Level 2, and that's perfectly fine! Use our guide to und
 
 1. **Assess Your API**: Use the [Richardson Maturity Model assessment](api-design/maturity-model/assessment-guide.md) (5 minutes)
 2. **API Design**: Review [foundations](api-design/foundations/) and [request/response patterns](api-design/request-response/)
-3. **Architecture**: Set up [DDD package structure](spring-design/project-structure/Package-Organization.md)
-4. **Implementation**: Choose [imperative](spring-design/project-structure/Imperative-Examples.md) or [reactive](spring-design/project-structure/Reactive-Examples.md)
+3. **Architecture**: Set up [DDD package structure](spring-design/project-structure/package-organization.md)
+4. **Implementation**: Choose [imperative](spring-design/project-structure/imperative-examples.md) or [reactive](spring-design/project-structure/reactive-examples.md)
 5. **Controllers**: Implement using [controller patterns](spring-design/controllers/)
 6. **Error Handling**: Apply [error handling](spring-design/error-handling/) with RFC 7807
-7. **Security**: Configure [OAuth 2.1](spring-design/security/OAuth2-Resource-Server.md) and [authorization](spring-design/security/)
+7. **Security**: Configure [OAuth 2.1](spring-design/security/oauth2-resource-server.md) and [authorization](spring-design/security/)
 8. **Testing**: Follow [testing patterns](spring-design/testing/) (unit, integration, specialized)
 9. **Production**: Add [observability](spring-design/observability/) and [configuration](spring-design/configuration/)
 
@@ -99,8 +99,8 @@ Key directories:
 | **Assessment** | [Maturity Model](api-design/maturity-model/) | - |
 | **API Design** | [API Standards](api-design/) | [Controllers](spring-design/controllers/) |
 | **Project Setup** | [Foundations](api-design/foundations/) | [Project Structure](spring-design/project-structure/) |
-| **Error Handling** | [Error Standards](api-design/request-response/Error-Response-Standards.md) | [Error Handling](spring-design/error-handling/) |
+| **Error Handling** | [Error Standards](api-design/request-response/error-response-standards.md) | [Error Handling](spring-design/error-handling/) |
 | **Security** | [Security Standards](api-design/security/) | [Security Implementation](spring-design/security/) |
-| **Testing** | [Documentation Testing](api-design/documentation/Documentation-Testing.md) | [Testing Patterns](spring-design/testing/) |
+| **Testing** | [Documentation Testing](api-design/documentation/documentation-testing.md) | [Testing Patterns](spring-design/testing/) |
 | **Production** | [Advanced Patterns](api-design/advanced-patterns/) | [Observability](spring-design/observability/) |
 

@@ -191,5 +191,5 @@ Client
 
 ## Related Documentation
 
-- [API Observability Standards](../../API-Observability-Standards.md)
-- [Error Response Standards](../../../request-response/Error-Response-Standards.md)
+- [API Observability Standards](../../api-observability-standards.md)
+- [Error Response Standards](../../../request-response/error-response-standards.md)

@@ -607,6 +607,6 @@ matchers:
 
 ## Related Documentation
 
-- [API Integration Testing](../integration-testing/API-Integration-Testing.md)
-- [Error Response Standards](../../../api-design/request-response/Error-Response-Standards.md)
-- [API Version Strategy](../../../api-design/foundations/API%20Version%20Strategy.md)
+- [API Integration Testing](../integration-testing/api-integration-testing.md)
+- [Error Response Standards](../../../api-design/request-response/error-response-standards.md)
+- [API Version Strategy](../../../api-design/foundations/api-version-strategy.md)

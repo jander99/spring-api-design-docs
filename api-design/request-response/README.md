@@ -18,28 +18,28 @@ Good formats make APIs easy to use. This guide covers:
 
 ## Documentation
 
-### [Content Types and Structure](Content-Types-and-Structure.md)
+### [Content Types and Structure](content-types-and-structure.md)
 **How to structure requests and responses**
 - Standard content types
 - Request validation
 - Response format
 - Link patterns (HATEOAS)
 
-### [Error Response Standards](Error-Response-Standards.md)
+### [Error Response Standards](error-response-standards.md)
 **How to handle errors**
 - HTTP status codes
 - Error response format
 - RFC 7807 Problem Details
 - Error code naming
 
-### [Pagination and Filtering](Pagination-and-Filtering.md)
+### [Pagination and Filtering](pagination-and-filtering.md)
 **How to return lists**
 - Page response structure
 - Filtering patterns
 - Sorting options
 - Search features
 
-### [Streaming APIs](Streaming-APIs.md)
+### [Streaming APIs](streaming-apis.md)
 **How to stream data**
 - NDJSON format
 - Server-Sent Events (SSE)
@@ -147,5 +147,5 @@ All patterns use HTTP and JSON. They work with any REST framework.
 
 - [API Design Standards](../) - Full API design guide
 - [Spring Design Standards](../../spring-design/) - Spring Boot patterns
-- [Security Standards](../security/Security%20Standards.md) - Security guide
-- [API Version Strategy](../foundations/API%20Version%20Strategy.md) - Versioning guide
+- [Security Standards](../security/security-standards.md) - Security guide
+- [API Version Strategy](../foundations/api-version-strategy.md) - Versioning guide

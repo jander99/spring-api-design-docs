@@ -3,7 +3,7 @@
 ## Critical Issues Found
 
 ### 1. **Resource Naming Convention Error** ❌
-**File**: `api-design/foundations/Resource Naming and URL Structure.md`  
+**File**: `api-design/foundations/resource-naming-and-url-structure.md`  
 **Line**: 32  
 **Issue**: Documentation suggests using singular nouns for specific resources (`/order/{orderId}`)  
 **Industry Standard**: Use plural nouns throughout (`/orders/{orderId}`)  
@@ -20,7 +20,7 @@
 ```
 
 ### 2. **Error Response Format Not RFC 7807 Compliant** ❌
-**File**: `api-design/request-response/Error-Response-Standards.md`  
+**File**: `api-design/request-response/error-response-standards.md`  
 **Lines**: 35-50  
 **Issue**: Custom error format instead of RFC 7807 Problem Details standard  
 **Severity**: HIGH - Doesn't follow established web standards  
@@ -72,7 +72,7 @@
 ## Medium Priority Issues
 
 ### 3. **HTTP Verb Usage Table Inconsistency** ⚠️
-**File**: `api-design/foundations/Resource Naming and URL Structure.md`  
+**File**: `api-design/foundations/resource-naming-and-url-structure.md`  
 **Lines**: 39-42  
 **Issue**: Shows collection and specific item with different base paths  
 **Impact**: Confusing mixed messaging about singular vs plural  

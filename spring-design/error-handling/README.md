@@ -8,37 +8,37 @@ This directory contains comprehensive documentation for error handling and excep
 
 ### Core Components
 
-1. **[Exception Hierarchy](./Exception-Hierarchy.md)**
+1. **[Exception Hierarchy](./exception-hierarchy.md)**
    - Base exception classes and inheritance structure
    - Custom exception types for different error scenarios
    - Domain-specific error codes and registry
    - Best practices for exception design
 
-2. **[Error Response Formats](./Error-Response-Formats.md)**
+2. **[Error Response Formats](./error-response-formats.md)**
    - RFC 7807 Problem Details implementation
    - Legacy error response formats for backward compatibility
    - Error response builder with content negotiation
    - Configuration and customization options
 
-3. **[Imperative Error Handling](./Imperative-Error-Handling.md)**
+3. **[Imperative Error Handling](./imperative-error-handling.md)**
    - Spring MVC global exception handlers (`@ControllerAdvice`)
    - Request ID providers for servlet applications
    - Error metrics collection with Micrometer
    - Testing patterns for error responses
 
-4. **[Reactive Error Handling](./Reactive-Error-Handling.md)**
+4. **[Reactive Error Handling](./reactive-error-handling.md)**
    - WebFlux error handling with `AbstractErrorWebExceptionHandler`
    - Reactive request ID providers and context management
    - Non-blocking error handling patterns
    - Circuit breaker and retry patterns
 
-5. **[Validation Standards](./Validation-Standards.md)**
+5. **[Validation Standards](./validation-standards.md)**
    - Bean Validation (JSR-380) implementation
    - Custom validator development
    - Service-level business rule validation
    - Reactive validation patterns
 
-6. **[Error Logging and Monitoring](./Error-Logging-and-Monitoring.md)**
+6. **[Error Logging and Monitoring](./error-logging-and-monitoring.md)**
    - Structured logging with MDC and correlation IDs
    - Error metrics with Micrometer
    - Health indicators and alerting
@@ -231,10 +231,10 @@ void shouldReturnBadRequest_WhenValidationFails() throws Exception {
 
 ## Related Documentation
 
-- **[Project Structure and Package Organization](../project-structure/Package-Organization.md)**: Overall project structure
+- **[Project Structure and Package Organization](../project-structure/package-organization.md)**: Overall project structure
 - **[Controller Implementation](../controllers/README.md)**: Controller design patterns
 - **[Security Implementation](../security/README.md)**: Security-related error handling
-- **[Logging and Monitoring](../observability/Logging and Monitoring.md)**: General logging and monitoring patterns
+- **[Logging and Monitoring](../observability/logging-and-monitoring.md)**: General logging and monitoring patterns
 
 ## Common Error Scenarios
 

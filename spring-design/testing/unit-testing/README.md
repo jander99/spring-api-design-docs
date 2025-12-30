@@ -8,13 +8,13 @@ This directory contains comprehensive guidelines for unit testing in Spring Boot
 
 ### Core Unit Testing Documentation
 
-- **[Unit Testing Fundamentals](Unit-Testing-Fundamentals.md)**: Core principles, setup, testing libraries, and best practices for writing effective unit tests in Spring Boot applications.
+- **[Unit Testing Fundamentals](unit-testing-fundamentals.md)**: Core principles, setup, testing libraries, and best practices for writing effective unit tests in Spring Boot applications.
 
-- **[Domain Layer Testing](Domain-Layer-Testing.md)**: Comprehensive guide to testing domain entities, value objects, domain services, and business logic in complete isolation.
+- **[Domain Layer Testing](domain-layer-testing.md)**: Comprehensive guide to testing domain entities, value objects, domain services, and business logic in complete isolation.
 
-- **[Application Layer Testing](Application-Layer-Testing.md)**: Patterns for testing application services, use case orchestration, and transaction handling with proper mocking strategies.
+- **[Application Layer Testing](application-layer-testing.md)**: Patterns for testing application services, use case orchestration, and transaction handling with proper mocking strategies.
 
-- **[Controller Unit Testing](Controller-Unit-Testing.md)**: Detailed guide to testing web controllers in isolation using `@WebMvcTest`, `@WebFluxTest`, and proper request/response testing patterns.
+- **[Controller Unit Testing](controller-unit-testing.md)**: Detailed guide to testing web controllers in isolation using `@WebMvcTest`, `@WebFluxTest`, and proper request/response testing patterns.
 
 ## Key Unit Testing Principles
 
@@ -211,7 +211,7 @@ void shouldThrowException_whenOrderNameIsBlank(String blankName) {
 
 ## Related Documentation
 
-- [Testing Structure](../../project-structure/Testing-Structure.md)
-- [Domain Layer Architecture](../../project-structure/Package-Organization.md)
+- [Testing Structure](../../project-structure/testing-structure.md)
+- [Domain Layer Architecture](../../project-structure/package-organization.md)
 - [Error Handling Standards](../../error-handling/README.md)
-- [Security Testing](../../security/Security-Testing.md)
+- [Security Testing](../../security/security-testing.md)

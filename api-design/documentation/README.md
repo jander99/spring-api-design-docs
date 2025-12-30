@@ -13,17 +13,17 @@ This section covers how to document your APIs. Good docs help developers use you
 
 ## Files
 
-### [OpenAPI-Standards.md](OpenAPI-Standards.md)
+### [OpenAPI Standards](openapi-standards.md)
 **How to write OpenAPI specs**
 
 Covers OpenAPI 3.1+ format, schema design, and best practices.
 
-### [Documentation-Testing.md](Documentation-Testing.md)
+### [Documentation Testing](documentation-testing.md)
 **How to test your docs**
 
 Covers contract testing and keeping docs in sync with code.
 
-### [Documentation-Tools-and-Integration.md](Documentation-Tools-and-Integration.md)
+### [Documentation Tools and Integration](documentation-tools-and-integration.md)
 **Tools and automation**
 
 Covers tools, workflows, and CI/CD integration.

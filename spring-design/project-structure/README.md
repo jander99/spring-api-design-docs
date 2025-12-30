@@ -8,7 +8,7 @@ Our project structure standards ensure consistent organization across all micros
 
 ## Documentation Structure
 
-### 📋 [Package Organization](./Package-Organization.md)
+### 📋 [Package Organization](./package-organization.md)
 **Core structure principles and package layout**
 
 Defines the foundational structure for Spring Boot microservices:
@@ -17,7 +17,7 @@ Defines the foundational structure for Spring Boot microservices:
 - Standard naming conventions
 - Implementation guidelines and anti-patterns
 
-### 🔄 [Imperative Examples](./Imperative-Examples.md)
+### 🔄 [Imperative Examples](./imperative-examples.md)
 **Spring MVC implementation patterns**
 
 Concrete examples for traditional blocking I/O implementations:
@@ -26,7 +26,7 @@ Concrete examples for traditional blocking I/O implementations:
 - Synchronous application services
 - Traditional web configuration
 
-### ⚡ [Reactive Examples](./Reactive-Examples.md)
+### ⚡ [Reactive Examples](./reactive-examples.md)
 **WebFlux implementation patterns**
 
 Concrete examples for non-blocking reactive implementations:
@@ -35,7 +35,7 @@ Concrete examples for non-blocking reactive implementations:
 - Reactive application services
 - Reactive web configuration
 
-### 🧪 [Testing Structure](./Testing-Structure.md)
+### 🧪 [Testing Structure](./testing-structure.md)
 **Test organization and patterns**
 
 Comprehensive testing strategies for both imperative and reactive implementations:
@@ -48,11 +48,11 @@ Comprehensive testing strategies for both imperative and reactive implementation
 
 | Aspect | Package Organization | Imperative | Reactive | Testing |
 |--------|---------------------|------------|----------|---------|
-| **Domain Layer** | [Structure](./Package-Organization.md#domain-package) | [Examples](./Imperative-Examples.md#domain-layer-examples) | [Examples](./Reactive-Examples.md#domain-layer-examples) | [Tests](./Testing-Structure.md#domain-layer-testing) |
-| **Application Layer** | [Structure](./Package-Organization.md#application-package) | [Examples](./Imperative-Examples.md#application-layer-examples) | [Examples](./Reactive-Examples.md#application-layer-examples) | [Tests](./Testing-Structure.md#application-layer-testing) |
-| **Infrastructure Layer** | [Structure](./Package-Organization.md#infrastructure-package) | [Examples](./Imperative-Examples.md#infrastructure-layer-examples) | [Examples](./Reactive-Examples.md#infrastructure-layer-examples) | [Tests](./Testing-Structure.md#infrastructure-layer-testing) |
-| **Interface Layer** | [Structure](./Package-Organization.md#interfaces-package) | [Examples](./Imperative-Examples.md#interface-layer-examples) | [Examples](./Reactive-Examples.md#interface-layer-examples) | [Tests](./Testing-Structure.md#interface-layer-testing) |
-| **Configuration** | [Structure](./Package-Organization.md#config-package) | [Examples](./Imperative-Examples.md#configuration-examples) | [Examples](./Reactive-Examples.md#configuration-examples) | [Integration](./Testing-Structure.md#integration-testing) |
+| **Domain Layer** | [Structure](./package-organization.md#domain-package) | [Examples](./imperative-examples.md#domain-layer-examples) | [Examples](./reactive-examples.md#domain-layer-examples) | [Tests](./testing-structure.md#domain-layer-testing) |
+| **Application Layer** | [Structure](./package-organization.md#application-package) | [Examples](./imperative-examples.md#application-layer-examples) | [Examples](./reactive-examples.md#application-layer-examples) | [Tests](./testing-structure.md#application-layer-testing) |
+| **Infrastructure Layer** | [Structure](./package-organization.md#infrastructure-package) | [Examples](./imperative-examples.md#infrastructure-layer-examples) | [Examples](./reactive-examples.md#infrastructure-layer-examples) | [Tests](./testing-structure.md#infrastructure-layer-testing) |
+| **Interface Layer** | [Structure](./package-organization.md#interfaces-package) | [Examples](./imperative-examples.md#interface-layer-examples) | [Examples](./reactive-examples.md#interface-layer-examples) | [Tests](./testing-structure.md#interface-layer-testing) |
+| **Configuration** | [Structure](./package-organization.md#config-package) | [Examples](./imperative-examples.md#configuration-examples) | [Examples](./reactive-examples.md#configuration-examples) | [Integration](./testing-structure.md#integration-testing) |
 
 ## Key Principles
 
@@ -84,10 +84,10 @@ Comprehensive testing strategies for both imperative and reactive implementation
 
 ## Getting Started
 
-1. **Choose Implementation Style**: Decide between [imperative](./Imperative-Examples.md) or [reactive](./Reactive-Examples.md) based on your use case
-2. **Review Package Organization**: Understand the [core structure principles](./Package-Organization.md)
+1. **Choose Implementation Style**: Decide between [imperative](./imperative-examples.md) or [reactive](./reactive-examples.md) based on your use case
+2. **Review Package Organization**: Understand the [core structure principles](./package-organization.md)
 3. **Follow Examples**: Use the concrete examples as templates for your implementation
-4. **Implement Tests**: Apply the [testing patterns](./Testing-Structure.md) for comprehensive coverage
+4. **Implement Tests**: Apply the [testing patterns](./testing-structure.md) for comprehensive coverage
 
 ## Common Patterns
 

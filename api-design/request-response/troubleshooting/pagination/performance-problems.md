@@ -201,6 +201,6 @@ Instead of using numeric offsets, use a cursor that encodes the position:
 
 ## Related Documentation
 
-- [Main Pagination Guide](../../Pagination-and-Filtering.md)
+- [Main Pagination Guide](../../pagination-and-filtering.md)
 - [Cursor Pagination Reference](../../reference/pagination/cursor-pagination.md)
 - [Common Issues](common-issues.md)

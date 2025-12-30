@@ -372,6 +372,6 @@ ALERT: Client api-key-67890 at 95% of daily quota
 
 ## Related Documentation
 
-- [Security Standards](Security%20Standards.md) - Authentication and authorization
-- [Error Response Standards](../request-response/Error-Response-Standards.md) - Error format
-- [API Observability Standards](../advanced-patterns/API-Observability-Standards.md) - Monitoring
+- [Security Standards](security-standards.md) - Authentication and authorization
+- [Error Response Standards](../request-response/error-response-standards.md) - Error format
+- [API Observability Standards](../advanced-patterns/api-observability-standards.md) - Monitoring
