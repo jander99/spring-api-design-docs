@@ -188,7 +188,7 @@ public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrders() {
 - **API Design Standards**: See `../api-design/` for framework-agnostic REST principles
 - **Error Handling**: See `../error-handling/` for exception management patterns
 - **Security Implementation**: See `../security/` for detailed OAuth 2.1 configuration
-- **Testing Standards**: See `../testing/Unit-Testing-Fundamentals.md` and `../testing/Integration-Testing-Fundamentals.md`
+- **Testing Standards**: See `../testing/unit-testing/Unit-Testing-Fundamentals.md` and `../testing/integration-testing/Integration-Testing-Fundamentals.md`
 
 ## 📝 Migration Notes
 

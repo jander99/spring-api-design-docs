@@ -146,8 +146,7 @@ Always echo back applied filters:
 ## Related Documentation
 
 ### Detailed Examples
-- [Complete Examples](examples/pagination/complete-examples.md) - Full code examples and use cases
-- [Framework Integration](examples/pagination/framework-integration.md) - Implementation patterns for specific frameworks
+- [Complete Examples](examples/pagination/complete-examples.md) - Full examples and use cases
 
 ### Advanced Patterns
 - [Complex Filtering](reference/pagination/advanced-patterns.md) - Advanced query operators and search patterns

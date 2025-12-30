@@ -632,12 +632,12 @@ Content-Type: application/problem+json
 ## Related Standards
 
 - [API Error Response Standards](../request-response/Error-Response-Standards.md) - Error handling and RFC 7807
-- [API Security Standards](Security-Standards.md) - Authentication and authorization
-- [Rate Limiting & Protection Standards](Rate-Limiting-Protection-Standards.md) - API protection patterns
+- [API Security Standards](../security/Security%20Standards.md) - Authentication and authorization
+- Rate Limiting & Protection Standards - *Coming soon*
 
 ## Examples
 
-See [API Observability Examples](../examples/observability/) for complete implementation examples including:
+See [API Observability Examples](examples/observability/) for complete implementation examples including:
 - Health check implementations
 - Metrics collection patterns
 - Distributed tracing setup
