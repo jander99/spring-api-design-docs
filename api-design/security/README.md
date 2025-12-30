@@ -1,26 +1,31 @@
 # API Security Standards
 
-> **📖 Reading Guide**
+> **Reading Guide**
 > 
-> **⏱️ Reading Time:** 1 minute | **🟡 Level:** Intermediate
+> **Reading Time:** 1 minute | **Level:** Intermediate
 > 
-> **📋 Prerequisites:** HTTP fundamentals, basic API experience  
-> **🎯 Key Topics:** Authentication, Architecture
-> 
-> **📊 Complexity:** 15.1 grade level • 6.5% technical density • very difficult
+> **Prerequisites:** Basic HTTP knowledge  
+> **Key Topics:** Authentication, authorization
 
 ## Overview
 
-This directory contains comprehensive security standards and guidelines for protecting APIs across our microservices ecosystem. These standards establish consistent approaches to authentication, authorization, and API protection that ensure security by design.
+This section covers how to protect your APIs. Security is critical for every API.
 
 ## Files
 
 ### [Security Standards.md](Security%20Standards.md)
-Comprehensive security guidelines covering OAuth 2.1/OIDC implementation, authentication patterns, authorization strategies, and API protection mechanisms. Includes standards for HTTP security headers, token management, and security best practices.
+**How to secure your API**
+
+Covers:
+- OAuth 2.1 and OIDC
+- Authentication patterns
+- Authorization rules
+- HTTP security headers
+- Token management
 
 ## Navigation
 
-- [← Back to API Design](../README.md)
-- [Foundations →](../foundations/README.md)
-- [Advanced Patterns →](../advanced-patterns/README.md)
-- [Documentation →](../documentation/README.md)
+- [Back to API Design](../README.md)
+- [Foundations](../foundations/README.md)
+- [Advanced Patterns](../advanced-patterns/README.md)
+- [Documentation](../documentation/README.md)

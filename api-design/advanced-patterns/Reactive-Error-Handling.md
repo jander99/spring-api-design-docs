@@ -1,5 +1,14 @@
 # Reactive Error Handling
 
+> **Reading Guide**
+> 
+> **Reading Time:** 8 minutes | **Level:** Advanced
+> 
+> **Prerequisites:** Understanding of reactive programming concepts  
+> **Key Topics:** Backpressure, error propagation, resilience patterns
+> 
+> **Complexity:** Advanced content for reactive API error management
+
 ## Overview
 
 This document outlines error handling patterns for reactive APIs, focusing on backpressure management, error propagation strategies, and recovery mechanisms. These patterns ensure robust and resilient streaming APIs that can handle failures gracefully.

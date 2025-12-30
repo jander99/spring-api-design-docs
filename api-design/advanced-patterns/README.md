@@ -1,39 +1,46 @@
 # Advanced API Patterns
 
-> **📖 Reading Guide**
+> **Reading Guide**
 > 
-> **⏱️ Reading Time:** 1 minute | **🟡 Level:** Intermediate
+> **Reading Time:** 1 minute | **Level:** Intermediate
 > 
-> **📋 Prerequisites:** HTTP fundamentals, basic API experience  
-> **🎯 Key Topics:** Architecture
-> 
-> **📊 Complexity:** 12.4 grade level • 3.2% technical density • difficult
+> **Prerequisites:** Basic API experience  
+> **Key Topics:** Streaming, events, monitoring
 
 ## Overview
 
-This directory contains advanced architectural patterns and specialized techniques for building sophisticated, scalable APIs. These patterns support event-driven architectures, streaming protocols, reactive programming, and complex data flow scenarios.
+This section covers advanced patterns for complex APIs. Use these when you need real-time data, events, or better monitoring.
 
 ## Files
 
 ### [Event-Driven-Architecture.md](Event-Driven-Architecture.md)
-Comprehensive guide to event-driven architecture patterns for building reactive APIs. Covers event types, routing strategies, caching mechanisms, and patterns for scalable, loosely-coupled systems with asynchronous processing.
+**Building event-based systems**
+
+Covers event types, routing, and async processing.
 
 ### [HTTP-Streaming-Patterns.md](HTTP-Streaming-Patterns.md)
-Detailed patterns for implementing HTTP streaming protocols in APIs. Includes Server-Sent Events (SSE), WebSockets, and HTTP/2 streaming techniques for real-time data delivery.
+**Streaming data over HTTP**
+
+Covers SSE, WebSockets, and real-time delivery.
 
 ### [Streaming-Documentation-Patterns.md](Streaming-Documentation-Patterns.md)
-Specialized documentation patterns for streaming APIs and real-time data flows. Covers how to document asynchronous operations, event schemas, and streaming protocols.
+**Documenting streaming APIs**
+
+Covers how to document async and streaming endpoints.
 
 ### [Reactive-Error-Handling.md](Reactive-Error-Handling.md)
-Advanced error handling patterns for reactive and streaming APIs. Includes strategies for managing errors in asynchronous operations, stream failures, and distributed system fault tolerance.
+**Handling errors in reactive APIs**
 
-### [API-Observability-Standards.md](API-Observability-Standards.md) ⭐ NEW
-**⏱️ 10 min read • 🔴 Advanced**  
-Comprehensive framework for API observability including health checks, metrics exposure, distributed tracing, and operational monitoring. Defines language-agnostic standards for implementing the three pillars of observability in REST APIs.
+Covers error patterns for async and streaming systems.
+
+### [API-Observability-Standards.md](API-Observability-Standards.md)
+**Monitoring your APIs**
+
+Covers health checks, metrics, and distributed tracing.
 
 ## Navigation
 
-- [← Back to API Design](../README.md)
-- [Foundations →](../foundations/README.md)
-- [Security Standards →](../security/README.md)
-- [Documentation →](../documentation/README.md)
+- [Back to API Design](../README.md)
+- [Foundations](../foundations/README.md)
+- [Security Standards](../security/README.md)
+- [Documentation](../documentation/README.md)

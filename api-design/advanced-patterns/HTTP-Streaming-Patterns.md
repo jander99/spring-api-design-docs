@@ -1,5 +1,14 @@
 # HTTP Streaming Patterns
 
+> **Reading Guide**
+> 
+> **Reading Time:** 10 minutes | **Level:** Advanced
+> 
+> **Prerequisites:** HTTP fundamentals, understanding of real-time data requirements  
+> **Key Topics:** SSE, WebSockets, NDJSON, streaming responses
+> 
+> **Complexity:** Advanced technical content for real-time API design
+
 ## Overview
 
 This document outlines HTTP streaming patterns for building reactive APIs that handle real-time data flow efficiently. These patterns focus on HTTP-based streaming protocols, Server-Sent Events (SSE), and WebSocket integrations that can be implemented in any technology stack.

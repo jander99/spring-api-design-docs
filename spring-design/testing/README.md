@@ -46,7 +46,7 @@ Our testing strategy follows the testing pyramid approach:
 
 - **[Reactive Testing](specialized-testing/Reactive-Testing.md)**: Testing reactive streams and asynchronous operations
 - **[Infrastructure Testing](specialized-testing/Infrastructure-Testing.md)**: Testing repositories, API clients, and external adapters
-- **[Contract Testing Standards](specialized-testing/Contract%20Testing%20Standards.md)**: Consumer-driven contract testing and API contract verification
+- **[Contract Testing Standards](specialized-testing/Contract-Testing-Standards.md)**: Consumer-driven contract testing and API contract verification
 
 ## Quick Reference
 

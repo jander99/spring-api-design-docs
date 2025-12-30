@@ -1,5 +1,14 @@
 # Streaming Documentation Patterns
 
+> **Reading Guide**
+> 
+> **Reading Time:** 6 minutes | **Level:** Intermediate
+> 
+> **Prerequisites:** Familiarity with OpenAPI and streaming protocols  
+> **Key Topics:** SSE documentation, WebSocket docs, flow control descriptions
+> 
+> **Complexity:** Intermediate content for API documentation authors
+
 ## Overview
 
 This document outlines special considerations and patterns for documenting streaming APIs, including Server-Sent Events (SSE), WebSockets, and other real-time communication protocols. Streaming APIs require additional documentation to properly convey their behavior, connection management, and flow control characteristics.

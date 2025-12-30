@@ -1,5 +1,14 @@
 # Event-Driven Architecture
 
+> **Reading Guide**
+> 
+> **Reading Time:** 8 minutes | **Level:** Advanced
+> 
+> **Prerequisites:** Understanding of distributed systems and messaging concepts  
+> **Key Topics:** Events, messaging patterns, async communication
+> 
+> **Complexity:** Advanced technical content covering distributed systems patterns
+
 ## Overview
 
 Event-driven architecture enables building systems that react to events as they happen. Events represent important business occurrences (like "order created" or "payment processed") that other parts of your system need to know about.

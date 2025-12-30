@@ -1,84 +1,77 @@
 # Request/Response Format Standards
 
-> **📖 Reading Guide**
+> **Reading Guide**
 > 
-> **⏱️ Reading Time:** 3 minutes | **🔴 Level:** Advanced
+> **Reading Time:** 3 minutes | **Level:** Beginner
 > 
-> **📋 Prerequisites:** Strong API background, experience with complex systems  
-> **🎯 Key Topics:** Authentication, REST, Architecture
-> 
-> **📊 Complexity:** 18.1 grade level • 2.8% technical density • very difficult
+> **Prerequisites:** Basic HTTP knowledge  
+> **Key Topics:** JSON structure, errors, pagination
 
-This section shows how to format API requests and responses. These guides work with any technology and help keep your APIs consistent.
+This section shows how to format API requests and responses. These guides work with any technology.
 
-## Overview
+## What You'll Learn
 
-Good request and response formats make APIs easy to use. These standards show how to structure data in your APIs, covering content types, error handling, and collections.
+Good formats make APIs easy to use. This guide covers:
+- How to structure data
+- How to handle errors
+- How to return lists and pages
 
-## Documentation Structure
+## Documentation
 
-### 📄 [Content Types and Structure](Content-Types-and-Structure.md)
-**How to structure API requests and responses**
-- Standard content types and alternatives
-- How to validate requests
-- Response structure
-- HATEOAS link patterns
-- How to handle empty fields
+### [Content Types and Structure](Content-Types-and-Structure.md)
+**How to structure requests and responses**
+- Standard content types
+- Request validation
+- Response format
+- Link patterns (HATEOAS)
 
-### ❌ [Error Response Standards](Error-Response-Standards.md)
-**How to handle errors properly**
+### [Error Response Standards](Error-Response-Standards.md)
+**How to handle errors**
 - HTTP status codes
-- Standardized error response formats
-- RFC 7807 Problem Details implementation
-- Error code naming conventions
-- Framework-agnostic error handling patterns
+- Error response format
+- RFC 7807 Problem Details
+- Error code naming
 
-### 📊 [Pagination and Filtering](Pagination-and-Filtering.md)
-**Collection response patterns for lists and search results**
-- Pagination response structures
-- Filtering and search patterns
-- Sorting criteria standards
-- Advanced query capabilities
-- Performance optimization guidelines
+### [Pagination and Filtering](Pagination-and-Filtering.md)
+**How to return lists**
+- Page response structure
+- Filtering patterns
+- Sorting options
+- Search features
 
-### 🌊 [Streaming APIs](Streaming-APIs.md)
-**Streaming response formats for real-time and bulk data**
-- NDJSON streaming patterns
-- Server-Sent Events (SSE) implementation
-- Flow control and backpressure handling
-- Streaming error management
-- Performance considerations for large datasets
+### [Streaming APIs](Streaming-APIs.md)
+**How to stream data**
+- NDJSON format
+- Server-Sent Events (SSE)
+- Flow control
+- Large dataset handling
 
-## Key Design Principles
+## Key Principles
 
-### Framework Agnostic
-All patterns are based on HTTP and JSON standards, working with any REST framework.
+### Works Everywhere
+All patterns use HTTP and JSON. They work with any REST framework.
 
-### Consistency First
-- Standardized field naming conventions
-- Consistent metadata structures
-- Uniform error response formats
-- Predictable pagination patterns
+### Stay Consistent
+- Use the same field names
+- Use the same response structure
+- Use the same error format
+- Use the same pagination style
 
-### Modern Standards
-- RFC 7807 Problem Details for errors
+### Use Modern Standards
+- RFC 7807 for errors
 - JSON Schema for validation
 - HTTP streaming protocols
-- OAuth 2.1/OIDC security integration
-
-### Developer Experience
-- Clear documentation with examples
-- Comprehensive error messages
-- Intuitive API contracts
-- Excellent debugging capabilities
+- OAuth 2.1 for security
 
 ## Common Patterns
 
-### Standard Response Wrapper
+### Standard Response
+
 ```json
 {
   "data": {
-    // Resource data or array of resources
+    "id": "123",
+    "name": "Example"
   },
   "meta": {
     "timestamp": "2024-07-15T14:32:22Z",
@@ -87,22 +80,26 @@ All patterns are based on HTTP and JSON standards, working with any REST framewo
 }
 ```
 
-### Error Response Format
+### Error Response
+
 ```json
 {
   "type": "https://example.com/problems/validation-error",
   "title": "Validation Error",
   "status": 400,
-  "detail": "The request contains invalid parameters",
-  "instance": "/v1/orders",
-  "errors": [...]
+  "detail": "The request has invalid data",
+  "instance": "/v1/orders"
 }
 ```
 
 ### Collection Response
+
 ```json
 {
-  "data": [...],
+  "data": [
+    { "id": "1", "name": "First" },
+    { "id": "2", "name": "Second" }
+  ],
   "meta": {
     "pagination": {
       "page": 0,
@@ -117,63 +114,38 @@ All patterns are based on HTTP and JSON standards, working with any REST framewo
 ## Quick Reference
 
 ### Content Types
-- **Default**: `application/json`
-- **Errors**: `application/problem+json` (RFC 7807)
-- **Streaming**: `application/x-ndjson`, `text/event-stream`
-- **Files**: `multipart/form-data`, `application/octet-stream`
+
+| Type | Use For |
+|------|---------|
+| `application/json` | Default for all responses |
+| `application/problem+json` | Error responses (RFC 7807) |
+| `application/x-ndjson` | Streaming data |
+| `text/event-stream` | Server-Sent Events |
 
 ### HTTP Status Codes
-- **200**: Success with response body
-- **201**: Resource created
-- **400**: Client error (validation, format)
-- **401**: Authentication required
-- **403**: Authorization denied
-- **404**: Resource not found
-- **422**: Business validation error
-- **500**: Server error
+
+| Code | Meaning |
+|------|---------|
+| 200 | Success |
+| 201 | Created |
+| 400 | Bad request |
+| 401 | Not logged in |
+| 403 | Not allowed |
+| 404 | Not found |
+| 422 | Invalid data |
+| 500 | Server error |
 
 ### Pagination Parameters
-- `page`: Page number (0-indexed)
-- `size`: Items per page (default: 20)
-- `sort`: Sorting criteria (`field,direction`)
 
-## Implementation Notes
-
-### Validation Integration
-Modern APIs should integrate validation with RFC 7807 Problem Details:
-- JSON Schema validation
-- Standard validation patterns
-- Consistent error response formats
-
-### Security Considerations
-- OAuth 2.1/OIDC token validation
-- Proper HTTP security headers
-- Request payload size limits
-- Rate limiting implementation
-
-### Performance Optimization
-- Efficient pagination strategies
-- Database index optimization
-- Streaming for large datasets
-- Proper HTTP caching headers
-
-## Framework Integration
-
-These standards are framework-agnostic and can be implemented using any REST framework's standard features.
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `page` | Page number (starts at 0) | 0 |
+| `size` | Items per page | 20 |
+| `sort` | Sort field and direction | varies |
 
 ## Related Documentation
 
-- **[API Design Standards](../)**: Complete API design documentation
-- **[Spring Design Standards](../../spring-design/)**: Spring Boot-specific implementation patterns
-- **[Security Standards](../security/Security Standards.md)**: Security implementation standards
-- **[API Version Strategy](../foundations/API Version Strategy.md)**: Versioning strategies and patterns
-
-## Usage Examples
-
-Each document includes comprehensive examples showing:
-- Complete HTTP request/response examples
-- Error scenario handling
-- Edge case management
-- Framework integration patterns
-
-These standards ensure consistent, predictable interaction patterns across all APIs in our ecosystem, supporting both traditional REST APIs and modern streaming services.
+- [API Design Standards](../) - Full API design guide
+- [Spring Design Standards](../../spring-design/) - Spring Boot patterns
+- [Security Standards](../security/Security%20Standards.md) - Security guide
+- [API Version Strategy](../foundations/API%20Version%20Strategy.md) - Versioning guide

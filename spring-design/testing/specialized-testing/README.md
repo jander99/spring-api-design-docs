@@ -12,7 +12,7 @@ This directory contains guidelines for specialized testing approaches in Spring 
 
 - **[Infrastructure Testing](Infrastructure-Testing.md)**: Testing infrastructure components, external adapters, repository implementations, and technical integrations with proper isolation and verification.
 
-- **[Contract Testing Standards](Contract%20Testing%20Standards.md)**: Consumer-driven contract testing using Spring Cloud Contract, API contract verification, and provider-consumer testing patterns.
+- **[Contract Testing Standards](Contract-Testing-Standards.md)**: Consumer-driven contract testing using Spring Cloud Contract, API contract verification, and provider-consumer testing patterns.
 
 ## Key Specialized Testing Concepts
 
