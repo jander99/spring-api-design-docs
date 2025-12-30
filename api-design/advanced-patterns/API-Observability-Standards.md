@@ -633,7 +633,7 @@ Content-Type: application/problem+json
 
 - [API Error Response Standards](../request-response/Error-Response-Standards.md) - Error handling and RFC 7807
 - [API Security Standards](../security/Security%20Standards.md) - Authentication and authorization
-- Rate Limiting & Protection Standards - *Coming soon*
+- [Rate Limiting & Protection Standards](../security/Rate-Limiting-Standards.md) - API protection patterns
 
 ## Examples
 
