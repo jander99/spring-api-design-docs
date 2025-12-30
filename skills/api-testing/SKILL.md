@@ -217,13 +217,13 @@ rules:
 ### Test Naming Convention
 
 ```
-should{ExpectedBehavior}When{Condition}
+should{ExpectedBehavior}_when{Condition}
 
 Examples:
-- shouldReturn201WhenOrderCreated
-- shouldReturn400WhenCustomerIdMissing
-- shouldReturn404WhenOrderNotFound
-- shouldReturn403WhenUserNotAuthorized
+- shouldReturn201_whenOrderCreated
+- shouldReturn400_whenCustomerIdMissing
+- shouldReturn404_whenOrderNotFound
+- shouldReturn403_whenUserNotAuthorized
 ```
 
 ## Anti-Patterns
@@ -261,12 +261,21 @@ Examples:
 - [ ] Contract tests pass
 - [ ] OpenAPI schema valid
 - [ ] No breaking changes detected
-- [ ] Code coverage > 80%
+- [ ] Code coverage meets targets
 ```
+
+### Component Coverage Targets
+
+| Component Type | Minimum Coverage |
+|----------------|-----------------|
+| Domain Models | 90% |
+| Domain Services | 90% |
+| Application Services | 85% |
+| Infrastructure Components | 80% |
+| Controllers | 80% |
 
 ## Loading Additional Context
 
 When you need deeper guidance:
 
-- **Contract testing patterns**: Load `references/contract-testing.md`
 - **Java/Spring implementation**: Load `references/java-spring.md`

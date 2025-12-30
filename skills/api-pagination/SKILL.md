@@ -199,12 +199,16 @@ GET /orders?customerName[contains]=smith
 | `[eq]` | Equals (default) | `?status=ACTIVE` |
 | `[ne]` | Not equals | `?status[ne]=CANCELLED` |
 | `[in]` | In list | `?status[in]=ACTIVE,PENDING` |
+| `[nin]` | Not in list | `?status[nin]=CANCELLED,FAILED` |
 | `[gt]` | Greater than | `?total[gt]=100` |
 | `[gte]` | Greater than or equal | `?total[gte]=100` |
 | `[lt]` | Less than | `?total[lt]=500` |
 | `[lte]` | Less than or equal | `?total[lte]=500` |
+| `[between]` | Between values | `?total[between]=100,500` |
 | `[contains]` | Contains substring | `?name[contains]=smith` |
 | `[startsWith]` | Starts with | `?email[startsWith]=admin` |
+| `[exists]` | Field exists | `?notes[exists]=true` |
+| `[null]` | Field is null | `?deletedAt[null]=true` |
 
 ## Sorting
 
@@ -417,5 +421,4 @@ When you need deeper guidance:
 
 - **Cursor pagination implementation**: Load `references/cursor-pagination.md`
 - **Offset pagination details**: Load `references/offset-pagination.md`
-- **Advanced filtering patterns**: Load `references/filtering.md`
 - **Java/Spring implementation**: Load `references/java-spring.md`

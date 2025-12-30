@@ -151,10 +151,10 @@ Include metadata and end markers:
 
 ```json
 {"type":"metadata","totalRecords":1000,"startTime":"2024-07-15T14:30:00Z"}
-{"type":"data","id":"order-1","status":"PROCESSING"}
-{"type":"data","id":"order-2","status":"COMPLETED"}
+{"type":"data","sequence":1,"data":{"id":"order-1","status":"PROCESSING"}}
+{"type":"data","sequence":2,"data":{"id":"order-2","status":"COMPLETED"}}
 {"type":"error","code":"PROCESSING_ERROR","recordId":"order-3","message":"Failed to process"}
-{"type":"stream-end","reason":"completed","processed":2,"errors":1}
+{"type":"stream-end","reason":"completed","totalProcessed":2,"totalErrors":1}
 ```
 
 ### NDJSON Record Types
@@ -162,24 +162,36 @@ Include metadata and end markers:
 | Type | Purpose | Fields |
 |------|---------|--------|
 | `metadata` | Stream metadata | `totalRecords`, `startTime` |
-| `data` | Actual data record | Resource fields |
+| `data` | Actual data record | `sequence`, `data` (payload) |
 | `progress` | Progress update | `processed`, `total`, `percentage` |
 | `error` | Processing error | `code`, `message`, `recordId` |
+| `heartbeat` | Keep connection alive | `timestamp`, `processed` |
 | `stream-end` | Stream completion | `reason`, `processed`, `errors` |
+
+### Character Encoding Requirements
+
+- **Encoding**: UTF-8 (required)
+- **BOM**: Not allowed
+- **Line separator**: `\n` only (not `\r\n`)
+- **Maximum line length**: 1 MB (1,048,576 bytes)
 
 ## Error Handling in Streams
 
 ### SSE Error Events
 
+Use RFC 7807 problem format:
+
 ```
 id: 50
 event: error
-data: {"type":"https://example.com/problems/stream-error","title":"Processing Error","status":500,"detail":"Database connection lost"}
+data: {"type":"https://api.example.com/problems/stream-error","title":"Processing Error","status":500,"detail":"Database connection lost"}
 
 id: 51
 event: stream-end
-data: {"reason":"error","processedCount":49}
+data: {"reason":"error","totalProcessed":49}
 ```
+
+Valid `stream-end` reasons: `completed`, `cancelled`, `error`, `timeout`
 
 ### NDJSON Error Records
 
@@ -227,15 +239,26 @@ Accept: application/x-ndjson
 
 Server respects (or caps) the requested batch size.
 
-### Rate Limiting Headers
+### Flow Control Headers
 
-Include rate info in streaming responses:
+Client request headers:
+
+```http
+GET /orders/stream HTTP/1.1
+Accept: application/x-ndjson
+X-Stream-Buffer-Size: 100
+X-Stream-Rate-Limit: 10/second
+```
+
+Server response headers:
 
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/x-ndjson
-X-Batch-Size: 100
-X-Rate-Limit: 1000/minute
+X-Stream-Rate: 10/second
+X-Stream-Buffer-Size: 100
+X-Stream-Batch-Size: 50
+X-Stream-Total-Items: 10000
 ```
 
 ### Server-Side Backpressure

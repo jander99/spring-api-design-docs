@@ -31,7 +31,7 @@ All error responses should follow RFC 7807 with Content-Type `application/proble
 }
 ```
 
-**Required fields:**
+**Recommended fields (per RFC 7807 best practices):**
 - `type`: URI identifying the problem type (use `about:blank` for generic errors)
 - `title`: Human-readable summary of the problem type
 - `status`: HTTP status code
@@ -219,7 +219,7 @@ Retry-After: 60
   "instance": "/v1/orders",
   "limit": 100,
   "remaining": 0,
-  "resetAt": "2024-01-15T10:31:00Z"
+  "resetTime": "2024-01-15T10:31:00Z"
 }
 ```
 

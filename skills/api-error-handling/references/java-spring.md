@@ -68,11 +68,27 @@ public class BusinessException extends ApplicationException {
     }
 }
 
-// 403 Forbidden
+// 403 Forbidden - Base class for security-related exceptions
+@ResponseStatus(HttpStatus.FORBIDDEN)
+public class SecurityException extends ApplicationException {
+    public SecurityException(String errorCode, String message, Object... args) {
+        super(errorCode, message, args);
+    }
+}
+
+// 403 Forbidden - Specific access denied exception
 @ResponseStatus(HttpStatus.FORBIDDEN)
 public class AccessDeniedException extends ApplicationException {
     public AccessDeniedException(String message) {
         super("ACCESS_DENIED", message);
+    }
+}
+
+// 500 Internal Server Error - Technical/infrastructure errors
+@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+public class TechnicalException extends ApplicationException {
+    public TechnicalException(String errorCode, String message, Throwable cause, Object... args) {
+        super(errorCode, message, cause, args);
     }
 }
 ```

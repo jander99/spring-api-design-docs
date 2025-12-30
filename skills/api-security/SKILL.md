@@ -53,7 +53,7 @@ Endpoints that don't require authentication:
 ```
 /actuator/health          # Health checks
 /actuator/info            # App info
-/v3/api-docs/**           # OpenAPI docs
+/api-docs/**              # OpenAPI docs
 /swagger-ui/**            # Swagger UI
 /oauth/token              # Token endpoint
 ```
@@ -63,6 +63,8 @@ All other endpoints require authentication by default (fail closed).
 ## Authorization
 
 ### Authorization Model Decision
+
+> **Recommended**: Use binary resource-based authorization where users either have full access to a resource or no access.
 
 | Model | Best For | Implementation |
 |-------|----------|----------------|
@@ -350,5 +352,4 @@ When you need deeper guidance:
 
 - **OAuth 2.1/OIDC patterns**: Load `references/oauth2-oidc.md`
 - **Authorization strategies**: Load `references/authorization.md`
-- **CORS and headers**: Load `references/cors-headers.md`
 - **Java/Spring implementation**: Load `references/java-spring.md`

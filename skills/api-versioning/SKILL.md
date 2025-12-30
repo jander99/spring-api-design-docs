@@ -248,7 +248,6 @@ GET /v1/customers/123?exclude_deprecated=true
 
 When you need deeper guidance:
 
-- **Deprecation policies**: Load `references/deprecation.md`
 - **Java/Spring implementation**: Load `references/java-spring.md`
 
 **Note**: Spring-specific versioning documentation is limited in source materials. Consider using URL path versioning with separate controller classes per version.
