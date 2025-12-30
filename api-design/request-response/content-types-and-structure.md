@@ -36,7 +36,7 @@ When supporting alternative content types, follow these guidelines:
 | `multipart/form-data` | File uploads | Document part specifications clearly |
 | `application/x-ndjson` | Streaming JSON data | Newline-delimited JSON for streaming APIs |
 | `text/event-stream` | Server-Sent Events | For real-time data streaming |
-| `application/problem+json` | RFC 7807 Problem Details | Modern error response format |
+| `application/problem+json` | RFC 9457 Problem Details | Modern error response format |
 
 ## Request Payload Structure
 
@@ -95,7 +95,7 @@ Implement consistent validation across all APIs:
 }
 ```
 
-**Validation Response Integration**: Modern APIs should return RFC 7807 Problem Details format for validation errors. See [Error Response Standards](error-response-standards.md) for detailed error handling patterns.
+**Validation Response Integration**: Modern APIs should return RFC 9457 Problem Details format for validation errors. See [Error Response Standards](error-response-standards.md) for detailed error handling patterns.
 
 ### Bulk Operations
 
@@ -180,6 +180,43 @@ For more sophisticated APIs, consider including hypermedia links:
 }
 ```
 
+### Choosing a Response Pattern
+
+Two common response patterns exist. Choose based on your API's maturity level:
+
+| Pattern | Structure | Best For |
+|---------|-----------|----------|
+| **Envelope Pattern** | `{"data": {...}, "meta": {...}}` | Most REST APIs (RMM Level 2) |
+| **HAL/HATEOAS Pattern** | `{"id": ..., "_links": {...}}` | Hypermedia APIs (RMM Level 3) |
+
+**Envelope Pattern** (Recommended for most APIs):
+- Separates resource data from metadata
+- Consistent structure across all endpoints
+- Easy to add pagination, timestamps, request IDs
+
+**HAL/HATEOAS Pattern**:
+- Resources include hypermedia links
+- Self-describing responses
+- Best for public APIs requiring discoverability
+
+You can combine patterns by including `_links` within the `data` object:
+
+```json
+{
+  "data": {
+    "id": "order-123",
+    "status": "PROCESSING",
+    "_links": {
+      "self": {"href": "/v1/orders/order-123"},
+      "cancel": {"href": "/v1/orders/order-123/cancel"}
+    }
+  },
+  "meta": {
+    "timestamp": "2024-07-15T14:32:22Z"
+  }
+}
+```
+
 ## Examples
 
 ### Single Resource Response
@@ -207,13 +244,13 @@ Response:
 
 When implementing these request/response formats:
 
-- **Validation**: Use JSON Schema validation or standard validation patterns that produce RFC 7807 responses
+- **Validation**: Use JSON Schema validation or standard validation patterns that produce RFC 9457 responses
 - **Content negotiation**: Implement proper Accept header handling for different response formats
 
 These patterns are based on HTTP and JSON standards and work with any REST framework.
 
 ## Related Documentation
 
-- [Error Response Standards](error-response-standards.md) - Error handling and RFC 7807 Problem Details
+- [Error Response Standards](error-response-standards.md) - Error handling and RFC 9457 Problem Details
 - [Pagination and Filtering](pagination-and-filtering.md) - Collection response patterns
 - [Streaming APIs](streaming-apis.md) - Streaming response formats

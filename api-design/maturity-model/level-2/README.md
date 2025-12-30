@@ -141,7 +141,7 @@ DELETE /orders/123/items/1  → Remove item (204)
 - [ ] Rate limiting headers
 - [ ] CORS properly configured
 - [ ] Pagination standards
-- [ ] Consistent error format (RFC 7807)
+- [ ] Consistent error format (RFC 9457)
 
 ## 🚀 If You Want Level 3
 

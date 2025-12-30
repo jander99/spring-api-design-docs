@@ -7,7 +7,7 @@
 > **📋 Prerequisites:** Strong API background, experience with complex systems  
 > **🎯 Key Topics:** Architecture, Documentation
 > 
-> **📊 Complexity:** 22.1 grade level • 2.2% technical density • very difficult
+> **📊 Complexity:** 21.3 grade level • 2.1% technical density • very difficult
 
 ## Overview
 
@@ -265,13 +265,13 @@ paths:
 
 ### Error Examples
 
-Document examples of error responses using RFC 7807 Problem Details format:
+Document examples of error responses using RFC 9457 Problem Details format:
 
 ```yaml
 components:
   examples:
     ValidationError:
-      summary: Validation error example (RFC 7807)
+      summary: Validation error example (RFC 9457)
       value:
         type: "https://example.com/problems/validation-error"
         title: "Validation Error"

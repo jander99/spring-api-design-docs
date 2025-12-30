@@ -292,7 +292,7 @@ FUNCTION track_version_performance(version, response_time):
   }
 }
 
-// v2 error format (RFC 7807)
+// v2 error format (RFC 9457)
 {
   "type": "https://example.com/problems/validation-error",
   "title": "Validation Error",

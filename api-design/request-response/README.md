@@ -29,7 +29,7 @@ Good formats make APIs easy to use. This guide covers:
 **How to handle errors**
 - HTTP status codes
 - Error response format
-- RFC 7807 Problem Details
+- RFC 9457 Problem Details
 - Error code naming
 
 ### [Pagination and Filtering](pagination-and-filtering.md)
@@ -58,7 +58,7 @@ All patterns use HTTP and JSON. They work with any REST framework.
 - Use the same pagination style
 
 ### Use Modern Standards
-- RFC 7807 for errors
+- RFC 9457 for errors
 - JSON Schema for validation
 - HTTP streaming protocols
 - OAuth 2.1 for security
@@ -118,7 +118,7 @@ All patterns use HTTP and JSON. They work with any REST framework.
 | Type | Use For |
 |------|---------|
 | `application/json` | Default for all responses |
-| `application/problem+json` | Error responses (RFC 7807) |
+| `application/problem+json` | Error responses (RFC 9457) |
 | `application/x-ndjson` | Streaming data |
 | `text/event-stream` | Server-Sent Events |
 

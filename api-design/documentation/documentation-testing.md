@@ -81,9 +81,9 @@ rules:
 ```yaml
 # .spectral.yaml (extended)
 rules:
-  # Enforce RFC 7807 error responses
+  # Enforce RFC 9457 error responses
   error-response-format:
-    description: Error responses must follow RFC 7807
+    description: Error responses must follow RFC 9457
     severity: error
     given: $.paths[*][*].responses[?(@property >= 400)].content['application/problem+json']
     then:
@@ -248,7 +248,7 @@ tests:
       headers:
         Location: /v1/orders/*
 
-  - name: Invalid request returns RFC 7807 error
+  - name: Invalid request returns RFC 9457 error
     request:
       method: POST
       path: /v1/orders
@@ -272,7 +272,7 @@ Contract Tests: orders-api.yaml
 
 ✓ Get order returns valid response (245ms)
 ✓ Create order validates request body (312ms)
-✓ Invalid request returns RFC 7807 error (89ms)
+✓ Invalid request returns RFC 9457 error (89ms)
 
 ───────────────────────────────────────────────────────
 Tests: 3 passed, 0 failed
@@ -299,7 +299,7 @@ Contract Tests: orders-api.yaml
     "total": "99.95"  // Should be number: 99.95
   }
 
-✓ Invalid request returns RFC 7807 error (89ms)
+✓ Invalid request returns RFC 9457 error (89ms)
 
 ───────────────────────────────────────────────────────
 Tests: 2 passed, 1 failed

@@ -631,7 +631,7 @@ Content-Type: application/problem+json
 
 ## Related Standards
 
-- [API Error Response Standards](../request-response/error-response-standards.md) - Error handling and RFC 7807
+- [API Error Response Standards](../request-response/error-response-standards.md) - Error handling and RFC 9457
 - [API Security Standards](../security/security-standards.md) - Authentication and authorization
 - [Rate Limiting & Protection Standards](../security/rate-limiting-standards.md) - API protection patterns
 

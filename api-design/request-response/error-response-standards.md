@@ -11,7 +11,7 @@
 
 ## Overview
 
-Consistent error handling is crucial for creating predictable, debuggable APIs. This document outlines the standards for error responses, including HTTP status codes, error formats, and the RFC 7807 Problem Details standard.
+Consistent error handling is crucial for creating predictable, debuggable APIs. This document outlines the standards for error responses, including HTTP status codes, error formats, and the RFC 9457 Problem Details standard.
 
 ## HTTP Status Codes
 
@@ -30,7 +30,7 @@ Use appropriate HTTP status codes for different error scenarios:
 
 ## Error Response Structure
 
-All error responses must follow RFC 7807 Problem Details standard with Content-Type `application/problem+json`:
+All error responses must follow RFC 9457 Problem Details standard with Content-Type `application/problem+json`:
 
 ```json
 {
@@ -48,7 +48,7 @@ All error responses must follow RFC 7807 Problem Details standard with Content-T
 }
 ```
 
-### RFC 7807 Standard Fields
+### RFC 9457 Standard Fields
 
 | Field | Required | Description |
 |-------|----------|-------------|
@@ -74,9 +74,9 @@ All error responses must follow RFC 7807 Problem Details standard with Content-T
 | Authentication | `AUTH_` | `AUTH_TOKEN_EXPIRED`, `AUTH_INVALID_CREDENTIALS` |
 | Payment Processing | `PAY_` | `PAY_INSUFFICIENT_FUNDS`, `PAY_GATEWAY_ERROR` |
 
-## RFC 7807 Problem Details Standard
+## RFC 9457 Problem Details Standard
 
-Use RFC 7807 Problem Details for consistent error responses across all APIs:
+Use RFC 9457 Problem Details for consistent error responses across all APIs:
 
 ```http
 HTTP/1.1 400 Bad Request
@@ -98,14 +98,16 @@ Content-Type: application/problem+json
 }
 ```
 
-### RFC 7807 Benefits
+### RFC 9457 Benefits
 
 - **Standardized format** across different services and clients
 - **Machine-readable** error types with URIs
 - **Extensible** with custom properties
 - **Wide framework support** in modern web frameworks
 
-### RFC 7807 Required Fields
+### Problem Details Standard Fields
+
+While RFC 9457 makes all fields technically optional, these fields are strongly recommended for meaningful error responses:
 
 | Field | Description | Example |
 |-------|-------------|---------|
@@ -115,7 +117,7 @@ Content-Type: application/problem+json
 | `detail` | Human-readable explanation | `The request contains invalid parameters` |
 | `instance` | URI reference to problem occurrence | `/v1/orders` |
 
-### RFC 7807 Optional Extensions
+### RFC 9457 Optional Extensions
 
 You can extend the Problem Details format with custom fields:
 
@@ -267,7 +269,7 @@ See [Streaming APIs](streaming-apis.md) for more details on streaming error patt
 
 Always set the correct content type for error responses:
 
-- **RFC 7807**: Use `application/problem+json`
+- **RFC 9457**: Use `application/problem+json`
 - **Legacy format**: Use `application/json` with standard error structure
 
 ### Error Logging

@@ -73,7 +73,7 @@ api-design/
 1. **Resources as Nouns**: URLs represent things, not actions
 2. **HTTP Verbs for Actions**: GET reads, POST creates, PUT replaces, DELETE removes
 3. **Consistent Patterns**: Same structure across all endpoints
-4. **Clear Errors**: RFC 7807 Problem Details format
+4. **Clear Errors**: RFC 9457 Problem Details format
 5. **Security First**: OAuth 2.1 and proper authorization
 
 ## Common Patterns Quick Reference
@@ -87,7 +87,7 @@ PUT  /v1/orders/{id}         # Replace order
 DELETE /v1/orders/{id}       # Delete order
 ```
 
-### Error Response (RFC 7807)
+### Error Response (RFC 9457)
 ```json
 {
   "type": "https://api.example.com/problems/not-found",

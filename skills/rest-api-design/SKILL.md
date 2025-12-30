@@ -47,6 +47,36 @@ GET  /orders/findByCustomer
 **Safe**: Does not modify server state (cacheable)
 **Idempotent**: Multiple identical requests = same result as single request
 
+### PATCH Method Formats
+
+Two standard formats exist for PATCH operations:
+
+| Format | Content-Type | Use Case |
+|--------|--------------|----------|
+| JSON Merge Patch | `application/merge-patch+json` | Simple partial updates |
+| JSON Patch | `application/json-patch+json` | Complex operations (add, remove, move) |
+
+**JSON Merge Patch (RFC 7396)** - Recommended for simple updates:
+```http
+PATCH /orders/123 HTTP/1.1
+Content-Type: application/merge-patch+json
+
+{"status": "SHIPPED", "trackingNumber": "ABC123"}
+```
+
+**JSON Patch (RFC 6902)** - For complex operations:
+```http
+PATCH /orders/123 HTTP/1.1
+Content-Type: application/json-patch+json
+
+[
+  {"op": "replace", "path": "/status", "value": "SHIPPED"},
+  {"op": "add", "path": "/trackingNumber", "value": "ABC123"}
+]
+```
+
+Use JSON Merge Patch for most cases. Use JSON Patch when you need array manipulation, conditional updates, or moving values between fields.
+
 ### 3. Collection vs Instance URLs
 
 ```

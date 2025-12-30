@@ -88,7 +88,7 @@ Take our [5-minute assessment](assessment-guide.md) to determine your API's matu
 ### If you're at Level 0:
 1. [Understand your current state](level-0/)
 2. [Learn what you need for Level 1](level-0/next-steps.md)
-3. [Review our Resource Design guide](../foundations/Resource-Naming-and-URL-Structure.md)
+3. [Review our Resource Design guide](../foundations/resource-naming-and-url-structure.md)
 
 ### If you're at Level 1:
 1. [Review your accomplishments](level-1/)

@@ -261,7 +261,7 @@ GET /v1/customers/123?exclude_deprecated=true
 }
 ```
 
-### RFC 7807 Problem Details
+### RFC 9457 Problem Details
 ```json
 {
   "type": "https://example.com/problems/validation-error",

@@ -44,6 +44,36 @@ Consistent resource naming and URL structure are fundamental to creating intuiti
 | PATCH | Bulk partial update (if applicable) | Update order partially |
 | DELETE | Delete all orders (use with caution) | Delete specific order |
 
+### PATCH Method Formats
+
+Two standard formats exist for PATCH operations:
+
+| Format | Content-Type | Use Case |
+|--------|-------------|----------|
+| JSON Merge Patch | `application/merge-patch+json` | Simple partial updates |
+| JSON Patch | `application/json-patch+json` | Complex operations (add, remove, move, copy) |
+
+**Recommendation:** Use JSON Merge Patch (RFC 7396) for simple field updates. Use JSON Patch (RFC 6902) when you need operations like array manipulation, conditional updates, or moving values between fields.
+
+**JSON Merge Patch Example:**
+```http
+PATCH /orders/123 HTTP/1.1
+Content-Type: application/merge-patch+json
+
+{"status": "SHIPPED", "trackingNumber": "ABC123"}
+```
+
+**JSON Patch Example:**
+```http
+PATCH /orders/123 HTTP/1.1
+Content-Type: application/json-patch+json
+
+[
+  {"op": "replace", "path": "/status", "value": "SHIPPED"},
+  {"op": "add", "path": "/trackingNumber", "value": "ABC123"}
+]
+```
+
 ### Important Distinction
 
 A key distinction in our API convention is the semantic difference between collection and specific resource endpoints:
@@ -258,6 +288,6 @@ When implementing these URL structures:
 
 - **REST framework compatibility**: These patterns work with any REST framework
 - **HTTP method semantics**: Follow standard HTTP method definitions regardless of implementation technology
-- **Error handling**: Use appropriate HTTP status codes and RFC 7807 Problem Details format
+- **Error handling**: Use appropriate HTTP status codes and RFC 9457 Problem Details format
 
 The principles outlined here are based on REST architectural constraints and HTTP standards, making them universally applicable.

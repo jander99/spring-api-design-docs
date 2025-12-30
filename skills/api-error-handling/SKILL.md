@@ -1,6 +1,6 @@
 ---
 name: api-error-handling
-description: Design and implement error responses for REST APIs using RFC 7807 Problem Details. Use when creating error handling strategies, validation error formats, exception hierarchies, or implementing consistent error responses across API endpoints.
+description: Design and implement error responses for REST APIs using RFC 9457 Problem Details. Use when creating error handling strategies, validation error formats, exception hierarchies, or implementing consistent error responses across API endpoints.
 ---
 
 # API Error Handling
@@ -9,7 +9,7 @@ description: Design and implement error responses for REST APIs using RFC 7807 P
 
 Activate this skill when you need to:
 - Design error response formats for an API
-- Implement RFC 7807 Problem Details standard
+- Implement RFC 9457 Problem Details standard
 - Handle validation errors with field-level details
 - Choose appropriate HTTP status codes for errors
 - Create exception hierarchies for business logic
@@ -17,9 +17,9 @@ Activate this skill when you need to:
 
 ## Core Principles
 
-### Use RFC 7807 Problem Details
+### Use RFC 9457 Problem Details
 
-All error responses should follow RFC 7807 with Content-Type `application/problem+json`:
+All error responses should follow RFC 9457 Problem Details with Content-Type `application/problem+json`:
 
 ```json
 {
@@ -31,7 +31,7 @@ All error responses should follow RFC 7807 with Content-Type `application/proble
 }
 ```
 
-**Recommended fields (per RFC 7807 best practices):**
+**Recommended fields (per RFC 9457):**
 - `type`: URI identifying the problem type (use `about:blank` for generic errors)
 - `title`: Human-readable summary of the problem type
 - `status`: HTTP status code
@@ -135,7 +135,7 @@ https://api.example.com/problems/
 
 Load these references based on what you need:
 
-- **RFC 7807 details and extensions**: Load `references/rfc-7807.md`
+- **RFC 9457 details and extensions**: Load `references/rfc-9457.md`
 - **Validation error patterns**: Load `references/validation-patterns.md`
 - **Java/Spring implementation**: Load `references/java-spring.md`
 
@@ -233,7 +233,7 @@ Retry-After: 60
 - Return generic messages without actionable details
 - Leak internal implementation details (table names, query errors)
 - Skip the `type` field (use `about:blank` if no specific URI)
-- Use custom error formats when RFC 7807 works
+- Use custom error formats when RFC 9457 works
 - Return 500 for client errors (validation, auth, not found)
 
 ## Implementation Checklist
@@ -242,7 +242,7 @@ When implementing error handling:
 
 1. [ ] Define problem type URIs for your domain errors
 2. [ ] Create error code registry with domain prefixes
-3. [ ] Implement RFC 7807 response structure
+3. [ ] Implement RFC 9457 response structure
 4. [ ] Set `Content-Type: application/problem+json`
 5. [ ] Include `instance` with the request path
 6. [ ] Add `errors` array for validation failures

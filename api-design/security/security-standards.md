@@ -17,6 +17,8 @@ Security is a fundamental aspect of API design that must be implemented consiste
 
 ### OAuth 2.1/OIDC Implementation
 
+> **Note:** OAuth 2.1 is currently in final draft status (draft-ietf-oauth-v2-1). It consolidates OAuth 2.0 security best practices and deprecates insecure patterns. While not yet a finalized RFC, it represents the current industry direction and should be followed for new implementations.
+
 All APIs must implement OAuth 2.1 with OpenID Connect (OIDC) authentication following modern security practices:
 
 #### Token Validation
