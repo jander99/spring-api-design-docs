@@ -21,7 +21,7 @@ Pagination splits large result sets into pages. This guide covers:
 
 ## Documentation
 
-### [Cursor Pagination Implementation](./Cursor-Pagination-Implementation.md)
+### [Cursor Pagination Implementation](./cursor-pagination-implementation.md)
 
 **Complete cursor-based pagination patterns**
 

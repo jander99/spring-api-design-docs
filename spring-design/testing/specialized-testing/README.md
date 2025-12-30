@@ -12,7 +12,7 @@ This directory contains guidelines for specialized testing approaches in Spring 
 
 - **[Infrastructure Testing](infrastructure-testing.md)**: Testing infrastructure components, external adapters, repository implementations, and technical integrations with proper isolation and verification.
 
-- **[Contract Testing Standards](Contract-Testing-Standards.md)**: Consumer-driven contract testing using Spring Cloud Contract, API contract verification, and provider-consumer testing patterns.
+- **[Contract Testing Standards](contract-testing-standards.md)**: Consumer-driven contract testing using Spring Cloud Contract, API contract verification, and provider-consumer testing patterns.
 
 ## Key Specialized Testing Concepts
 
@@ -342,7 +342,7 @@ void shouldRetry_whenExternalServiceFails() {
 
 ## Related Documentation
 
-- [Reactive Controllers](../../controllers/Reactive-Controllers.md)
+- [Reactive Controllers](../../controllers/reactive-controllers.md)
 - [External Services Configuration](../../configuration/external-services.md)
 - [Reactive Error Handling](../../error-handling/reactive-error-handling.md)
 - [Security Testing](../../security/security-testing.md)

@@ -349,4 +349,4 @@ CursorPaginatedResponse:
 ## Implementation References
 
 For language-specific implementation details, see:
-- [Spring Boot Cursor Pagination](../../../../spring-design/pagination/Cursor-Pagination-Implementation.md) - Java/Spring implementation patterns
+- [Spring Boot Cursor Pagination](../../../../spring-design/pagination/cursor-pagination-implementation.md) - Java/Spring implementation patterns

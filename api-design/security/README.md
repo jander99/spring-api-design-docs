@@ -23,7 +23,7 @@ Covers:
 - HTTP security headers
 - Token management
 
-### [Rate-Limiting-Standards.md](Rate-Limiting-Standards.md)
+### [Rate Limiting Standards](rate-limiting-standards.md)
 **How to protect your API from abuse**
 
 Covers:

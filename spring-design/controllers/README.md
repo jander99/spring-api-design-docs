@@ -4,7 +4,7 @@ This directory contains comprehensive documentation for implementing controllers
 
 ## 📋 Table of Contents
 
-### [Controller Fundamentals](./Controller-Fundamentals.md)
+### [Controller Fundamentals](./controller-fundamentals.md)
 **Core principles and patterns for all controller implementations**
 - Controller design principles and structure
 - Package organization and naming conventions
@@ -14,7 +14,7 @@ This directory contains comprehensive documentation for implementing controllers
 - Common patterns and anti-patterns
 - Versioning and global error handling integration
 
-### [Imperative Controllers](./Imperative-Controllers.md)
+### [Imperative Controllers](./imperative-controllers.md)
 **Spring MVC patterns with blocking I/O**
 - Basic controller structure and CRUD operations
 - Standard response patterns with ApiResponse wrapper
@@ -23,7 +23,7 @@ This directory contains comprehensive documentation for implementing controllers
 - Best practices for status codes and validation
 - Exception handling strategies
 
-### [Reactive Controllers](./Reactive-Controllers.md)
+### [Reactive Controllers](./reactive-controllers.md)
 **WebFlux patterns with non-blocking I/O**
 - Reactive controller structure using Mono and Flux
 - Reactive service interfaces and validation patterns
@@ -32,7 +32,7 @@ This directory contains comprehensive documentation for implementing controllers
 - Security in reactive controllers
 - Advanced reactive patterns (parallel processing, deduplication)
 
-### [Request Response Mapping](./Request-Response-Mapping.md)
+### [Request Response Mapping](./request-response-mapping.md)
 **DTOs, mappers, and validation patterns**
 - Request DTO structure with validation annotations
 - Response DTO patterns and immutability
@@ -40,7 +40,7 @@ This directory contains comprehensive documentation for implementing controllers
 - Validation standards and custom validation
 - Best practices for separation of concerns and null safety
 
-### [Controller Testing](./Controller-Testing.md)
+### [Controller Testing](./controller-testing.md)
 **Comprehensive testing strategies**
 - Unit testing for imperative controllers with MockMvc
 - Reactive controller testing with WebTestClient
