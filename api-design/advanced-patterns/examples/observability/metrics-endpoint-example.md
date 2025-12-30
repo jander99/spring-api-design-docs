@@ -1,5 +1,11 @@
 # Metrics Endpoint Examples
 
+> **Reading Guide**
+> - **Reading Time**: 4 minutes
+> - **For**: Developers implementing metrics endpoints
+> - **Prerequisites**: Basic HTTP knowledge
+> - **Reading Level**: Grade 11.3 (Flesch: 27.9)
+
 This document provides HTTP/JSON examples for API metrics endpoints.
 
 ## Metrics Discovery Endpoint

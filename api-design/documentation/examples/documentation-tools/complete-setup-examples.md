@@ -1,5 +1,11 @@
 # Complete Setup Examples
 
+> **Reading Guide**
+> - **Reading Time**: 5 minutes
+> - **For**: Advanced developers with strong API background
+> - **Prerequisites**: Experience with documentation tools, CI/CD pipelines
+> - **Reading Level**: Grade 23.2 (Flesch: -37.3) - Very Difficult (code-heavy)
+
 This document provides detailed configuration examples for popular documentation tools and platforms.
 
 ## Swagger UI Advanced Configuration

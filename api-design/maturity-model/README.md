@@ -103,7 +103,6 @@ Take our [5-minute assessment](assessment-guide.md) to determine your API's matu
 ### If you're at Level 3:
 1. [Ensure full compliance](level-3/)
 2. [Review best practices](level-3/best-practices.md)
-3. [Help others improve](level-3/case-studies.md)
 
 ## 🎯 Most Common Starting Point
 

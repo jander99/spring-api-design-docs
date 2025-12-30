@@ -1,5 +1,11 @@
 # Cursor-Based Pagination
 
+> **Reading Guide**
+> - **Reading Time**: 6 minutes
+> - **For**: Advanced developers implementing cursor pagination
+> - **Prerequisites**: Strong API background, experience with complex systems
+> - **Reading Level**: Grade 13.7 (Flesch: 25)
+
 This document provides guidance on cursor-based pagination for high-performance APIs handling large datasets.
 
 ## Overview

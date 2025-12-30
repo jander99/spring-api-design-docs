@@ -1,5 +1,11 @@
 # Event-Driven Architecture Configuration Reference
 
+> **Reading Guide**
+> - **Reading Time**: 5 minutes
+> - **For**: Developers configuring event-driven systems
+> - **Prerequisites**: Basic REST API knowledge
+> - **Reading Level**: Grade 14.8 (Flesch: 8) - Technical reference
+
 ## Event Structure Standards
 
 ### Complete Event Schema

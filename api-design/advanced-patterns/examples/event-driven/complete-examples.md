@@ -1,5 +1,11 @@
 # Event-Driven Architecture Examples
 
+> **Reading Guide**
+> - **Reading Time**: 5 minutes
+> - **For**: Developers implementing event-driven APIs
+> - **Prerequisites**: Strong API background, experience with complex systems
+> - **Reading Level**: Grade 31.1 (Flesch: -26.2) - Code-heavy reference
+
 ## Event Processing Example
 
 ### Publishing Events

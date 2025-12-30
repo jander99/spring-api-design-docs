@@ -1,5 +1,11 @@
 # Event-Driven Architecture Troubleshooting
 
+> **Reading Guide**
+> - **Reading Time**: 3 minutes
+> - **For**: Developers debugging event-driven systems
+> - **Prerequisites**: Basic HTTP knowledge
+> - **Reading Level**: Grade 11.3 (Flesch: 30.5)
+
 ## Common Issues and Solutions
 
 ### Event Processing Problems

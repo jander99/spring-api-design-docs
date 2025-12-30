@@ -1,5 +1,11 @@
 # Complete Pagination Examples
 
+> **Reading Guide**
+> - **Reading Time**: 4 minutes
+> - **For**: Advanced developers implementing pagination
+> - **Prerequisites**: Strong API background, experience with complex systems
+> - **Reading Level**: Grade 16.5 (Flesch: 10)
+
 This document provides comprehensive examples for implementing pagination, filtering, and sorting in collection APIs.
 
 ## Complete Collection Response

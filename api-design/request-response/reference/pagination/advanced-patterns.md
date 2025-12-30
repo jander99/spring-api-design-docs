@@ -1,5 +1,11 @@
 # Advanced Pagination Patterns
 
+> **Reading Guide**
+> - **Reading Time**: 10 minutes
+> - **For**: Advanced developers building complex pagination systems
+> - **Prerequisites**: Strong API background, experience with complex systems
+> - **Reading Level**: Grade 19.6 (Flesch: -7.4)
+
 This document covers sophisticated pagination, filtering, and search patterns for complex API requirements.
 
 ## Advanced Filtering Patterns

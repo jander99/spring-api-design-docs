@@ -1,5 +1,11 @@
 # Request Correlation Examples
 
+> **Reading Guide**
+> - **Reading Time**: 4 minutes
+> - **For**: Developers implementing distributed tracing
+> - **Prerequisites**: Basic REST API knowledge
+> - **Reading Level**: Grade 11.1 (Flesch: 34.8)
+
 This document provides HTTP examples for request correlation and distributed tracing.
 
 ## Correlation ID Headers

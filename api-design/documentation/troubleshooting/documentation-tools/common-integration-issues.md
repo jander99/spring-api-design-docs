@@ -1,5 +1,11 @@
 # Common Integration Issues and Solutions
 
+> **Reading Guide**
+> - **Reading Time**: 8 minutes
+> - **For**: Advanced developers debugging documentation issues
+> - **Prerequisites**: Experience with Swagger UI, CI/CD pipelines, authentication
+> - **Reading Level**: Grade 25.1 (Flesch: 3) - Very Difficult (code-heavy)
+
 This guide covers common problems with documentation tools and how to fix them.
 
 ## Swagger UI Issues

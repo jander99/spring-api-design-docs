@@ -1,13 +1,10 @@
 # Tool Comparison Guide
 
-> **📖 Reading Guide**
-> 
-> **⏱️ Reading Time:** 4 minutes | **🔴 Level:** Advanced
-> 
-> **📋 Prerequisites:** Strong API background, experience with complex systems  
-> **🎯 Key Topics:** Architecture, Documentation
-> 
-> **📊 Complexity:** 49.8 grade level • 0.5% technical density • very difficult
+> **Reading Guide**
+> - **Reading Time**: 4 minutes
+> - **For**: Advanced developers evaluating documentation tools
+> - **Prerequisites**: Strong API background, experience with complex systems
+> - **Reading Level**: Grade 40.8 (Flesch: -53) - Very Difficult (table-heavy)
 
 Compare documentation tools to find the best one for your project.
 

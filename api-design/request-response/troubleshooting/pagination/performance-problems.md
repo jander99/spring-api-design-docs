@@ -1,5 +1,11 @@
 # Pagination Performance Problems
 
+> **Reading Guide**
+> - **Reading Time**: 3 minutes
+> - **For**: Intermediate to advanced developers optimizing pagination
+> - **Prerequisites**: HTTP fundamentals, basic API experience
+> - **Reading Level**: Grade 14.3 (Flesch: 24)
+
 This document identifies common performance issues in pagination implementations and provides solutions for optimization.
 
 ## Common Performance Issues

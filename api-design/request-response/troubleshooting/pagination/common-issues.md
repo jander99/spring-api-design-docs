@@ -1,5 +1,11 @@
 # Common Pagination Issues and Solutions
 
+> **Reading Guide**
+> - **Reading Time**: 14 minutes
+> - **For**: Advanced developers debugging pagination issues
+> - **Prerequisites**: Strong API background, experience with complex systems
+> - **Reading Level**: Grade 12.4 (Flesch: 30)
+
 This document covers frequently encountered problems when implementing pagination, filtering, and sorting, along with their solutions.
 
 ## Common Pagination Issues

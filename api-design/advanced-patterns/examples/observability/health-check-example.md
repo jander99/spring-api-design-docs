@@ -1,5 +1,11 @@
 # Health Check API Examples
 
+> **Reading Guide**
+> - **Reading Time**: 3 minutes
+> - **For**: Developers implementing health check endpoints
+> - **Prerequisites**: Basic HTTP knowledge
+> - **Reading Level**: Grade 9.1 (Flesch: 42.5)
+
 This document provides HTTP/JSON examples for health check endpoints.
 
 ## Basic Health Endpoint
