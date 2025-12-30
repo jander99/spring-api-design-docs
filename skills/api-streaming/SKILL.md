@@ -5,121 +5,404 @@ description: Implement streaming APIs using Server-Sent Events (SSE), NDJSON, an
 
 # API Streaming
 
-<!--
-SOURCE DOCUMENTS:
-- api-design/request-response/Streaming-APIs.md
-- api-design/advanced-patterns/HTTP-Streaming-Patterns.md
-- api-design/advanced-patterns/Reactive-Error-Handling.md
-- api-design/reference/streaming/sse-specification.md
-- api-design/reference/streaming/ndjson-specification.md
-- api-design/reference/streaming/flow-control.md
-- api-design/examples/streaming/
-- spring-design/controllers/Reactive-Controllers.md
-
-REFERENCE FILES TO CREATE:
-- references/sse-patterns.md (Server-Sent Events)
-- references/ndjson-patterns.md (NDJSON streaming)
-- references/flow-control.md (backpressure, connection management)
-- references/java-spring.md (WebFlux, Flux/Mono, reactive patterns)
--->
-
 ## When to Use This Skill
 
 Use this skill when you need to:
-- Stream real-time updates to clients
+- Stream real-time updates to clients (live feeds, notifications)
+- Export large datasets efficiently
+- Report progress for long-running operations
 - Implement Server-Sent Events (SSE)
 - Use NDJSON for data streaming
 - Handle backpressure in data flows
-- Build progress reporting for long operations
-- Export large datasets efficiently
 
-## Core Principles
+## Streaming Format Decision
 
-TODO: Extract and condense from Streaming-APIs.md
+| Use Case | Format | Content-Type |
+|----------|--------|--------------|
+| Real-time browser notifications | SSE | `text/event-stream` |
+| Live dashboard updates | SSE | `text/event-stream` |
+| Bulk data export | NDJSON | `application/x-ndjson` |
+| Log streaming | NDJSON | `application/x-ndjson` |
+| ETL pipelines | NDJSON | `application/x-ndjson` |
+| Bidirectional communication | WebSocket | N/A |
+| Large JSON arrays | Chunked JSON | `application/json` |
 
-### Streaming Formats
-- **SSE (Server-Sent Events)**: Browser-native, text-based, auto-reconnect
-- **NDJSON**: Newline-delimited JSON, good for data processing
-- **WebSocket**: Bidirectional, but more complex
+## URL Pattern
 
-### When to Use Each Format
-- SSE: Real-time notifications, live feeds, progress updates
-- NDJSON: Bulk data export, log streaming, ETL pipelines
-- WebSocket: Chat, gaming, collaborative editing
+Provide both standard and streaming endpoints:
 
-### Flow Control
-- Implement backpressure to prevent overwhelming clients
-- Use heartbeats to detect stale connections
-- Handle reconnection gracefully with event IDs
+```
+GET /orders              → Returns JSON array (complete)
+GET /orders/stream       → Returns NDJSON stream
+GET /orders/events       → Returns SSE stream
+```
 
-### Content Types
-- SSE: `text/event-stream`
-- NDJSON: `application/x-ndjson`
+## Server-Sent Events (SSE)
+
+### Request
+
+```http
+GET /orders/events HTTP/1.1
+Accept: text/event-stream
+Authorization: Bearer {token}
+```
+
+### Response Format
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/event-stream
+Cache-Control: no-cache
+Connection: keep-alive
+
+id: 1
+event: order-created
+data: {"orderId":"order-123","status":"CREATED"}
+
+id: 2
+event: order-updated
+data: {"orderId":"order-123","status":"PROCESSING"}
+
+id: 3
+event: order-shipped
+data: {"orderId":"order-123","status":"SHIPPED","trackingNumber":"1Z999AA1"}
+```
+
+### SSE Event Structure
+
+```
+id: unique-event-id
+event: event-type
+data: {"json":"payload"}
+retry: 5000
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `id` | Recommended | Unique ID for reconnection support |
+| `event` | Recommended | Event type name |
+| `data` | Required | JSON payload (can span multiple lines) |
+| `retry` | Optional | Reconnection delay in milliseconds |
+
+### Standard Event Types
+
+| Event Type | Description |
+|------------|-------------|
+| `{resource}-created` | New resource created |
+| `{resource}-updated` | Resource modified |
+| `{resource}-deleted` | Resource removed |
+| `heartbeat` | Keep connection alive |
+| `error` | Stream error occurred |
+| `stream-end` | Stream completed |
+
+### Heartbeat Events
+
+Send periodic heartbeats to detect stale connections:
+
+```
+: heartbeat
+id: 100
+
+event: heartbeat
+data: {"timestamp":"2024-07-15T14:30:00Z"}
+```
+
+The `:` prefix is a comment (ignored by clients but keeps connection alive).
+
+### Reconnection with Last-Event-ID
+
+Client reconnects with last received ID:
+
+```http
+GET /orders/events HTTP/1.1
+Accept: text/event-stream
+Last-Event-ID: 42
+```
+
+Server resumes from event 43 onwards.
+
+## NDJSON Streaming
+
+### Request
+
+```http
+GET /orders/stream HTTP/1.1
+Accept: application/x-ndjson
+Authorization: Bearer {token}
+```
+
+### Response Format
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/x-ndjson
+Transfer-Encoding: chunked
+
+{"id":"order-1","status":"PROCESSING","total":99.95}
+{"id":"order-2","status":"COMPLETED","total":149.50}
+{"id":"order-3","status":"PENDING","total":75.00}
+```
+
+Each line is a complete, valid JSON object. No commas between lines.
+
+### Structured NDJSON Stream
+
+Include metadata and end markers:
+
+```json
+{"type":"metadata","totalRecords":1000,"startTime":"2024-07-15T14:30:00Z"}
+{"type":"data","id":"order-1","status":"PROCESSING"}
+{"type":"data","id":"order-2","status":"COMPLETED"}
+{"type":"error","code":"PROCESSING_ERROR","recordId":"order-3","message":"Failed to process"}
+{"type":"stream-end","reason":"completed","processed":2,"errors":1}
+```
+
+### NDJSON Record Types
+
+| Type | Purpose | Fields |
+|------|---------|--------|
+| `metadata` | Stream metadata | `totalRecords`, `startTime` |
+| `data` | Actual data record | Resource fields |
+| `progress` | Progress update | `processed`, `total`, `percentage` |
+| `error` | Processing error | `code`, `message`, `recordId` |
+| `stream-end` | Stream completion | `reason`, `processed`, `errors` |
+
+## Error Handling in Streams
+
+### SSE Error Events
+
+```
+id: 50
+event: error
+data: {"type":"https://example.com/problems/stream-error","title":"Processing Error","status":500,"detail":"Database connection lost"}
+
+id: 51
+event: stream-end
+data: {"reason":"error","processedCount":49}
+```
+
+### NDJSON Error Records
+
+```json
+{"type":"error","code":"RECORD_ERROR","recordId":"order-123","message":"Invalid data format"}
+```
+
+### HTTP Errors Before Stream Starts
+
+If error occurs before streaming begins, return standard HTTP error:
+
+```http
+HTTP/1.1 401 Unauthorized
+Content-Type: application/problem+json
+
+{
+  "type": "https://example.com/problems/unauthorized",
+  "title": "Unauthorized",
+  "status": 401
+}
+```
+
+### Errors During Stream
+
+Once streaming has started, include errors in the stream:
+
+```
+event: error
+data: {"type":"stream-error","message":"Database connection lost"}
+
+event: stream-end
+data: {"reason":"error"}
+```
+
+## Flow Control
+
+### Batch Size Control
+
+Client can request specific batch sizes:
+
+```http
+GET /orders/stream?batchSize=100 HTTP/1.1
+Accept: application/x-ndjson
+```
+
+Server respects (or caps) the requested batch size.
+
+### Rate Limiting Headers
+
+Include rate info in streaming responses:
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/x-ndjson
+X-Batch-Size: 100
+X-Rate-Limit: 1000/minute
+```
+
+### Server-Side Backpressure
+
+When client can't keep up:
+1. Buffer up to a limit
+2. Apply backpressure to data source
+3. If buffer overflows, send warning event
+4. Optionally close connection with error
+
+## Long-Running Operations
+
+### Async Operation Pattern
+
+For operations that take longer than HTTP timeout:
+
+```http
+POST /orders/bulk-import HTTP/1.1
+Content-Type: application/json
+
+{"items": [...thousands of items...]}
+
+HTTP/1.1 202 Accepted
+Location: /operations/op-123
+Content-Type: application/json
+
+{
+  "operationId": "op-123",
+  "status": "PROCESSING",
+  "progressUrl": "/operations/op-123/events"
+}
+```
+
+### Progress Stream
+
+```http
+GET /operations/op-123/events HTTP/1.1
+Accept: text/event-stream
+
+event: progress
+data: {"processed":100,"total":1000,"percentage":10}
+
+event: progress
+data: {"processed":500,"total":1000,"percentage":50}
+
+event: completed
+data: {"processed":1000,"total":1000,"successCount":998,"errorCount":2}
+```
+
+## Connection Management
+
+### Timeout Handling
+
+- Set appropriate read timeouts (> heartbeat interval)
+- Implement reconnection with exponential backoff
+- Use `retry` field to control client reconnection
+
+### Connection Limits
+
+- Limit concurrent streaming connections per client
+- Return 429 if connection limit exceeded
+- Consider connection pooling for high-traffic scenarios
+
+### Graceful Shutdown
+
+```
+event: stream-end
+data: {"reason":"server-shutdown","message":"Server is shutting down, please reconnect"}
+```
+
+## Security
+
+### Authentication
+
+Always require authentication for streaming endpoints:
+
+```http
+GET /orders/events HTTP/1.1
+Authorization: Bearer {token}
+Accept: text/event-stream
+```
+
+### Token Expiration During Stream
+
+For long-lived streams, handle token expiration:
+
+**Option 1: Close and require reconnection**
+```
+event: error
+data: {"type":"token-expired","message":"Please reconnect with new token"}
+```
+
+**Option 2: Token refresh notification**
+```
+event: token-refresh-required
+data: {"expiresIn":300,"refreshUrl":"/auth/refresh"}
+```
+
+### Per-Message Authorization
+
+Filter streamed data based on user permissions - don't stream data the user shouldn't see.
 
 ## Quick Reference
 
-TODO: Add streaming format decision tree
+### SSE Endpoint
 
-| Use Case | Recommended Format |
-|----------|-------------------|
-| Browser notifications | SSE |
-| Live dashboard updates | SSE |
-| Bulk data export | NDJSON |
-| Log streaming | NDJSON |
-| Bidirectional comms | WebSocket |
-| File uploads with progress | Multipart + SSE |
+```http
+GET /orders/events HTTP/1.1
+Accept: text/event-stream
+Authorization: Bearer {token}
+
+HTTP/1.1 200 OK
+Content-Type: text/event-stream
+Cache-Control: no-cache
+
+id: 1
+event: order-created
+data: {"orderId":"123","status":"CREATED"}
+```
+
+### NDJSON Endpoint
+
+```http
+GET /orders/stream HTTP/1.1
+Accept: application/x-ndjson
+Authorization: Bearer {token}
+
+HTTP/1.1 200 OK
+Content-Type: application/x-ndjson
+Transfer-Encoding: chunked
+
+{"id":"order-1","status":"PROCESSING"}
+{"id":"order-2","status":"COMPLETED"}
+```
+
+## Anti-Patterns
+
+| Anti-Pattern | Problem | Fix |
+|--------------|---------|-----|
+| No heartbeat | Stale connections undetected | Send heartbeat every 15-30 seconds |
+| Missing event IDs | Can't resume on reconnect | Include sequential IDs |
+| Unbounded streams | Resource exhaustion | Add limits, use pagination for huge datasets |
+| No backpressure | Memory exhaustion | Buffer with limits, apply backpressure |
+| Blocking in reactive | Thread starvation | Use non-blocking operations only |
+| No error events | Client doesn't know about failures | Stream errors as events |
+| Infinite retry | DoS on failures | Use exponential backoff |
+
+## Streaming Checklist
+
+- [ ] Choose appropriate format (SSE vs NDJSON)
+- [ ] Set correct Content-Type header
+- [ ] Include event IDs for SSE
+- [ ] Implement heartbeat mechanism
+- [ ] Handle errors as stream events
+- [ ] Support reconnection with Last-Event-ID
+- [ ] Implement backpressure handling
+- [ ] Add authentication/authorization
+- [ ] Handle token expiration for long streams
+- [ ] Include stream-end event/record
+- [ ] Set appropriate timeouts
+- [ ] Test with network interruptions
 
 ## Loading Additional Context
 
 When you need deeper guidance:
 
-- **Server-Sent Events**: Load `references/sse-patterns.md`
-- **NDJSON streaming**: Load `references/ndjson-patterns.md`
-- **Flow control patterns**: Load `references/flow-control.md`
+- **Server-Sent Events patterns**: Load `references/sse-patterns.md`
+- **NDJSON streaming patterns**: Load `references/ndjson-patterns.md`
+- **Flow control and backpressure**: Load `references/flow-control.md`
 - **Java/Spring implementation**: Load `references/java-spring.md`
-
-## Examples
-
-TODO: Add minimal illustrative examples
-
-### SSE Response
-```
-Content-Type: text/event-stream
-
-event: update
-data: {"orderId": "123", "status": "processing"}
-
-event: update
-data: {"orderId": "123", "status": "shipped"}
-
-event: complete
-data: {"orderId": "123", "status": "delivered"}
-```
-
-### NDJSON Response
-```
-Content-Type: application/x-ndjson
-
-{"id": 1, "name": "Item 1", "price": 10.00}
-{"id": 2, "name": "Item 2", "price": 20.00}
-{"id": 3, "name": "Item 3", "price": 30.00}
-```
-
-### SSE with Retry
-```
-retry: 5000
-id: 12345
-event: message
-data: {"content": "Hello"}
-```
-
-## Anti-Patterns
-
-TODO: Extract from source documents
-
-- No heartbeat mechanism (stale connection detection)
-- Missing event IDs for reconnection
-- Unbounded streams without pagination
-- No backpressure handling
-- Blocking operations in reactive streams
-- Missing error events in SSE
