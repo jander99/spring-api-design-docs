@@ -97,7 +97,7 @@
   - Common HTTP patterns
   - Create shared reference sections
 
-- [ ] **Add Visual Diagrams**
+- [x] **Add Visual Diagrams** ✅ COMPLETE
   - Authentication/authorization flows
   - API lifecycle workflows
   - Versioning decision trees
@@ -159,7 +159,7 @@
   - Financial transaction processing
   - Content management systems
 
-- [ ] **Decision Framework**
+- [x] **Decision Framework** ✅ COMPLETE
   - When to use each pattern
   - Trade-offs and considerations
   - Business impact assessment

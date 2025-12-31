@@ -36,7 +36,10 @@ This guide helps you diagnose and fix common API problems quickly.
 
 | Guide | Description |
 |-------|-------------|
-| [Streaming Issues](streaming/common-issues.md) | SSE, WebSocket, and streaming problems |
+| [Pagination Issues](pagination/common-issues.md) | Missing items, duplicates, cursor errors |
+| [Cursor Migration](pagination/cursor-vs-offset-migration.md) | Migrate from offset to cursor pagination |
+| [Streaming Issues](streaming/common-issues.md) | SSE, WebSocket, NDJSON, backpressure, and memory leaks |
+| [Reconnection Strategies](streaming/reconnection-strategies.md) | Backoff, resumption, and handling missed events |
 | [Streaming Testing](streaming/testing-strategies.md) | Test streaming endpoints |
 | [Versioning Problems](versioning/common-problems.md) | API version migration issues |
 
