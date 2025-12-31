@@ -75,7 +75,7 @@ Transfer-Encoding: chunked
 ### Single Resource Endpoint
 
 ```http
-GET /v1/order/order-123 HTTP/1.1
+GET /v1/orders/order-123 HTTP/1.1
 Accept: application/json
 
 HTTP/1.1 200 OK
@@ -122,7 +122,7 @@ Content-Type: application/json
 Implementing real-time updates with SSE:
 
 ```http
-GET /order/order-123/events HTTP/1.1
+GET /orders/order-123/events HTTP/1.1
 Accept: text/event-stream
 
 HTTP/1.1 200 OK
@@ -167,7 +167,7 @@ retry: 3000
 For bi-directional communication:
 
 ```
-ws://api.example.com/order/order-123/ws
+ws://api.example.com/orders/order-123/ws
 
 // Client sends:
 {"command": "get-status"}
@@ -255,7 +255,7 @@ Accept: application/x-ndjson
 ### Testing SSE Endpoints
 
 ```http
-GET /order/order-123/events HTTP/1.1
+GET /orders/order-123/events HTTP/1.1
 Accept: text/event-stream
 
 # Expect: 200 OK with text/event-stream
@@ -267,7 +267,7 @@ Accept: text/event-stream
 ### Testing WebSocket Endpoints
 
 ```
-ws://api.example.com/order/order-123/ws
+ws://api.example.com/orders/order-123/ws
 
 # Test: Connection establishment
 # Test: Message exchange patterns

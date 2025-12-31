@@ -480,57 +480,14 @@ annotations:
 
 ## Rate Limiting Headers
 
-### Rate Limit Response Headers
+For comprehensive rate limiting standards, including headers, response formats, DDoS protection, and brute force prevention, see [Rate Limiting Standards](../security/rate-limiting-standards.md).
 
-#### Standard Rate Limiting Headers
+Key headers for observability integration:
+- `X-RateLimit-Limit` - Maximum requests allowed
+- `X-RateLimit-Remaining` - Requests remaining
+- `X-RateLimit-Reset` - When limit resets
 
-**X-RateLimit-Limit**
-- **Purpose**: Request limit per time window
-- **Example**: `X-RateLimit-Limit: 1000`
-
-**X-RateLimit-Remaining**
-- **Purpose**: Requests remaining in current window  
-- **Example**: `X-RateLimit-Remaining: 742`
-
-**X-RateLimit-Reset**
-- **Purpose**: Time when rate limit resets
-- **Format**: Unix timestamp or seconds until reset
-- **Example**: `X-RateLimit-Reset: 1642251600`
-
-#### Rate Limit Response Example
-
-```http
-HTTP/1.1 200 OK
-X-RateLimit-Limit: 1000
-X-RateLimit-Remaining: 742
-X-RateLimit-Reset: 1642251600
-Retry-After: 3600
-Content-Type: application/json
-
-{
-  "data": {...}
-}
-```
-
-#### Rate Limit Exceeded Response
-
-```http
-HTTP/1.1 429 Too Many Requests  
-X-RateLimit-Limit: 1000
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1642251600
-Retry-After: 3600
-Content-Type: application/problem+json
-
-{
-  "type": "https://tools.ietf.org/html/rfc6585#section-4",
-  "title": "Too Many Requests", 
-  "status": 429,
-  "detail": "Rate limit of 1000 requests per hour exceeded",
-  "instance": "/v1/orders",
-  "rateLimitReset": 1642251600
-}
-```
+Monitor rate limit metrics as part of your observability strategy to detect abuse patterns and capacity issues.
 
 ## Performance Monitoring
 

@@ -199,7 +199,7 @@ Security events should include these fields following structured logging princip
   "user_id": "user-12345",
   "request_id": "req-98765",
   "correlation_id": "corr-abcd",
-  "resource_path": "/v1/order/12345",
+  "resource_path": "/v1/orders/12345",
   "remote_ip": "192.168.1.100",
   "user_agent": "Mozilla/5.0...",
   "failure_reason": "expired_token",

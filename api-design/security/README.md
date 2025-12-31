@@ -2,35 +2,35 @@
 
 > **Reading Guide**
 > 
-> **Reading Time:** 1 minute | **Level:** Intermediate
+> **Reading Time:** 1 minute | **Level:** Beginner
 > 
 > **Prerequisites:** Basic HTTP knowledge  
-> **Key Topics:** Authentication, authorization
+> **Key Topics:** Login, access control
 
 ## Overview
 
-This section covers how to protect your APIs. Security is critical for every API.
+This section shows how to keep your APIs safe. Security matters for every API.
 
 ## Files
 
 ### [Security Standards](security-standards.md)
-**How to secure your API**
+**How to keep your API safe**
 
-Covers:
-- OAuth 2.1 and OIDC
-- Authentication patterns
-- Authorization rules
-- HTTP security headers
-- Token management
+Learn about:
+- Login systems (OAuth 2.1)
+- Who you are (login checks)
+- What you can do (access rules)
+- Safety headers
+- Token use
 
 ### [Rate Limiting Standards](rate-limiting-standards.md)
-**How to protect your API from abuse**
+**How to stop API abuse**
 
-Covers:
-- Rate limiting strategies
-- Rate limit headers
-- Quota management
-- Client best practices
+Learn about:
+- Request caps
+- Limit headers
+- Usage quotas
+- Client tips
 
 ## Navigation
 

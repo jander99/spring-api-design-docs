@@ -9,24 +9,24 @@
 
 ## Overview
 
-This section covers how to document your APIs. Good docs help developers use your API correctly.
+This section shows how to document your APIs. Good docs help developers use your API well.
 
 ## Files
 
 ### [OpenAPI Standards](openapi-standards.md)
 **How to write OpenAPI specs**
 
-Covers OpenAPI 3.1+ format, schema design, and best practices.
+Covers OpenAPI 3.1+ format, data models, and tips.
 
 ### [Documentation Testing](documentation-testing.md)
 **How to test your docs**
 
-Covers contract testing and keeping docs in sync with code.
+Shows how to test that docs match your code.
 
 ### [Documentation Tools and Integration](documentation-tools-and-integration.md)
-**Tools and automation**
+**Tools and setup**
 
-Covers tools, workflows, and CI/CD integration.
+Covers tools, workflows, and build system setup.
 
 ## Navigation
 
