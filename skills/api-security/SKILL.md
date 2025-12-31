@@ -355,3 +355,4 @@ When you need deeper guidance:
 - **Java/Spring implementation**: Load `references/java-spring.md`
 - **Rate limiting strategies and algorithms**: Load `/home/jeff/workspaces/spring-api-design-docs/api-design/security/rate-limiting-standards.md`
 - **Multi-tenancy patterns (isolation, routing, data partitioning)**: Load `/home/jeff/workspaces/spring-api-design-docs/api-design/advanced-patterns/multi-tenancy-patterns.md`
+- **Advanced security (zero-trust, mTLS, DPoP, threat modeling)**: Load `/home/jeff/workspaces/spring-api-design-docs/api-design/security/advanced-security-patterns.md`

@@ -318,3 +318,5 @@ When you need deeper guidance:
 - **Java/Spring implementation**: Load `references/java-spring.md`
 - **Data modeling and JSON conventions**: Load `/home/jeff/workspaces/spring-api-design-docs/api-design/foundations/data-modeling-standards.md`
 - **HTTP client patterns (retry, circuit breaker, pooling)**: Load `/home/jeff/workspaces/spring-api-design-docs/api-design/request-response/http-client-best-practices.md`
+- **Microservices integration (service mesh, distributed transactions)**: Load `/home/jeff/workspaces/spring-api-design-docs/api-design/advanced-patterns/microservices-integration-patterns.md`
+- **API governance (reviews, quality gates, compliance)**: Load `/home/jeff/workspaces/spring-api-design-docs/api-design/documentation/api-governance.md`

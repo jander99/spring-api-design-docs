@@ -158,7 +158,7 @@ Request → Controller → Service → Repository → Database
 - [ ] 404 for missing resources
 - [ ] 409 for conflicts
 - [ ] 429 for rate limits
-- [ ] 500 errors return RFC 7807 format
+- [ ] 500 errors return RFC 9457 format
 
 ### Security Testing
 
@@ -279,3 +279,5 @@ Examples:
 When you need deeper guidance:
 
 - **Java/Spring implementation**: Load `references/java-spring.md`
+- **CI/CD integration (pipelines, quality gates, contract testing)**: Load `/home/jeff/workspaces/spring-api-design-docs/api-design/documentation/ci-cd-integration.md`
+- **Development tooling (linting, mocking, code generation)**: Load `/home/jeff/workspaces/spring-api-design-docs/api-design/documentation/development-tooling.md`

@@ -429,3 +429,5 @@ When you need deeper guidance:
 - **NDJSON streaming patterns**: Load `references/ndjson-patterns.md`
 - **Flow control and backpressure**: Load `references/flow-control.md`
 - **Java/Spring implementation**: Load `references/java-spring.md`
+- **HTTP streaming patterns (SSE, WebSocket, chunked)**: Load `/home/jeff/workspaces/spring-api-design-docs/api-design/advanced-patterns/http-streaming-patterns.md`
+- **Async/batch patterns (long-running ops, webhooks)**: Load `/home/jeff/workspaces/spring-api-design-docs/api-design/advanced-patterns/async-batch-patterns.md`

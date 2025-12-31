@@ -249,5 +249,7 @@ GET /v1/customers/123?exclude_deprecated=true
 When you need deeper guidance:
 
 - **Java/Spring implementation**: Load `references/java-spring.md`
+- **API lifecycle management (complete lifecycle, sunset, migration)**: Load `/home/jeff/workspaces/spring-api-design-docs/api-design/foundations/api-lifecycle-management.md`
+- **Deprecation policies and examples**: Load `/home/jeff/workspaces/spring-api-design-docs/api-design/reference/versioning/deprecation-policies.md`
 
 **Note**: Spring-specific versioning documentation is limited in source materials. Consider using URL path versioning with separate controller classes per version.

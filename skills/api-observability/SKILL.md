@@ -317,3 +317,5 @@ When you need deeper guidance:
 - **Health check patterns**: Load `references/health-checks.md`
 - **Metrics and tracing**: Load `references/metrics-tracing.md`
 - **Java/Spring implementation**: Load `references/java-spring.md`
+- **API analytics and insights (usage metrics, dashboards, privacy)**: Load `/home/jeff/workspaces/spring-api-design-docs/api-design/advanced-patterns/api-analytics-insights.md`
+- **Full observability standards**: Load `/home/jeff/workspaces/spring-api-design-docs/api-design/advanced-patterns/api-observability-standards.md`
