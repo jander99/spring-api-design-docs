@@ -28,6 +28,11 @@ Shows how to test that docs match your code.
 
 Covers tools, workflows, and build system setup.
 
+### [API Governance](api-governance.md)
+**Review processes and quality gates**
+
+Covers review workflows, approval criteria, change management, compliance requirements, and exception processes.
+
 ## Navigation
 
 - [Back to API Design](../README.md)

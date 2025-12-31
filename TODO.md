@@ -28,7 +28,7 @@
   - Data type standards for APIs
   - Schema versioning strategies
 
-- [ ] **API Lifecycle Management**
+- [x] **API Lifecycle Management** ✅ COMPLETE
   - Beyond versioning: complete lifecycle workflows
   - Migration strategies and tooling
   - Sunset procedures and timelines
@@ -49,7 +49,7 @@
   - Connection pooling guidelines
   - Error recovery strategies
 
-- [ ] **API Governance**
+- [x] **API Governance** ✅ COMPLETE
   - Review processes and approval workflows
   - Compliance requirements
   - Design review templates
@@ -80,6 +80,8 @@
 - [x] **Performance Standards** - Complete in `/api-design/advanced-patterns/performance-standards.md`
 - [x] **Data Modeling & Schema Design** - Complete in `/api-design/foundations/data-modeling-standards.md`
 - [x] **Async/Batch Processing Patterns** - Complete in `/api-design/advanced-patterns/async-batch-patterns.md`
+- [x] **API Lifecycle Management** - Complete in `/api-design/foundations/api-lifecycle-management.md`
+- [x] **API Governance** - Complete in `/api-design/documentation/api-governance.md`
 
 ## Content Improvements (Medium Priority)
 

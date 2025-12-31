@@ -21,6 +21,9 @@ Comprehensive guidelines for designing RESTful and Reactive API endpoints with p
 ### [API Version Strategy](api-version-strategy.md)
 Detailed versioning strategy for API evolution and backward compatibility. Includes URI-based versioning patterns, migration strategies, and version lifecycle management.
 
+### [API Lifecycle Management](api-lifecycle-management.md)
+Complete guide to managing APIs from design to retirement. Covers lifecycle stages, deprecation processes, sunset procedures, migration strategies, and client communication templates.
+
 ### [Data Modeling Standards](data-modeling-standards.md)
 Comprehensive standards for API schema design. Covers field naming conventions, data type standards, JSON Schema patterns, and schema evolution strategies for building consistent, maintainable APIs.
 
