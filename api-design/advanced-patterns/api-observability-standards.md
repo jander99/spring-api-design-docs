@@ -644,6 +644,7 @@ Use this checklist when implementing API observability:
 
 ### Advanced Patterns
 - [Performance Standards](performance-standards.md) - Caching, optimization, and SLOs
+- [API Analytics & Insights](api-analytics-insights.md) - Usage analytics, business metrics, privacy
 - [Event-Driven Architecture](event-driven-architecture.md) - Async event monitoring
 - [Reactive Error Handling](reactive-error-handling.md) - Error handling in reactive streams
 

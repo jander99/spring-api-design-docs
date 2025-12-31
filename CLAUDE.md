@@ -50,6 +50,11 @@ Universal HTTP/REST principles with no programming language dependencies:
 - `api-lifecycle-management.md`: Version lifecycle, deprecation, sunset policies
 - `api-governance.md`: Review processes, design consistency, compliance
 - `multi-tenancy-patterns.md`: Tenant isolation, data partitioning, routing
+- `microservices-integration-patterns.md`: Service mesh, circuit breakers, distributed transactions
+- `api-analytics-insights.md`: Usage metrics, dashboards, privacy considerations
+- `advanced-security-patterns.md`: Zero-trust, mTLS, threat modeling, DPoP
+- `ci-cd-integration.md`: Pipelines, contract testing, deployment strategies
+- `development-tooling.md`: Tool selection, linting, code generation
 
 **Note**: All API design documentation uses only JSON, YAML, and HTTP examples. No programming language code is included.
 

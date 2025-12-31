@@ -12,8 +12,9 @@
 - **Adaptive Rate Limiting** - [Rate Limiting](security/rate-limiting-standards.md#adaptive-rate-limiting)
 - **Alert Severity** - [Observability](advanced-patterns/api-observability-standards.md#alerting-standards)
 - **All-or-Nothing Processing** - [Batch Patterns](advanced-patterns/async-batch-patterns.md#all-or-nothing-processing)
+- **API Analytics** - [Analytics & Insights](advanced-patterns/api-analytics-insights.md), [Metrics Taxonomy](advanced-patterns/api-analytics-insights.md#core-metrics-taxonomy)
 - **API Catalog** - [Governance](documentation/api-governance.md#api-catalog-and-registry)
-- **API Gateway** - [Versioning](foundations/api-version-strategy.md#api-gateway-considerations)
+- **API Gateway** - [Versioning](foundations/api-version-strategy.md#api-gateway-considerations), [Microservices](advanced-patterns/microservices-integration-patterns.md#api-gateway-patterns)
 - **API Lifecycle** - [Lifecycle Management](foundations/api-lifecycle-management.md), [Governance](documentation/api-governance.md#api-lifecycle-status)
 - **Async Operations** - [Async Patterns](advanced-patterns/async-batch-patterns.md), [202 Accepted](advanced-patterns/async-batch-patterns.md#the-202-accepted-pattern)
 - **Audit Logging** - [Observability](advanced-patterns/api-observability-standards.md#audit-logging-requirements), [Multi-Tenancy](advanced-patterns/multi-tenancy-patterns.md#audit-logging)
@@ -40,7 +41,10 @@
 - **CDN Integration** - [Performance](advanced-patterns/performance-standards.md#cdn-integration)
 - **Change Management** - [Governance](documentation/api-governance.md#change-management)
 - **Chunked Transfer** - [Streaming APIs](request-response/streaming-apis.md#3-chunked-json---for-traditional-json-arrays)
-- **Circuit Breaker** - [HTTP Client](request-response/http-client-best-practices.md#circuit-breaker-pattern), [Reactive Errors](advanced-patterns/reactive-error-handling.md#circuit-breaker-pattern)
+- **CI/CD Integration** - [CI/CD Integration](documentation/ci-cd-integration.md), [Quality Gates](documentation/ci-cd-integration.md#quality-gates-summary)
+- **Circuit Breaker** - [HTTP Client](request-response/http-client-best-practices.md#circuit-breaker-pattern), [Reactive Errors](advanced-patterns/reactive-error-handling.md#circuit-breaker-pattern), [Microservices](advanced-patterns/microservices-integration-patterns.md#circuit-breaker-pattern)
+- **Code Generation** - [Development Tooling](documentation/development-tooling.md#code-generation-from-openapi)
+- **Contract Testing** - [CI/CD](documentation/ci-cd-integration.md#contract-testing), [Microservices](advanced-patterns/microservices-integration-patterns.md#contract-testing-considerations)
 - **Client Errors (4xx)** - [Status Codes](quick-reference/status-codes.md#client-error-codes-4xx), [Error Standards](request-response/error-response-standards.md)
 - **Compliance** - [Governance](documentation/api-governance.md#compliance-requirements)
 - **Compression** - [Performance](advanced-patterns/performance-standards.md#compression)
@@ -66,8 +70,11 @@
 - **Deprecation** - [Lifecycle](foundations/api-lifecycle-management.md#deprecation-process), [Versioning](foundations/api-version-strategy.md#deprecation-policy), [OpenAPI](documentation/openapi-standards.md#deprecation-documentation)
 - **Deprecation Headers** - [Lifecycle](foundations/api-lifecycle-management.md#http-deprecation-headers)
 - **Design Review** - [Governance](documentation/api-governance.md#api-design-review-process)
+- **Development Tooling** - [Development Tooling](documentation/development-tooling.md), [Tool Selection](documentation/development-tooling.md#tool-selection-decision-framework)
 - **Distributed Tracing** - [Observability](advanced-patterns/api-observability-standards.md#opentelemetry-integration)
+- **Distributed Transactions** - [Microservices](advanced-patterns/microservices-integration-patterns.md#distributed-transaction-patterns)
 - **Documentation Standards** - [OpenAPI](documentation/openapi-standards.md), [Governance](documentation/api-governance.md#documentation-standards)
+- **DPoP (Token Binding)** - [Advanced Security](security/advanced-security-patterns.md#token-security-patterns)
 - **Domain Events** - [Event-Driven](advanced-patterns/event-driven-architecture.md#event-types)
 
 ## E
@@ -158,7 +165,10 @@
 
 - **Maturity Model** - [Maturity Model](maturity-model/README.md), [Assessment Guide](maturity-model/assessment-guide.md)
 - **Merge Patch** - [URL Structure](foundations/resource-naming-and-url-structure.md#patch-method-formats)
-- **Metrics** - [Observability](advanced-patterns/api-observability-standards.md#metrics-endpoints)
+- **Metrics** - [Observability](advanced-patterns/api-observability-standards.md#metrics-endpoints), [Analytics](advanced-patterns/api-analytics-insights.md#core-metrics-taxonomy)
+- **Microservices** - [Integration Patterns](advanced-patterns/microservices-integration-patterns.md)
+- **Mocking Tools** - [Development Tooling](documentation/development-tooling.md#api-mocking-tools-and-patterns)
+- **mTLS** - [Advanced Security](security/advanced-security-patterns.md#mutual-tls-mtls-for-api-authentication), [Microservices](advanced-patterns/microservices-integration-patterns.md#inter-service-authentication)
 - **Metrics Naming** - [Observability](advanced-patterns/api-observability-standards.md#metric-naming-conventions)
 - **Migration Guide** - [Lifecycle](foundations/api-lifecycle-management.md#migration-strategies)
 - **Monetary Values** - [Data Modeling](foundations/data-modeling-standards.md#numeric-types)
@@ -238,7 +248,11 @@
 ## S
 
 - **Safe Methods** - [HTTP Methods](quick-reference/http-methods.md#idempotency-explained)
-- **Saga Pattern** - [Event-Driven](advanced-patterns/event-driven-architecture.md#3-saga-pattern)
+- **Saga Pattern** - [Event-Driven](advanced-patterns/event-driven-architecture.md#3-saga-pattern), [Microservices](advanced-patterns/microservices-integration-patterns.md#distributed-transaction-patterns)
+- **Security Automation** - [Advanced Security](security/advanced-security-patterns.md#security-automation)
+- **Security Event Logging** - [Advanced Security](security/advanced-security-patterns.md#security-event-logging-standards)
+- **Service Discovery** - [Microservices](advanced-patterns/microservices-integration-patterns.md#service-discovery-patterns)
+- **Service Mesh** - [Microservices](advanced-patterns/microservices-integration-patterns.md#service-mesh-considerations)
 - **Sampling Strategies** - [Observability](advanced-patterns/api-observability-standards.md#trace-sampling-strategies)
 - **Schema Evolution** - [Data Modeling](foundations/data-modeling-standards.md#schema-evolution)
 - **Security Headers** - [Security](security/security-standards.md#security-headers), [Headers](quick-reference/headers.md#security)
@@ -266,6 +280,7 @@
 
 - **Tenant Identification** - [Multi-Tenancy](advanced-patterns/multi-tenancy-patterns.md#tenant-identification-strategies)
 - **Tenant Isolation** - [Multi-Tenancy](advanced-patterns/multi-tenancy-patterns.md#data-isolation)
+- **Threat Modeling** - [Advanced Security](security/advanced-security-patterns.md#api-threat-modeling-with-stride)
 - **Throttling** - [Rate Limiting](security/rate-limiting-standards.md)
 - **Timeout Standards** - [HTTP Client](request-response/http-client-best-practices.md#timeout-standards)
 - **Token Bucket** - [Rate Limiting](security/rate-limiting-standards.md#token-bucket)
@@ -282,6 +297,8 @@
 - **URI Path Versioning** - [Versioning](foundations/api-version-strategy.md#uri-path-versioning-recommended)
 - **URL Structure** - [Resource Naming](foundations/resource-naming-and-url-structure.md)
 - **USE Method** - [Observability](advanced-patterns/api-observability-standards.md#use-method-metrics)
+- **Usage Analytics** - [Analytics](advanced-patterns/api-analytics-insights.md#api-usage-analytics)
+- **User Behavior Tracking** - [Analytics](advanced-patterns/api-analytics-insights.md#user-behavior-tracking)
 - **UUID** - [Data Modeling](foundations/data-modeling-standards.md#string-types)
 
 ## V
@@ -309,6 +326,10 @@
 - **X-Request-ID** - [Observability](advanced-patterns/api-observability-standards.md#required-headers), [Headers](quick-reference/headers.md)
 - **X-Tenant-ID** - [Multi-Tenancy](advanced-patterns/multi-tenancy-patterns.md#strategy-3-request-header)
 
+## Z
+
+- **Zero-Trust Architecture** - [Advanced Security](security/advanced-security-patterns.md#zero-trust-architecture-principles)
+
 ---
 
 ## Document Quick Reference
@@ -335,5 +356,10 @@
 | [reactive-error-handling.md](advanced-patterns/reactive-error-handling.md) | Backpressure, recovery patterns |
 | [openapi-standards.md](documentation/openapi-standards.md) | OpenAPI 3.1, documentation |
 | [api-governance.md](documentation/api-governance.md) | Reviews, quality gates, compliance |
+| [ci-cd-integration.md](documentation/ci-cd-integration.md) | Pipelines, testing, deployment |
+| [development-tooling.md](documentation/development-tooling.md) | Tools, linting, code generation |
+| [advanced-security-patterns.md](security/advanced-security-patterns.md) | Zero-trust, mTLS, threat modeling |
+| [microservices-integration-patterns.md](advanced-patterns/microservices-integration-patterns.md) | Service mesh, circuit breakers, sagas |
+| [api-analytics-insights.md](advanced-patterns/api-analytics-insights.md) | Usage metrics, dashboards, privacy |
 | [maturity-model/](maturity-model/README.md) | Richardson levels, assessment |
 | [quick-reference/](quick-reference/README.md) | HTTP methods, status codes, headers |

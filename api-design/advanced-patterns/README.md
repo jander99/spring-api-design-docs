@@ -53,6 +53,16 @@ Covers caching, response times, compression, and HTTP/2.
 
 Covers tenant identification, URL structure, data isolation, and per-tenant rate limiting.
 
+### [Microservices Integration Patterns](microservices-integration-patterns.md)
+**Connecting services reliably**
+
+Covers service discovery, circuit breakers, API gateways, distributed transactions, service mesh, and inter-service authentication.
+
+### [API Analytics & Insights](api-analytics-insights.md)
+**Measuring and understanding API usage**
+
+Covers usage analytics, performance metrics, business insights, version tracking, and privacy-compliant data collection.
+
 ## Navigation
 
 - [Back to API Design](../README.md)

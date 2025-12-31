@@ -548,6 +548,7 @@ Track these metrics to maintain API performance.
 ## Related Documentation
 
 - [API Observability Standards](api-observability-standards.md) - Monitoring and metrics
+- [API Analytics & Insights](api-analytics-insights.md) - Usage analytics and business metrics
 - [Pagination and Filtering](../request-response/pagination-and-filtering.md) - Detailed pagination patterns
 - [Streaming APIs](../request-response/streaming-apis.md) - Large data transfer patterns
 - [Rate Limiting Standards](../security/rate-limiting-standards.md) - Request throttling

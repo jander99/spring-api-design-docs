@@ -28,6 +28,11 @@ Shows how to test that docs match your code.
 
 Covers tools, workflows, and build system setup.
 
+### [Development Tooling](development-tooling.md)
+**Complete API toolchain guide**
+
+Covers OpenAPI editors, validators, mocking, testing, code generation, linting, monitoring, gateways, and tool selection.
+
 ### [API Governance](api-governance.md)
 **Review processes and quality gates**
 

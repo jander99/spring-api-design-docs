@@ -32,6 +32,21 @@ Learn about:
 - Usage quotas
 - Client tips
 
+### [Advanced Security Patterns](advanced-security-patterns.md)
+**Deep security for complex systems**
+
+Learn about:
+- Zero trust for APIs
+- Threat modeling (STRIDE)
+- Step-up and adaptive auth
+- Token binding and DPoP
+- Request signing (HMAC)
+- Mutual TLS (mTLS)
+- API key best practices
+- Bot and abuse prevention
+- Security logging
+- Incident response
+
 ## Navigation
 
 - [Back to API Design](../README.md)
