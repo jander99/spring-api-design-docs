@@ -13,6 +13,11 @@ This section covers advanced patterns for complex APIs. Use these when you need 
 
 ## Files
 
+### [Async & Batch Processing Patterns](async-batch-patterns.md)
+**Long-running operations and bulk processing**
+
+Covers 202 Accepted pattern, polling, webhooks, batch operations, and progress tracking.
+
 ### [Event-Driven Architecture](event-driven-architecture.md)
 **Building event-based systems**
 
@@ -37,6 +42,11 @@ Covers error patterns for async and streaming systems.
 **Monitoring your APIs**
 
 Covers health checks, metrics, and distributed tracing.
+
+### [API Performance Standards](performance-standards.md)
+**Optimizing API speed and efficiency**
+
+Covers caching, response times, compression, and HTTP/2.
 
 ## Navigation
 

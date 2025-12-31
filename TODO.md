@@ -11,14 +11,17 @@
   - Request correlation patterns (X-Request-ID, X-Trace-ID)
   - SLA/SLO definitions for APIs
 
-- [ ] **Rate Limiting & Protection Standards** ⭐ NEW
+- [x] **Rate Limiting & Protection Standards** ⭐ NEW ✅ COMPLETE
   - HTTP rate limiting headers (X-RateLimit-*)
   - HTTP 429 Too Many Requests patterns
   - Rate limiting algorithms at HTTP level
   - DDoS protection patterns
   - Per-user vs per-IP strategies
+  - Brute force protection patterns
+  - IETF standard headers
+  - Adaptive rate limiting
 
-- [ ] **Data Modeling & Schema Design Standards**
+- [x] **Data Modeling & Schema Design Standards** ✅ COMPLETE
   - JSON Schema patterns
   - OpenAPI schema evolution
   - API field naming conventions
@@ -32,14 +35,14 @@
   - Client communication templates
   - Deprecation workflow automation
 
-- [ ] **Performance Standards**
+- [x] **Performance Standards** ✅ COMPLETE
   - HTTP caching strategies and headers
   - Response time SLAs by endpoint type
   - Pagination performance patterns
   - Payload size optimization
   - HTTP/2 and HTTP/3 considerations
 
-- [ ] **HTTP Client Best Practices** ⭐ NEW
+- [x] **HTTP Client Best Practices** ⭐ NEW ✅ COMPLETE
   - Retry patterns and exponential backoff
   - Circuit breaker patterns at HTTP level
   - Timeout standards
@@ -53,7 +56,7 @@
   - Quality gates and checklists
   - Change management procedures
 
-- [ ] **Async/Batch Processing Patterns** (Partially Complete)
+- [x] **Async/Batch Processing Patterns** ✅ COMPLETE
   - Long-running operation handling
   - Job queue integration patterns
   - Polling vs webhook strategies
@@ -72,6 +75,11 @@
 - [x] **API Testing Standards** - Complete in `/spring-design/testing/` with comprehensive coverage
 - [x] **Event-Driven Architecture** - Complete in `/api-design/advanced-patterns/`
 - [x] **Richardson Maturity Model** - Complete in `/api-design/maturity-model/`
+- [x] **Rate Limiting & Protection Standards** - Enhanced in `/api-design/security/rate-limiting-standards.md`
+- [x] **HTTP Client Best Practices** - Complete in `/api-design/request-response/http-client-best-practices.md`
+- [x] **Performance Standards** - Complete in `/api-design/advanced-patterns/performance-standards.md`
+- [x] **Data Modeling & Schema Design** - Complete in `/api-design/foundations/data-modeling-standards.md`
+- [x] **Async/Batch Processing Patterns** - Complete in `/api-design/advanced-patterns/async-batch-patterns.md`
 
 ## Content Improvements (Medium Priority)
 

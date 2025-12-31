@@ -46,6 +46,13 @@ Good formats make APIs easy to use. This guide covers:
 - Flow control
 - Large dataset handling
 
+### [HTTP Client Best Practices](http-client-best-practices.md)
+**How to build reliable clients**
+- Retry patterns and exponential backoff
+- Circuit breaker patterns
+- Timeout standards
+- Connection management
+
 ## Key Principles
 
 ### Works Everywhere
