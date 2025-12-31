@@ -9,6 +9,7 @@
 | [HTTP Methods](http-methods.md) | GET, POST, PUT, PATCH, DELETE | Choosing the right method for an operation |
 | [Status Codes](status-codes.md) | 2xx, 3xx, 4xx, 5xx codes | Selecting response status codes |
 | [Headers](headers.md) | Request, response, custom headers | Setting or reading HTTP headers |
+| [FAQ](faq.md) | 35+ common API design questions | Quick answers to frequent questions |
 
 ## How to Use These Cards
 

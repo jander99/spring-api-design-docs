@@ -3,11 +3,10 @@
 > **📖 Reading Guide**
 > 
 > **⏱️ Reading Time:** 5 minutes | **🔴 Level:** Advanced
+> **Implementation Complexity:** Medium | **Team Skills:** OAuth understanding, security mindset
 > 
 > **📋 Prerequisites:** Strong API background, experience with complex systems  
 > **🎯 Key Topics:** Authentication, Security, Architecture
-> 
-> **📊 Complexity:** 16.4 grade level • 2.5% technical density • very difficult
 
 ## Overview
 

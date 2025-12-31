@@ -52,6 +52,15 @@ Use this documentation when you need to:
 | [Maturity Model](maturity-model/README.md) | Assess and improve your API design |
 | [Assessment Guide](maturity-model/assessment-guide.md) | 5-minute API evaluation |
 
+### Quick Reference
+
+| Resource | Purpose |
+|----------|---------|
+| [Topic Index](INDEX.md) | A-Z index of all patterns and concepts |
+| [HTTP Methods](quick-reference/http-methods.md) | Method quick reference card |
+| [Status Codes](quick-reference/status-codes.md) | Status code quick reference card |
+| [Headers](quick-reference/headers.md) | Common API headers reference |
+
 ## Directory Structure
 
 ```

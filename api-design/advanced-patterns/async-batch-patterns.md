@@ -3,6 +3,7 @@
 > **Reading Guide**
 > 
 > **Reading Time:** 13 minutes | **Level:** Advanced
+> **Implementation Complexity:** Complex | **Team Skills:** Distributed systems, message queues, database transactions
 > 
 > **Prerequisites:** HTTP fundamentals, REST API basics, error handling patterns  
 > **Key Topics:** Long-running operations, batch processing, webhooks, polling

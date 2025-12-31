@@ -3,6 +3,7 @@
 > **Reading Guide**
 > 
 > **Reading Time:** 13 minutes | **Level:** Advanced
+> **Implementation Complexity:** Complex | **Team Skills:** Database design, security architecture, caching strategies
 > 
 > **Prerequisites:** REST API basics, authentication patterns  
 > **Key Topics:** Tenant isolation, URL design, security, rate limiting
