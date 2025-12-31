@@ -13,6 +13,58 @@
 
 Consistent error handling is crucial for creating predictable, debuggable APIs. This document outlines the standards for error responses, including HTTP status codes, error formats, and the RFC 9457 Problem Details standard.
 
+## Status Code Decision Tree
+
+Use this tree to choose the right HTTP status code for your error:
+
+```
+Is this a client error or server error?
+├── Server Error ──────────────────────────────────────> 500 Internal Server Error
+│   (Unhandled exception, system failure)
+│
+└── Client Error ─┬─> Is the request malformed or unparseable?
+                  ├── Yes ────────────────────────────> 400 Bad Request
+                  │   (Invalid JSON, wrong content type)
+                  │
+                  └── No ──> Is authentication missing or invalid?
+                             ├── Yes ─────────────────> 401 Unauthorized
+                             │   (No token, expired token)
+                             │
+                             └── No ──> Is user authenticated but lacks permission?
+                                        ├── Yes ──────> 403 Forbidden
+                                        │   (Valid user, wrong role)
+                                        │
+                                        └── No ──> Does the resource exist?
+                                                   ├── No ───────> 404 Not Found
+                                                   │   (ID doesn't exist)
+                                                   │
+                                                   └── Yes ─> Is there a state conflict?
+                                                              ├── Yes ──> 409 Conflict
+                                                              │   (Duplicate, version mismatch)
+                                                              │
+                                                              └── No ──> Are there validation errors?
+                                                                         ├── Yes ─> 422 Unprocessable Entity
+                                                                         │   (Business rule violation)
+                                                                         │
+                                                                         └── No ──> Is rate limit exceeded?
+                                                                                    ├── Yes → 429 Too Many Requests
+                                                                                    └── No ──> 400 Bad Request
+                                                                                               (Catch-all client error)
+```
+
+**Quick reference by error type:**
+
+| Error Type | Status Code | When to Use |
+|------------|-------------|-------------|
+| Syntax error | 400 | Malformed JSON, wrong types |
+| Missing auth | 401 | No token or invalid token |
+| Access denied | 403 | Valid token, insufficient permissions |
+| Not found | 404 | Resource ID doesn't exist |
+| State conflict | 409 | Duplicate, concurrent modification |
+| Validation failed | 422 | Business rule violations |
+| Rate limited | 429 | Too many requests |
+| Server failure | 500 | Unhandled exceptions |
+
 ## HTTP Status Codes
 
 Use appropriate HTTP status codes for different error scenarios:

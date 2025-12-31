@@ -236,3 +236,27 @@ When implementing these security standards:
 These security standards are based on industry best practices and modern authentication protocols (OAuth 2.1, OpenID Connect), making them universally applicable.
 
 This security standards document provides a foundation for consistent security implementation across all APIs in our ecosystem, aligned with modern authentication standards and HTTP security best practices.
+
+## Related Documentation
+
+### Core Security
+- [Rate Limiting Standards](rate-limiting-standards.md) - Throttling and DDoS protection
+- [API Governance](../documentation/api-governance.md) - Security governance and compliance
+
+### Foundations
+- [Resource Naming and URL Structure](../foundations/resource-naming-and-url-structure.md) - URL design patterns
+- [API Lifecycle Management](../foundations/api-lifecycle-management.md) - Security in API lifecycle
+
+### Request/Response Patterns
+- [Error Response Standards](../request-response/error-response-standards.md) - Security error responses (401, 403)
+- [HTTP Client Best Practices](../request-response/http-client-best-practices.md) - Secure client implementation
+
+### Advanced Topics
+- [API Observability Standards](../advanced-patterns/api-observability-standards.md) - Security logging and monitoring
+- [Event-Driven Architecture](../advanced-patterns/event-driven-architecture.md) - Event security patterns
+- [Streaming APIs](../request-response/streaming-apis.md) - Streaming connection security
+
+### Spring Implementation
+- [OAuth2 Resource Server](../../spring-design/security/oauth2-resource-server.md) - Spring Security OAuth2
+- [Authorization Patterns](../../spring-design/security/authorization-patterns.md) - Spring authorization
+- [Security Testing](../../spring-design/security/security-testing.md) - Security test patterns

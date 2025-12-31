@@ -97,6 +97,34 @@ Host: api.example.com
 X-API-Version: 1
 ```
 
+### Version Strategy Decision Tree
+
+Use this tree to choose the right versioning approach for your API:
+
+```
+Do you need versions visible in browser/logs?
+├── Yes ─┬─> Is caching critical for performance?
+│        ├── Yes → URI Path Versioning (Recommended)
+│        │         Example: /v1/orders
+│        └── No ──> Do you want simple client integration?
+│                   ├── Yes → URI Path Versioning
+│                   └── No ──> Query Parameter Versioning
+│                              Example: /orders?version=1
+│
+└── No ──┬─> Do you want clean, version-free URLs?
+         ├── Yes ─┬─> Is strict REST compliance important?
+         │        ├── Yes → Accept Header (Content Negotiation)
+         │        │         Example: Accept: application/vnd.example.v1+json
+         │        └── No ──> Custom Header Versioning
+         │                   Example: X-API-Version: 1
+         └── No ──> URI Path Versioning (Recommended)
+```
+
+**Quick decision summary:**
+- **Most APIs**: Use URI path versioning (`/v1/resource`)
+- **Clean URL requirement**: Use header-based versioning
+- **Legacy system integration**: Use query parameters if required
+
 ### Comparison Table
 
 | Approach | Pros | Cons |

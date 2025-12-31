@@ -13,6 +13,47 @@
 
 This document defines the essential patterns for pagination, filtering, and sorting in collection responses. These patterns ensure consistent behavior across all APIs that return multiple resources.
 
+## Pagination Strategy Decision Tree
+
+Use this tree to choose the right pagination approach:
+
+```
+How large is your dataset?
+├── Small (<10,000 records) ─────────────────────────────┐
+│                                                        │
+├── Medium (10,000-100,000 records) ─┐                   │
+│                                    ▼                   ▼
+│              Do users need to jump to specific pages?
+│              ├── Yes → Offset-Based Pagination
+│              │         Example: ?page=5&size=20
+│              │         Pros: Simple, allows page jumping
+│              │         Cons: Slower on large datasets
+│              │
+│              └── No ──> Cursor-Based Pagination
+│                         Example: ?cursor=eyJpZCI6MTIzfQ
+│                         Pros: Consistent performance
+│                         Cons: No page jumping
+│
+└── Large (>100,000 records) ────────────────────────────┐
+                                                         ▼
+                           Is real-time data consistency critical?
+                           ├── Yes → Cursor-Based Pagination
+                           │         Handles concurrent inserts/deletes
+                           │
+                           └── No ──> Is the data sorted by a unique field?
+                                      ├── Yes → Keyset Pagination
+                                      │         Example: ?after_id=123&size=20
+                                      │         Pros: Fastest for large sets
+                                      │         Cons: Requires stable sort key
+                                      │
+                                      └── No ──> Cursor-Based Pagination
+```
+
+**Quick decision summary:**
+- **Small datasets, simple UI**: Offset pagination (`?page=0&size=20`)
+- **Large datasets, infinite scroll**: Cursor pagination (`?cursor=abc123`)
+- **Maximum performance, ordered data**: Keyset pagination (`?after_id=123`)
+
 ## Core Concepts
 
 ### Pagination Types

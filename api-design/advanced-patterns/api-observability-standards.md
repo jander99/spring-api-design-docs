@@ -586,11 +586,32 @@ Monitor rate limit metrics as part of your observability strategy to detect abus
 | High-cardinality metrics | Slows down your system | Limit the number of label values |
 | Insecure metrics exposure | Security risk | Implement proper authentication |
 
-## Related Standards
+## Related Documentation
 
-- [API Error Response Standards](../request-response/error-response-standards.md) - Error handling and RFC 9457
-- [API Security Standards](../security/security-standards.md) - Authentication and authorization
-- [Rate Limiting & Protection Standards](../security/rate-limiting-standards.md) - API protection patterns
+### Core Standards
+- [Error Response Standards](../request-response/error-response-standards.md) - Error handling and RFC 9457
+- [Security Standards](../security/security-standards.md) - Authentication and authorization
+- [Rate Limiting Standards](../security/rate-limiting-standards.md) - Throttling and protection
+
+### Advanced Patterns
+- [Performance Standards](performance-standards.md) - Caching, optimization, and SLOs
+- [Event-Driven Architecture](event-driven-architecture.md) - Async event monitoring
+- [Reactive Error Handling](reactive-error-handling.md) - Error handling in reactive streams
+
+### API Lifecycle
+- [API Lifecycle Management](../foundations/api-lifecycle-management.md) - Monitoring across lifecycle
+- [API Governance](../documentation/api-governance.md) - Operational governance
+
+### Request/Response Patterns
+- [Streaming APIs](../request-response/streaming-apis.md) - Streaming metrics and monitoring
+- [HTTP Client Best Practices](../request-response/http-client-best-practices.md) - Client-side observability
+
+### Spring Implementation
+- [Logging and Monitoring](../../spring-design/observability/logging-and-monitoring.md) - Spring observability
+- [Observability Configuration](../../spring-design/configuration/observability-configuration.md) - Spring config
+
+### Quick Reference
+- [Status Codes Quick Reference](../quick-reference/README.md) - HTTP status code guide
 
 ## Examples
 

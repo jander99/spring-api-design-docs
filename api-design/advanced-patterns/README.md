@@ -48,6 +48,11 @@ Covers health checks, metrics, and distributed tracing.
 
 Covers caching, response times, compression, and HTTP/2.
 
+### [Multi-Tenancy Patterns](multi-tenancy-patterns.md)
+**Serving multiple customers from one API**
+
+Covers tenant identification, URL structure, data isolation, and per-tenant rate limiting.
+
 ## Navigation
 
 - [Back to API Design](../README.md)

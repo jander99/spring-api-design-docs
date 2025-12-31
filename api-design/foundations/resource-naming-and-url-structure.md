@@ -291,3 +291,23 @@ When implementing these URL structures:
 - **Error handling**: Use appropriate HTTP status codes and RFC 9457 Problem Details format
 
 The principles outlined here are based on REST architectural constraints and HTTP standards, making them universally applicable.
+
+## Related Documentation
+
+### Core Standards
+- [Data Modeling Standards](data-modeling-standards.md) - Entity design and field naming conventions
+- [API Version Strategy](api-version-strategy.md) - URL versioning and compatibility
+- [API Lifecycle Management](api-lifecycle-management.md) - Managing API evolution
+
+### Request/Response Patterns
+- [Content Types and Structure](../request-response/content-types-and-structure.md) - Payload formats and structure
+- [Pagination and Filtering](../request-response/pagination-and-filtering.md) - Collection query patterns
+- [Error Response Standards](../request-response/error-response-standards.md) - RFC 9457 error handling
+- [Streaming APIs](../request-response/streaming-apis.md) - Real-time and streaming endpoints
+
+### Advanced Topics
+- [Async and Batch Patterns](../advanced-patterns/async-batch-patterns.md) - Bulk operations and long-running tasks
+- [Performance Standards](../advanced-patterns/performance-standards.md) - Caching and optimization
+
+### Quick Reference
+- [HTTP Methods Quick Reference](../quick-reference/README.md) - Method selection guide

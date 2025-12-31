@@ -251,6 +251,22 @@ These patterns are based on HTTP and JSON standards and work with any REST frame
 
 ## Related Documentation
 
-- [Error Response Standards](error-response-standards.md) - Error handling and RFC 9457 Problem Details
+### Core Standards
+- [Resource Naming and URL Structure](../foundations/resource-naming-and-url-structure.md) - URL design and HTTP methods
+- [Data Modeling Standards](../foundations/data-modeling-standards.md) - Entity design and field conventions
+- [Error Response Standards](error-response-standards.md) - RFC 9457 Problem Details format
+
+### Request/Response Patterns
 - [Pagination and Filtering](pagination-and-filtering.md) - Collection response patterns
 - [Streaming APIs](streaming-apis.md) - Streaming response formats
+- [HTTP Client Best Practices](http-client-best-practices.md) - Client-side implementation
+
+### Advanced Topics
+- [Async and Batch Patterns](../advanced-patterns/async-batch-patterns.md) - Bulk operations handling
+- [Performance Standards](../advanced-patterns/performance-standards.md) - Caching and content negotiation
+
+### Documentation
+- [OpenAPI Standards](../documentation/openapi-standards.md) - API specification and schemas
+
+### Quick Reference
+- [HTTP Methods Quick Reference](../quick-reference/README.md) - Method and status code guide
