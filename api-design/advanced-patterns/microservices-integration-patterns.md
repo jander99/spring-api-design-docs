@@ -924,15 +924,9 @@ X-Backend-Duration: 180
 
 ### Retry Policy Guidelines
 
-| Status Code | Retry? | Notes |
-|-------------|--------|-------|
-| 408 Request Timeout | Yes | Server didn't receive in time |
-| 429 Too Many Requests | Yes | Wait for Retry-After |
-| 500 Internal Server Error | Maybe | Could be permanent |
-| 502 Bad Gateway | Yes | Upstream issue |
-| 503 Service Unavailable | Yes | Temporary overload |
-| 504 Gateway Timeout | Yes | Upstream timeout |
-| 4xx Client Errors | No | Request is wrong |
+> **See Also**: [Retryable Status Codes](../quick-reference/status-codes.md#retryable-status-codes) for the complete reference table and [HTTP Client Best Practices](../request-response/http-client-best-practices.md#when-to-retry) for detailed retry strategies.
+
+**Quick rule**: Retry 5xx errors and 429 with backoff. Never retry 4xx errors (except 408).
 
 ### Retry Response Headers
 

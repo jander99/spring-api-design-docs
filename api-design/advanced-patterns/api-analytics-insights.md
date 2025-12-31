@@ -507,24 +507,9 @@ Track quota usage to optimize limits and find problems early.
 | **Burst patterns** | Requests in short windows | Spikes > 3x normal |
 | **Throttle duration** | Time clients are limited | Increasing trend |
 
-### Rate Limit Response with Analytics
+### Rate Limit Response Format
 
-```http
-HTTP/1.1 429 Too Many Requests
-Content-Type: application/problem+json
-X-RateLimit-Limit: 1000
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1705320060
-Retry-After: 45
-
-{
-  "type": "https://api.example.com/problems/rate-limit",
-  "title": "Rate Limit Exceeded",
-  "status": 429,
-  "detail": "You have exceeded 1000 requests per minute",
-  "retryAfter": 45
-}
-```
+> **See Also**: [Rate Limiting Standards](../security/rate-limiting-standards.md#rate-limited-response) for the complete 429 response format and header specifications.
 
 ### Rate Limit Analytics Data
 

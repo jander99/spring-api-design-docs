@@ -91,11 +91,14 @@
   - Decision trees for complex choices
   - Implementation checklists
 
-- [ ] **Consolidate Repetitive Content**
-  - RFC 7807 Problem Details (repeated 3+ times)
-  - OAuth 2.1 explanations
-  - Common HTTP patterns
-  - Create shared reference sections
+- [x] **Consolidate Repetitive Content** ✅ COMPLETE
+  - RFC 9457 Problem Details - Already well-consolidated (2 canonical files)
+  - OAuth 2.1 explanations - Already well-organized (3 purpose-specific files)
+  - HTTP patterns consolidated:
+    - Added retryable status codes reference to `status-codes.md`
+    - Consolidated retry/backoff patterns to `http-client-best-practices.md`
+    - Reduced ~100+ lines of duplicate content with cross-references
+  - 429 response examples now reference `rate-limiting-standards.md`
 
 - [x] **Add Visual Diagrams** ✅ COMPLETE
   - Authentication/authorization flows

@@ -110,7 +110,9 @@
 | 404 for unauthorized | Security, but confusing | Use 403 or 404 consistently |
 | 200 with error body | Breaks error handling | Use 4xx/5xx codes |
 
-## Error Response Format (RFC 7807)
+## Error Response Format (RFC 9457)
+
+All error responses should use the Problem Details format (RFC 9457):
 
 ```json
 {
@@ -121,6 +123,33 @@
   "instance": "/api/users/123"
 }
 ```
+
+> **See Also**: [Error Response Standards](../request-response/error-response-standards.md) and [RFC 9457 Reference](../request-response/reference/rfc-9457-reference.md) for complete details.
+
+## Retryable Status Codes
+
+Use this table to determine which errors clients should retry automatically.
+
+| Code | Retryable | Strategy | Notes |
+|------|-----------|----------|-------|
+| 408 | Yes | Immediate | Request Timeout - server didn't receive complete request |
+| 429 | Yes | Backoff | Rate limit - use `Retry-After` header if present |
+| 500 | Maybe | Backoff | Internal error - may be transient |
+| 502 | Yes | Backoff | Bad Gateway - upstream may recover |
+| 503 | Yes | Backoff | Unavailable - use `Retry-After` if present |
+| 504 | Yes | Backoff | Gateway Timeout - upstream may recover |
+| 4xx (other) | No | - | Client errors require request changes |
+
+### Retry Strategy Guidelines
+
+| Strategy | Initial Delay | Max Retries | Max Delay |
+|----------|---------------|-------------|-----------|
+| Immediate | 0-100ms | 1-2 | 100ms |
+| Backoff | 1 second | 3-5 | 30 seconds |
+
+> **See Also**: [HTTP Client Best Practices](../request-response/http-client-best-practices.md) for complete retry implementation patterns including exponential backoff with jitter.
+
+---
 
 ## Quick Lookup by Situation
 

@@ -272,26 +272,9 @@ Clients should:
 3. **Cache responses** - Reduce request count
 4. **Batch requests** - Combine operations when possible
 
-### Exponential Backoff
+### Exponential Backoff and Retry-After Handling
 
-```
-Retry 1: Wait 1 second
-Retry 2: Wait 2 seconds
-Retry 3: Wait 4 seconds
-Retry 4: Wait 8 seconds
-...
-Maximum: Wait 60 seconds
-```
-
-### Retry-After Handling
-
-```
-1. Receive 429 response
-2. Read Retry-After header
-3. Wait specified seconds
-4. Retry request
-5. If still 429, use exponential backoff
-```
+> **See**: [HTTP Client Best Practices](../request-response/http-client-best-practices.md#exponential-backoff) for complete retry implementation patterns including exponential backoff with jitter and Retry-After header handling.
 
 ## Documentation Requirements
 

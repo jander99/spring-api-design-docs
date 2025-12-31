@@ -413,13 +413,8 @@ The user has sent too many requests in a given time period.
    ```
 
 3. **Implement exponential backoff**
-   ```
-   Attempt 1: Wait 1 second
-   Attempt 2: Wait 2 seconds
-   Attempt 3: Wait 4 seconds
-   Attempt 4: Wait 8 seconds
-   Maximum: Cap at 60 seconds
-   ```
+   
+   > **See**: [HTTP Client Best Practices - Exponential Backoff](../request-response/http-client-best-practices.md#exponential-backoff) for complete implementation details including jitter.
 
 4. **Use batch endpoints**
    ```http

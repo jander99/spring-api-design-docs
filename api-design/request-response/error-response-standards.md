@@ -240,6 +240,8 @@ Retry-After: 60
 }
 ```
 
+> **See Also**: [Rate Limiting Standards](../security/rate-limiting-standards.md) for complete rate limit header specifications and response patterns.
+
 > **More Examples:** See [RFC 9457 Reference - Complete Examples](reference/rfc-9457-reference.md#complete-examples) for all status codes.
 
 ## Problem Type Standards
