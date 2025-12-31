@@ -146,7 +146,7 @@ Versioning is one tool in lifecycle management—not a replacement for it. A new
 | Bug fix | Patch within version | No lifecycle change |
 | New optional feature | Add within version | No lifecycle change |
 | Breaking change needed | Create new version | Start deprecation of old version |
-| Security vulnerability | Patch or emergency version | Accelerated deprecation if needed |
+| Security vulnerability | Patch or emergency version | May bypass standard notice periods per security incident policy |
 
 ### Version and Lifecycle Relationship
 

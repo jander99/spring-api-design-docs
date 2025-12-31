@@ -738,8 +738,8 @@ Content-Type: application/json
   "message": "Account deactivated successfully",
   "status": "DEACTIVATED",
   "deactivatedAt": "2024-07-15T16:00:00Z",
-  "dataRetentionEnds": "2024-08-14T16:00:00Z",
-  "reactivationDeadline": "2024-08-14T16:00:00Z",
+  "dataRetentionUntil": "2024-08-14T16:00:00Z",
+  "reactivationUntil": "2024-08-14T16:00:00Z",
   "info": "Your account data will be permanently deleted after 30 days. You can reactivate your account by logging in before this date."
 }
 ```

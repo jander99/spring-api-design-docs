@@ -224,7 +224,8 @@ Customer:
       description: Customer email address
     phone:
       type: string
-      description: Optional phone number
+      format: phone
+      description: Optional phone number in E.164 format
     createdAt:
       type: string
       format: date-time
