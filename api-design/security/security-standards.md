@@ -18,7 +18,45 @@ Security is a fundamental aspect of API design that must be implemented consiste
 
 > **Note:** OAuth 2.1 is currently in final draft status (draft-ietf-oauth-v2-1). It consolidates OAuth 2.0 security best practices and deprecates insecure patterns. While not yet a finalized RFC, it represents the current industry direction and should be followed for new implementations.
 
-All APIs must implement OAuth 2.1 with OpenID Connect (OIDC) authentication following modern security practices:
+All APIs must implement OAuth 2.1 with OpenID Connect (OIDC) authentication following modern security practices.
+
+#### OAuth 2.1 Authorization Code Flow
+
+```
+┌──────────┐                                  ┌───────────────┐
+│  Client  │                                  │ Authorization │
+│   App    │                                  │    Server     │
+└────┬─────┘                                  └───────┬───────┘
+     │                                                │
+     │  1. Redirect to /authorize                     │
+     │   (client_id, redirect_uri, scope, state,      │
+     │    code_challenge, code_challenge_method)      │
+     │───────────────────────────────────────────────▶│
+     │                                                │
+     │                    ┌──────────┐                │
+     │                    │   User   │                │
+     │                    └────┬─────┘                │
+     │                         │                      │
+     │                         │ 2. User authenticates│
+     │                         │    and consents      │
+     │                         │─────────────────────▶│
+     │                                                │
+     │  3. Redirect to callback                       │
+     │   (authorization_code, state)                  │
+     │◀───────────────────────────────────────────────│
+     │                                                │
+     │  4. POST /token                                │
+     │   (code, redirect_uri, code_verifier)          │
+     │───────────────────────────────────────────────▶│
+     │                                                │
+     │  5. Token response                             │
+     │   (access_token, refresh_token, id_token)      │
+     │◀───────────────────────────────────────────────│
+     │                                                │
+     ▼                                                ▼
+```
+
+The flow above shows PKCE (Proof Key for Code Exchange), which is required in OAuth 2.1 for all clients. The `code_challenge` prevents authorization code interception attacks.
 
 #### Token Validation
 
@@ -73,6 +111,38 @@ Our authorization model is resource-based rather than role or scope-based:
 ### Token Refresh
 
 Implement proactive token refresh several minutes before expiration to maintain session continuity.
+
+#### Token Refresh Flow
+
+```
+┌──────────┐                         ┌────────────┐
+│  Client  │                         │   Auth     │
+│   App    │                         │  Server    │
+└────┬─────┘                         └─────┬──────┘
+     │                                     │
+     │  Access token expires soon          │
+     │  (check exp claim)                  │
+     │                                     │
+     │  1. POST /token                     │
+     │   grant_type=refresh_token          │
+     │   refresh_token=<current_token>     │
+     │────────────────────────────────────▶│
+     │                                     │
+     │                                     │ 2. Validate refresh
+     │                                     │    token, rotate it
+     │                                     │
+     │  3. New tokens                      │
+     │   access_token=<new>                │
+     │   refresh_token=<new_rotated>       │
+     │◀────────────────────────────────────│
+     │                                     │
+     │  4. Store new tokens,               │
+     │     discard old refresh token       │
+     │                                     │
+     ▼                                     ▼
+```
+
+Refresh tokens should be single-use. Each refresh request returns a new refresh token, and the old one becomes invalid. This limits the damage if a refresh token is compromised.
 
 ## API Protection
 

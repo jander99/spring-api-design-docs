@@ -13,10 +13,10 @@ These are [Agent Skills](https://agentskills.io) - folders of instructions that 
 
 | Skill | Description |
 |-------|-------------|
-| `rest-api-design` | Resource naming, URL structure, HTTP methods, content negotiation |
+| `rest-api-design` | Resource naming, URL structure, HTTP methods, content negotiation, data modeling, HTTP client patterns |
 | `api-error-handling` | RFC 9457 error responses, validation patterns |
-| `api-pagination` | Cursor/offset pagination, filtering, sorting |
-| `api-security` | OAuth 2.1, authorization patterns, CORS, rate limiting |
+| `api-pagination` | Cursor/offset pagination, filtering, sorting, performance optimization |
+| `api-security` | OAuth 2.1, authorization patterns, CORS, rate limiting, multi-tenancy |
 | `api-streaming` | Server-Sent Events, NDJSON, reactive streaming patterns |
 | `api-observability` | Health checks, metrics, distributed tracing, correlation |
 | `api-versioning` | Version strategies, deprecation policies, migration |

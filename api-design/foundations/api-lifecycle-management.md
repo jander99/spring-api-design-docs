@@ -38,6 +38,45 @@ Every API moves through clear stages. Knowing these stages helps you plan work a
 | **Deprecated** | 6-12 months | Active but scheduled for removal | Migration support, usage monitoring |
 | **Retired** | Permanent | No longer available | Return 410 Gone, archive documentation |
 
+### API Lifecycle State Diagram
+
+```
+                         ┌─────────────────────────────────────┐
+                         │         API LIFECYCLE               │
+                         └─────────────────────────────────────┘
+
+  ┌────────┐      ┌─────────────┐      ┌────────┐      ┌───────────┐
+  │ DESIGN │─────▶│ DEVELOPMENT │─────▶│  BETA  │─────▶│ PUBLISHED │
+  └────────┘      └─────────────┘      └────────┘      └─────┬─────┘
+       │                │                   │                 │
+       │                │                   │                 │
+       ▼                ▼                   ▼                 │
+  ┌─────────────────────────────────────────────┐            │
+  │              Can be cancelled               │            │
+  │           (return to Design or              │            │
+  │            abandon project)                 │            │
+  └─────────────────────────────────────────────┘            │
+                                                             │
+       ┌─────────────────────────────────────────────────────┘
+       │
+       │  Breaking change needed?
+       │  Security issue?
+       │  End of support?
+       ▼
+  ┌────────────┐                              ┌─────────┐
+  │ DEPRECATED │─────────────────────────────▶│ RETIRED │
+  └────────────┘                              └─────────┘
+       │              6-12 months                  │
+       │              notice period                │
+       │                                           ▼
+       │                                    ┌─────────────┐
+       └───────────────────────────────────▶│  410 Gone   │
+                                            │  responses  │
+                                            └─────────────┘
+```
+
+Each stage has clear entry and exit criteria. APIs can only move forward through the lifecycle (no reverting from Published to Beta). The deprecation period gives clients time to migrate before retirement.
+
 ### Stage Transitions
 
 ```

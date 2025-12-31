@@ -353,3 +353,5 @@ When you need deeper guidance:
 - **OAuth 2.1/OIDC patterns**: Load `references/oauth2-oidc.md`
 - **Authorization strategies**: Load `references/authorization.md`
 - **Java/Spring implementation**: Load `references/java-spring.md`
+- **Rate limiting strategies and algorithms**: Load `/home/jeff/workspaces/spring-api-design-docs/api-design/security/rate-limiting-standards.md`
+- **Multi-tenancy patterns (isolation, routing, data partitioning)**: Load `/home/jeff/workspaces/spring-api-design-docs/api-design/advanced-patterns/multi-tenancy-patterns.md`

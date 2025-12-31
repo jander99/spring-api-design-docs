@@ -422,3 +422,4 @@ When you need deeper guidance:
 - **Cursor pagination implementation**: Load `references/cursor-pagination.md`
 - **Offset pagination details**: Load `references/offset-pagination.md`
 - **Java/Spring implementation**: Load `references/java-spring.md`
+- **Performance standards (response budgets, caching, optimization)**: Load `/home/jeff/workspaces/spring-api-design-docs/api-design/advanced-patterns/performance-standards.md`

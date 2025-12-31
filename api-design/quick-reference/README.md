@@ -6,6 +6,7 @@
 
 | Card | Description | Use When |
 |------|-------------|----------|
+| [Decision Framework](decision-framework.md) | REST vs GraphQL, versioning, auth, pagination, caching | Starting a new API or evaluating design choices |
 | [HTTP Methods](http-methods.md) | GET, POST, PUT, PATCH, DELETE | Choosing the right method for an operation |
 | [Status Codes](status-codes.md) | 2xx, 3xx, 4xx, 5xx codes | Selecting response status codes |
 | [Headers](headers.md) | Request, response, custom headers | Setting or reading HTTP headers |

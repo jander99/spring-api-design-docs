@@ -316,3 +316,5 @@ When you need deeper guidance:
 - **HTTP method semantics and idempotency**: Load `references/http-methods.md`
 - **Richardson Maturity Model assessment**: Load `references/richardson-maturity.md`
 - **Java/Spring implementation**: Load `references/java-spring.md`
+- **Data modeling and JSON conventions**: Load `/home/jeff/workspaces/spring-api-design-docs/api-design/foundations/data-modeling-standards.md`
+- **HTTP client patterns (retry, circuit breaker, pooling)**: Load `/home/jeff/workspaces/spring-api-design-docs/api-design/request-response/http-client-best-practices.md`

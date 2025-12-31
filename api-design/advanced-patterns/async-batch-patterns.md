@@ -18,6 +18,48 @@ This document covers patterns for handling these scenarios through standard HTTP
 
 ## Long-Running Operations
 
+### Async Operation Flow Overview
+
+```
+┌──────────┐                    ┌──────────┐                    ┌─────────┐
+│  Client  │                    │   API    │                    │  Queue  │
+└────┬─────┘                    └────┬─────┘                    └────┬────┘
+     │                               │                               │
+     │  1. POST /reports             │                               │
+     │   (report parameters)         │                               │
+     │──────────────────────────────▶│                               │
+     │                               │                               │
+     │                               │  2. Create operation          │
+     │                               │     record, enqueue job       │
+     │                               │──────────────────────────────▶│
+     │                               │                               │
+     │  3. 202 Accepted              │                               │
+     │   Location: /operations/xyz   │                               │
+     │◀──────────────────────────────│                               │
+     │                               │                               │
+     │  4. GET /operations/xyz       │                               │
+     │──────────────────────────────▶│                               │
+     │                               │                               │
+     │  5. 200 OK                    │                               │
+     │   status: "running"           │                               │
+     │   Retry-After: 5              │                               │
+     │◀──────────────────────────────│                               │
+     │                               │                               │
+     │        ... wait ...           │        ... processing ...     │
+     │                               │                               │
+     │  6. GET /operations/xyz       │                               │
+     │──────────────────────────────▶│                               │
+     │                               │                               │
+     │  7. 200 OK                    │                               │
+     │   status: "completed"         │                               │
+     │   result: { downloadUrl }     │                               │
+     │◀──────────────────────────────│                               │
+     │                               │                               │
+     ▼                               ▼                               ▼
+```
+
+The flow shows the submit-poll-complete pattern. Clients submit work, receive an operation ID, poll for status, and retrieve results when complete.
+
 ### The 202 Accepted Pattern
 
 When an operation takes more than a few seconds, return `202 Accepted` immediately. Include a `Location` header pointing to a status endpoint.
@@ -84,6 +126,36 @@ Use clear, consistent states across all operations:
 | `completed` | Finished successfully | (terminal) |
 | `failed` | Finished with error | (terminal) |
 | `cancelled` | Stopped by client request | (terminal) |
+
+#### Operation State Diagram
+
+```
+                    ┌───────────────────────────────────────┐
+                    │                                       │
+                    │        ┌───────────┐                  │
+      Submit ──────▶│───────▶│  PENDING  │                  │
+                    │        └─────┬─────┘                  │
+                    │              │                        │
+                    │              │ Worker picks up job    │
+                    │              ▼                        │
+                    │        ┌───────────┐                  │
+                    │        │  RUNNING  │◀─────────────┐   │
+                    │        └─────┬─────┘              │   │
+                    │              │                 Retry  │
+                    │     ┌────────┼────────┐          │   │
+                    │     │        │        │          │   │
+                    │     ▼        ▼        ▼          │   │
+                    │ ┌───────┐ ┌──────┐ ┌─────────┐   │   │
+                    │ │COMPLTD│ │FAILED│ │CANCELLED│   │   │
+                    │ └───────┘ └──┬───┘ └─────────┘   │   │
+                    │              │                    │   │
+                    │              │ If retryable ──────┘   │
+                    │              │                        │
+                    └──────────────┴────────────────────────┘
+                         Terminal states (no further transitions)
+```
+
+Operations move through states in one direction. Terminal states (`completed`, `failed`, `cancelled`) cannot transition to other states. Failed operations may be retried, which creates a new operation starting from `pending`.
 
 ## Status Polling
 

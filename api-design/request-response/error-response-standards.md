@@ -13,6 +13,53 @@
 
 Consistent error handling is crucial for creating predictable, debuggable APIs. This document outlines the standards for error responses, including HTTP status codes, error formats, and the RFC 9457 Problem Details standard.
 
+### Error Handling Flow
+
+```
+┌──────────┐         ┌──────────┐         ┌───────────────┐
+│  Client  │────────▶│   API    │────────▶│   Service     │
+└──────────┘         └────┬─────┘         └───────┬───────┘
+                          │                       │
+                          │   Request processing  │
+                          │                       │
+                          │                       ▼
+                          │               ┌───────────────┐
+                          │               │ Error occurs? │
+                          │               └───────┬───────┘
+                          │                       │
+                          │           ┌───────────┴───────────┐
+                          │           │                       │
+                          │          Yes                      No
+                          │           │                       │
+                          │           ▼                       ▼
+                          │   ┌───────────────┐       ┌───────────┐
+                          │   │ Classify error│       │  Success  │
+                          │   │ (4xx or 5xx)  │       │  response │
+                          │   └───────┬───────┘       └───────────┘
+                          │           │
+                          │           ▼
+                          │   ┌───────────────┐
+                          │   │ Build Problem │
+                          │   │ Details (9457)│
+                          │   └───────┬───────┘
+                          │           │
+                          │           ▼
+                          │   ┌───────────────┐
+                          │   │  Log error    │
+                          │   │  with context │
+                          │   └───────┬───────┘
+                          │           │
+                          ◀───────────┘
+                          │
+                          ▼
+                   ┌─────────────┐
+                   │   Return    │
+                   │ problem+json│
+                   └─────────────┘
+```
+
+Every error follows this flow: detect, classify, format as RFC 9457, log, and return. This ensures consistent error handling across all endpoints.
+
 ## Status Code Decision Tree
 
 Use this tree to choose the right HTTP status code for your error:
