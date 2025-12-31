@@ -408,6 +408,47 @@ GET /shipping-addresses HTTP/1.1
 GET /customer-orders HTTP/1.1
 ```
 
+## Implementation Checklist
+
+Use this checklist when designing a new API resource:
+
+### Phase 1: Resource Planning
+
+- [ ] Identify the domain entity and confirm it represents a noun, not an action
+- [ ] Determine if the resource is an aggregate root (top-level) or a child resource
+- [ ] Choose plural noun name using kebab-case (e.g., `shipping-addresses`)
+- [ ] Define the resource identifier format (UUID, numeric ID, or natural key)
+
+### Phase 2: URL Design
+
+- [ ] Create collection endpoint with plural noun (`/orders`)
+- [ ] Create instance endpoint with identifier (`/orders/{orderId}`)
+- [ ] Limit nesting depth to 2 levels maximum
+- [ ] Use query parameters for filtering by related entities, not nested paths
+- [ ] Define any action endpoints for non-CRUD operations (`/orders/{id}/cancel`)
+
+### Phase 3: HTTP Method Mapping
+
+- [ ] Map GET to retrieval operations (collection and instance)
+- [ ] Map POST to resource creation on collection endpoint
+- [ ] Map PUT/PATCH to updates on instance endpoint
+- [ ] Map DELETE to removal on instance endpoint
+- [ ] Document which PATCH format to use (JSON Merge Patch vs JSON Patch)
+
+### Phase 4: Query Parameters
+
+- [ ] Define pagination parameters (`page`, `size`)
+- [ ] Define sorting parameters (`sort`)
+- [ ] Define filtering parameters using intuitive field names
+- [ ] Document default values for all optional parameters
+
+### Phase 5: Verification
+
+- [ ] Confirm URLs use lowercase letters only
+- [ ] Verify consistent plural form across all related endpoints
+- [ ] Check that no verbs appear in resource paths
+- [ ] Validate against anti-patterns listed in this document
+
 ## Related Documentation
 
 ### Core Standards

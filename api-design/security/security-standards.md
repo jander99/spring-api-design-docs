@@ -398,6 +398,50 @@ X-RateLimit-Reset: 1640995200
 }
 ```
 
+## Implementation Checklist
+
+Use this checklist when implementing API security:
+
+### Phase 1: Authentication Setup
+
+- [ ] Configure OAuth 2.1/OIDC provider integration
+- [ ] Implement JWT token validation (signature, expiration, issuer, audience)
+- [ ] Set access token lifetime to 15-60 minutes
+- [ ] Configure refresh token rotation with single-use tokens
+- [ ] Define and document public paths that bypass authentication
+
+### Phase 2: Authorization Configuration
+
+- [ ] Implement resource-based authorization checks
+- [ ] Configure permission validation for each protected endpoint
+- [ ] Add per-message authorization for streaming connections
+- [ ] Implement proactive token refresh before expiration
+
+### Phase 3: Security Headers
+
+- [ ] Add `Content-Security-Policy: default-src 'self'`
+- [ ] Add `X-Content-Type-Options: nosniff`
+- [ ] Add `X-Frame-Options: DENY`
+- [ ] Add `Strict-Transport-Security: max-age=31536000; includeSubDomains`
+- [ ] Add `Cache-Control: no-store` for sensitive responses
+- [ ] Add `Referrer-Policy: strict-origin-when-cross-origin`
+
+### Phase 4: CORS and Rate Limiting
+
+- [ ] Configure explicit allowed origins (no wildcards in production)
+- [ ] Define allowed methods and headers for each origin
+- [ ] Implement rate limiting at gateway or application level
+- [ ] Add rate limit headers (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`)
+- [ ] Return `429 Too Many Requests` with `Retry-After` header when exceeded
+
+### Phase 5: Verification
+
+- [ ] Test authentication failure responses (401 with generic message)
+- [ ] Test authorization failure responses (403 without leaking details)
+- [ ] Verify no tokens appear in URLs or logs
+- [ ] Confirm security event logging is enabled
+- [ ] Run security scanner against the API
+
 ## Related Documentation
 
 ### Core Security

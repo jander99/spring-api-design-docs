@@ -9,6 +9,17 @@
 > 
 > **Complexity:** Advanced technical content covering distributed systems patterns
 
+## Executive Summary
+
+**What this covers:** Patterns for building loosely-coupled systems using events, including event sourcing, CQRS, and saga patterns.
+
+**Key takeaways:**
+- Events decouple services—publishers don't need to know about subscribers
+- Make all event processing idempotent to handle duplicates gracefully
+- Use consistent event structure with `id`, `type`, `timestamp`, `source`, and `data` fields
+
+**When to use this guide:** Reference when designing systems that need asynchronous communication between services or real-time reactivity.
+
 ## Overview
 
 Event-driven architecture enables building systems that react to events as they happen. Events represent important business occurrences (like "order created" or "payment processed") that other parts of your system need to know about.

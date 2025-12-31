@@ -586,6 +586,55 @@ Monitor rate limit metrics as part of your observability strategy to detect abus
 | High-cardinality metrics | Slows down your system | Limit the number of label values |
 | Insecure metrics exposure | Security risk | Implement proper authentication |
 
+## Implementation Checklist
+
+Use this checklist when implementing API observability:
+
+### Phase 1: Health Checks
+
+- [ ] Create `/health` endpoint returning overall application status
+- [ ] Create `/health/live` endpoint for Kubernetes liveness probe
+- [ ] Create `/health/ready` endpoint for Kubernetes readiness probe
+- [ ] Add dependency health checks (database, cache, external services)
+- [ ] Ensure health checks complete within 1 second
+
+### Phase 2: Metrics Setup
+
+- [ ] Expose `/metrics` endpoint in Prometheus format
+- [ ] Implement HTTP request metrics (`http_requests_total`, `http_request_duration_seconds`)
+- [ ] Add error rate metrics by status code category
+- [ ] Include business metrics relevant to your domain
+- [ ] Follow naming conventions: snake_case with unit suffixes
+
+### Phase 3: Request Correlation
+
+- [ ] Generate `X-Request-ID` if not provided by client
+- [ ] Echo `X-Request-ID` in all responses
+- [ ] Propagate correlation headers to downstream services
+- [ ] Include request ID in all log entries
+
+### Phase 4: Distributed Tracing
+
+- [ ] Implement W3C Trace Context header propagation (`traceparent`, `tracestate`)
+- [ ] Configure sampling rates (10% production, 100% critical paths)
+- [ ] Add HTTP span attributes (`method`, `url`, `status_code`)
+- [ ] Add business span attributes where relevant
+
+### Phase 5: Logging and Alerting
+
+- [ ] Use structured JSON logging format
+- [ ] Include timestamp, level, service, version, and request context in logs
+- [ ] Configure log levels appropriately (ERROR for failures, INFO for business events)
+- [ ] Set up critical alerts for >5% error rate and service unavailability
+- [ ] Set up warning alerts for P95 latency exceeding thresholds
+
+### Phase 6: Verification
+
+- [ ] Confirm health endpoints return correct status codes (200 healthy, 503 unhealthy)
+- [ ] Verify metrics endpoint requires authentication in production
+- [ ] Test that request IDs appear in both responses and logs
+- [ ] Validate alerts fire correctly for simulated failure scenarios
+
 ## Related Documentation
 
 ### Core Standards

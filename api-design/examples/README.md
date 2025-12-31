@@ -29,9 +29,17 @@ Focused examples demonstrating specific technical patterns.
 | [Order Export Stream](streaming/order-export-stream.md) | Paginated export with streaming | Hybrid pagination/streaming |
 
 ### Versioning
-| Example | Description | Pattern |
-|---------|-------------|---------|
-| [Migration Examples](versioning/migration-examples.md) | Version upgrade paths | Breaking change handling |
+
+| Example | Description | Pattern | Reading Time |
+|---------|-------------|---------|--------------|
+| [Migration Examples](versioning/migration-examples.md) | Complete v1 to v2 migration scenarios | Breaking changes, deprecation headers, parallel versions | 11 min |
+
+The versioning examples cover:
+- Breaking vs non-breaking change classification
+- Running multiple API versions in parallel
+- Deprecation headers (Sunset, Link, Warning)
+- Client migration scenarios by complexity
+- Complete migration timeline with checklist
 
 ---
 
@@ -95,3 +103,7 @@ Each business scenario example follows this structure:
 ### Advanced Patterns
 - [Streaming APIs](../request-response/streaming-apis.md)
 - [Async and Batch Patterns](../advanced-patterns/async-batch-patterns.md)
+
+### Versioning
+- [API Version Strategy](../foundations/api-version-strategy.md)
+- [Deprecation Policies](../reference/versioning/deprecation-policies.md)

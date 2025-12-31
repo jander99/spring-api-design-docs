@@ -1,417 +1,713 @@
-# API Versioning Migration Examples
+# API Version Migration Examples
 
-This document provides complete examples of how to migrate APIs from one version to another, showing before/after code and implementation strategies.
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 12 minutes | **🟡 Level:** Intermediate
+> 
+> **📋 Prerequisites:** Basic REST API knowledge, HTTP fundamentals  
+> **🎯 Key Topics:** Versioning, deprecation, migration, backward compatibility
+> 
+> **📊 Complexity:** 11.4 grade level • 0.8% technical density • fairly difficult
 
-## Example 1: Adding a New Field (Non-breaking)
+This guide shows complete version migration examples. You'll learn how to evolve APIs from v1 to v2, run versions in parallel, use deprecation headers, and handle client migrations safely.
 
-### Scenario
-Adding a new `email` field to the customer response without breaking existing clients.
+---
 
-### Before (v1)
-```json
-{
-  "id": "12345",
-  "name": "John Doe",
-  "phone": "+1-555-0123"
-}
-```
+## Patterns Demonstrated
 
-### After (v1 - same version)
-```json
-{
-  "id": "12345",
-  "name": "John Doe",
-  "phone": "+1-555-0123",
-  "email": "john.doe@example.com"
-}
-```
+| Pattern | Section | Documentation Reference |
+|---------|---------|------------------------|
+| URI path versioning | All Examples | [API Version Strategy](../../foundations/api-version-strategy.md) |
+| Deprecation headers | Deprecation Headers in Action | [Deprecation Policies](../../reference/versioning/deprecation-policies.md) |
+| Breaking vs non-breaking changes | Change Classification | [Version Strategy](../../foundations/api-version-strategy.md#when-to-create-a-new-version) |
+| Parallel version deployment | Running Versions in Parallel | [Gateway Considerations](../../foundations/api-version-strategy.md#api-gateway-considerations) |
 
-### Implementation Strategy
-1. Add the new field to your response model
-2. Ensure existing clients ignore unknown fields
-3. Document the new field in OpenAPI specification
-4. Update client libraries to support the new field
+---
 
-### OpenAPI Documentation
-```yaml
-components:
-  schemas:
-    Customer:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        phone:
-          type: string
-        email:
-          type: string
-          description: "Customer email address (added in v1.2)"
-```
+## Breaking vs Non-Breaking Changes
 
-## Example 2: Replacing a Field (Breaking Change)
+Before migrating, understand which changes require a new version.
 
-### Scenario
-Replacing the `phone` field with a more structured `contactInfo` object.
+### Non-Breaking Changes (Same Version)
 
-### Before (v1)
-```json
-{
-  "id": "12345",
-  "name": "John Doe",
-  "phone": "+1-555-0123"
-}
-```
+These changes work within the current version. Existing clients continue working.
 
-### After (v2)
-```json
-{
-  "id": "12345",
-  "name": "John Doe",
-  "contactInfo": {
-    "phone": "+1-555-0123",
-    "email": "john.doe@example.com",
-    "preferredMethod": "email"
-  }
-}
-```
+#### Adding Optional Response Fields
 
-### Implementation Strategy
-
-#### Phase 1: Deploy v2 with v1 Support
-```json
-// v1 response (deprecated)
-{
-  "id": "12345",
-  "name": "John Doe",
-  "phone": "+1-555-0123"
-}
-
-// v2 response (new)
-{
-  "id": "12345",
-  "name": "John Doe",
-  "contactInfo": {
-    "phone": "+1-555-0123",
-    "email": "john.doe@example.com",
-    "preferredMethod": "email"
-  }
-}
-```
-
-#### Phase 2: Add Deprecation Headers to v1
 ```http
-HTTP/1.1 200 OK
-Deprecation: true
-Sunset: Sat, 31 Dec 2025 23:59:59 GMT
-Link: </v2/customers/12345>; rel="successor-version"
-Warning: 299 - "This API version is deprecated and will be removed on 2025-12-31"
+GET /v1/customers/cust-123 HTTP/1.1
+Host: api.example.com
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Original v1 response:**
+```json
+{
+  "id": "cust-123",
+  "name": "Alice Johnson",
+  "email": "alice@example.com"
+}
+```
+
+**Enhanced v1 response (no version change needed):**
+```json
+{
+  "id": "cust-123",
+  "name": "Alice Johnson",
+  "email": "alice@example.com",
+  "loyaltyTier": "gold",
+  "memberSince": "2021-03-15"
+}
+```
+
+Clients that ignore unknown fields continue working. New clients can use the added fields.
+
+#### Adding New Endpoints
+
+```http
+GET /v1/customers/cust-123/preferences HTTP/1.1
+Host: api.example.com
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+```json
+{
+  "customerId": "cust-123",
+  "emailNotifications": true,
+  "smsNotifications": false,
+  "language": "en-US",
+  "timezone": "America/New_York"
+}
+```
+
+New endpoints don't affect existing clients who don't call them.
+
+#### Adding Optional Request Parameters
+
+```http
+GET /v1/orders?status=SHIPPED&includeItems=true HTTP/1.1
+Host: api.example.com
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+The new `includeItems` parameter is optional with a default value. Existing requests work unchanged.
+
+---
+
+### Breaking Changes (New Version Required)
+
+These changes require a new major version. They would break existing clients.
+
+#### Removing or Renaming Fields
+
+**v1 Response:**
+```json
+{
+  "id": "order-789",
+  "customerName": "Bob Smith",
+  "totalAmount": 299.99
+}
+```
+
+**v2 Response (field renamed):**
+```json
+{
+  "id": "order-789",
+  "customer": {
+    "id": "cust-456",
+    "displayName": "Bob Smith"
+  },
+  "pricing": {
+    "subtotal": 279.99,
+    "tax": 20.00,
+    "total": 299.99
+  }
+}
+```
+
+The `customerName` and `totalAmount` fields no longer exist. Clients expecting them would fail.
+
+#### Changing Field Types
+
+**v1 Response:**
+```json
+{
+  "id": "event-001",
+  "timestamp": 1704067200
+}
+```
+
+**v2 Response:**
+```json
+{
+  "id": "event-001",
+  "timestamp": "2024-01-01T00:00:00Z"
+}
+```
+
+The `timestamp` changed from integer (Unix epoch) to string (ISO 8601). Client parsing would break.
+
+#### Adding Required Request Fields
+
+**v1 Request:**
+```http
+POST /v1/products HTTP/1.1
 Content-Type: application/json
 
 {
-  "id": "12345",
-  "name": "John Doe",
-  "phone": "+1-555-0123"
+  "name": "Wireless Mouse",
+  "price": 29.99
 }
 ```
 
-#### Phase 3: Monitor and Support Migration
-- Track v1 usage with metrics
-- Provide migration documentation
-- Offer support for client updates
-- Send proactive notifications to API consumers
+**v2 Request:**
+```http
+POST /v2/products HTTP/1.1
+Content-Type: application/json
 
-#### Phase 4: Sunset v1
+{
+  "name": "Wireless Mouse",
+  "price": 29.99,
+  "categoryId": "cat-electronics",
+  "sku": "WM-2024-001"
+}
+```
+
+v2 requires `categoryId` and `sku`. Existing v1 requests would fail validation.
+
+---
+
+## Complete Migration Example: Customer API v1 to v2
+
+This example shows a full migration lifecycle for a customer management API.
+
+### The Problem
+
+The v1 Customer API has design issues:
+- Phone stored as single string (can't handle multiple numbers)
+- Address stored flat (inconsistent with other APIs)
+- No support for contact preferences
+
+### v1 API (Current)
+
+```http
+GET /v1/customers/cust-5839 HTTP/1.1
+Host: api.example.com
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-API-Version: 1
+
+{
+  "id": "cust-5839",
+  "name": "Maria Garcia",
+  "email": "maria.garcia@example.com",
+  "phone": "+1-555-0147",
+  "street": "456 Oak Avenue",
+  "city": "Austin",
+  "state": "TX",
+  "zipCode": "78701",
+  "createdAt": 1609459200
+}
+```
+
+### v2 API (New)
+
+```http
+GET /v2/customers/cust-5839 HTTP/1.1
+Host: api.example.com
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-API-Version: 2
+
+{
+  "id": "cust-5839",
+  "profile": {
+    "displayName": "Maria Garcia",
+    "email": "maria.garcia@example.com"
+  },
+  "contactInfo": {
+    "phones": [
+      {
+        "type": "mobile",
+        "number": "+1-555-0147",
+        "primary": true
+      },
+      {
+        "type": "work",
+        "number": "+1-555-0199",
+        "primary": false
+      }
+    ],
+    "preferredMethod": "email"
+  },
+  "address": {
+    "street": "456 Oak Avenue",
+    "city": "Austin",
+    "state": "TX",
+    "postalCode": "78701",
+    "country": "US"
+  },
+  "metadata": {
+    "createdAt": "2021-01-01T00:00:00Z",
+    "updatedAt": "2024-07-15T14:30:00Z",
+    "version": 3
+  }
+}
+```
+
+### Key Changes Summary
+
+| v1 Field | v2 Field | Change Type |
+|----------|----------|-------------|
+| `name` | `profile.displayName` | Restructured |
+| `email` | `profile.email` | Restructured |
+| `phone` | `contactInfo.phones[]` | Changed to array |
+| `street`, `city`, etc. | `address` object | Grouped |
+| `zipCode` | `address.postalCode` | Renamed |
+| `createdAt` (integer) | `metadata.createdAt` (ISO 8601) | Type changed |
+| — | `contactInfo.preferredMethod` | Added |
+| — | `address.country` | Added |
+
+---
+
+## Running Versions in Parallel
+
+During migration, both versions run simultaneously. This section shows the operational setup.
+
+### Gateway Routing Configuration
+
+Route requests to the correct backend based on version:
+
+```yaml
+# API Gateway configuration
+routes:
+  - name: customers-v1
+    match:
+      prefix: /v1/customers
+    route:
+      cluster: customers-service-v1
+      timeout: 30s
+    
+  - name: customers-v2
+    match:
+      prefix: /v2/customers
+    route:
+      cluster: customers-service-v2
+      timeout: 30s
+
+clusters:
+  - name: customers-service-v1
+    endpoints:
+      - address: customers-v1.internal
+        port: 8080
+    health_check:
+      path: /health
+      interval: 10s
+      
+  - name: customers-service-v2
+    endpoints:
+      - address: customers-v2.internal
+        port: 8080
+    health_check:
+      path: /health
+      interval: 10s
+```
+
+### Version Discovery Endpoint
+
+Clients can discover available versions:
+
+```http
+GET / HTTP/1.1
+Host: api.example.com
+```
+
+```json
+{
+  "apiName": "Customer API",
+  "versions": [
+    {
+      "version": "v1",
+      "status": "deprecated",
+      "deprecatedOn": "2024-07-01",
+      "sunsetDate": "2025-01-31",
+      "documentation": "https://docs.example.com/api/v1",
+      "baseUrl": "https://api.example.com/v1"
+    },
+    {
+      "version": "v2",
+      "status": "current",
+      "releasedOn": "2024-07-01",
+      "documentation": "https://docs.example.com/api/v2",
+      "baseUrl": "https://api.example.com/v2"
+    }
+  ],
+  "recommended": "v2"
+}
+```
+
+### Monitoring Both Versions
+
+Track usage metrics for migration planning:
+
+| Metric | v1 Value | v2 Value |
+|--------|----------|----------|
+| Daily requests | 45,000 | 82,000 |
+| Unique clients | 23 | 41 |
+| Error rate | 0.3% | 0.1% |
+| p99 latency | 245ms | 180ms |
+
+---
+
+## Deprecation Headers in Action
+
+When v2 launches, v1 responses include deprecation headers. These headers inform clients about the migration timeline.
+
+### Initial Deprecation Notice
+
+```http
+GET /v1/customers/cust-5839 HTTP/1.1
+Host: api.example.com
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-API-Version: 1
+Deprecation: true
+Sunset: Fri, 31 Jan 2025 23:59:59 GMT
+Link: </v2/customers/cust-5839>; rel="successor-version"
+Warning: 299 - "API v1 is deprecated. Migrate to v2 by 2025-01-31. See https://docs.example.com/migrate"
+
+{
+  "id": "cust-5839",
+  "name": "Maria Garcia",
+  "email": "maria.garcia@example.com",
+  "phone": "+1-555-0147",
+  "street": "456 Oak Avenue",
+  "city": "Austin",
+  "state": "TX",
+  "zipCode": "78701",
+  "createdAt": 1609459200
+}
+```
+
+### Header Explanation
+
+| Header | Purpose | Client Action |
+|--------|---------|---------------|
+| `Deprecation: true` | Machine-readable deprecation flag | Log warning, trigger alerts |
+| `Sunset: <date>` | When the API will stop working | Schedule migration before date |
+| `Link: <url>; rel="successor-version"` | Where to find the replacement | Use this URL for v2 |
+| `Warning: 299 - "<message>"` | Human-readable message | Display to developers |
+
+### Approaching Sunset (30 Days Before)
+
+As the sunset date approaches, increase warning urgency:
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-API-Version: 1
+Deprecation: true
+Sunset: Fri, 31 Jan 2025 23:59:59 GMT
+Link: </v2/customers/cust-5839>; rel="successor-version"
+Warning: 299 - "URGENT: API v1 sunset in 30 days. Migrate immediately."
+X-Deprecation-Days-Remaining: 30
+
+{
+  "id": "cust-5839",
+  ...
+}
+```
+
+### After Sunset (410 Gone)
+
+Once sunset passes, return 410 Gone:
+
+```http
+GET /v1/customers/cust-5839 HTTP/1.1
+Host: api.example.com
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
 ```http
 HTTP/1.1 410 Gone
 Content-Type: application/problem+json
 
 {
-  "type": "https://example.com/problems/version-deprecated",
-  "title": "API Version Deprecated",
+  "type": "https://api.example.com/problems/version-sunset",
+  "title": "API Version No Longer Available",
   "status": 410,
-  "detail": "This API version has been removed. Please use v2.",
-  "instance": "/v1/customers/12345",
-  "successor_version": "/v2/customers/12345"
+  "detail": "API v1 was sunset on 2025-01-31. Use v2 instead.",
+  "instance": "/v1/customers/cust-5839",
+  "sunsetDate": "2025-01-31T23:59:59Z",
+  "successor": {
+    "version": "v2",
+    "url": "/v2/customers/cust-5839",
+    "documentation": "https://docs.example.com/api/v2"
+  },
+  "migrationGuide": "https://docs.example.com/migrate-v1-to-v2"
 }
 ```
 
-## Example 3: Changing Field Types (Breaking Change)
+---
 
-### Scenario
-Changing `createdAt` from Unix timestamp to ISO 8601 format.
+## Client Migration Scenarios
 
-### Before (v1)
-```json
-{
-  "id": "order-123",
-  "amount": 99.99,
-  "createdAt": 1640995200
-}
+Different clients have different migration needs. Here are common scenarios.
+
+### Scenario 1: Simple Client Update
+
+A mobile app that only reads customer data.
+
+**Before (v1 client):**
+```
+REQUEST:
+  GET /v1/customers/cust-5839
+  
+RESPONSE HANDLING:
+  customer.name → Display in header
+  customer.email → Show in profile
+  customer.phone → Format and display
 ```
 
-### After (v2)
-```json
-{
-  "id": "order-123",
-  "amount": 99.99,
-  "createdAt": "2022-01-01T00:00:00Z"
-}
+**After (v2 client):**
+```
+REQUEST:
+  GET /v2/customers/cust-5839
+  
+RESPONSE HANDLING:
+  customer.profile.displayName → Display in header
+  customer.profile.email → Show in profile
+  customer.contactInfo.phones[0].number → Format and display
 ```
 
-### Implementation Strategy
+**Migration effort:** Low. Update field paths in client code.
 
-#### Dual-Field Support During Transition
-```json
-// v1 response (deprecated)
-{
-  "id": "order-123",
-  "amount": 99.99,
-  "createdAt": 1640995200
-}
+### Scenario 2: Integration Service
 
-// v2 response (new)
-{
-  "id": "order-123",
-  "amount": 99.99,
-  "createdAt": "2022-01-01T00:00:00Z"
-}
-```
+A billing system that creates and updates customers.
 
-#### OpenAPI Documentation for v2
-```yaml
-components:
-  schemas:
-    Order:
-      type: object
-      properties:
-        id:
-          type: string
-        amount:
-          type: number
-        createdAt:
-          type: string
-          format: date-time
-          description: "Order creation timestamp in ISO 8601 format"
-```
-
-## Example 4: Adding Required Fields (Breaking Change)
-
-### Scenario
-Adding a required `category` field to product creation requests.
-
-### Before (v1)
-```json
-POST /v1/products
-{
-  "name": "Wireless Headphones",
-  "price": 199.99
-}
-```
-
-### After (v2)
-```json
-POST /v2/products
-{
-  "name": "Wireless Headphones",
-  "price": 199.99,
-  "category": "electronics"
-}
-```
-
-### Implementation Strategy
-
-#### v1 - Provide Default Category
-```json
-// v1 continues to work by assigning default category
-POST /v1/products
-{
-  "name": "Wireless Headphones",
-  "price": 199.99
-}
-
-// Internal processing adds default:
-{
-  "name": "Wireless Headphones",
-  "price": 199.99,
-  "category": "uncategorized"
-}
-```
-
-#### v2 - Require Category
-```json
-// v2 requires category
-POST /v2/products
-{
-  "name": "Wireless Headphones",
-  "price": 199.99,
-  "category": "electronics"
-}
-```
-
-#### Error Handling for Missing Required Fields
-```json
-POST /v2/products
-{
-  "name": "Wireless Headphones",
-  "price": 199.99
-}
-
-// Response:
-HTTP/1.1 400 Bad Request
-Content-Type: application/problem+json
-
-{
-  "type": "https://example.com/problems/validation-error",
-  "title": "Validation Error",
-  "status": 400,
-  "detail": "Missing required field: category",
-  "instance": "/v2/products",
-  "invalid_params": [
-    {
-      "name": "category",
-      "reason": "required field missing"
-    }
-  ]
-}
-```
-
-## Example 5: URL Structure Changes (Breaking Change)
-
-### Scenario
-Changing from flat to nested resource structure for order items.
-
-### Before (v1)
-```
-GET /v1/order-items?orderId=123
-```
-
-### After (v2)
-```
-GET /v2/orders/123/items
-```
-
-### Implementation Strategy
-
-#### Support Both URL Patterns
-```
-// v1 (deprecated)
-GET /v1/order-items?orderId=123
-
-// v2 (new)
-GET /v2/orders/123/items
-```
-
-#### Response Format Consistency
-```json
-// Both versions return the same structure
-{
-  "items": [
-    {
-      "id": "item-1",
-      "productId": "prod-456",
-      "quantity": 2,
-      "price": 29.99
-    }
-  ]
-}
-```
-
-## Example 6: Authentication Changes (Breaking Change)
-
-### Scenario
-Migrating from API key authentication to OAuth 2.0.
-
-### Before (v1)
+**v1 Create Request:**
 ```http
-GET /v1/customers/123
-Authorization: Bearer api-key-12345
+POST /v1/customers HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "New Customer",
+  "email": "new@example.com",
+  "phone": "+1-555-0100",
+  "street": "123 Main St",
+  "city": "Seattle",
+  "state": "WA",
+  "zipCode": "98101"
+}
 ```
 
-### After (v2)
+**v2 Create Request:**
 ```http
-GET /v2/customers/123
-Authorization: Bearer oauth-jwt-token
+POST /v2/customers HTTP/1.1
+Content-Type: application/json
+
+{
+  "profile": {
+    "displayName": "New Customer",
+    "email": "new@example.com"
+  },
+  "contactInfo": {
+    "phones": [
+      {
+        "type": "mobile",
+        "number": "+1-555-0100",
+        "primary": true
+      }
+    ],
+    "preferredMethod": "email"
+  },
+  "address": {
+    "street": "123 Main St",
+    "city": "Seattle",
+    "state": "WA",
+    "postalCode": "98101",
+    "country": "US"
+  }
+}
 ```
 
-### Implementation Strategy
+**Migration effort:** Medium. Restructure request building and response parsing.
 
-#### Support Both Authentication Methods
-```
-// v1 - API key authentication
-GET /v1/customers/123
-Authorization: Bearer api-key-12345
+### Scenario 3: Batch Processing System
 
-// v2 - OAuth 2.0 authentication
-GET /v2/customers/123
-Authorization: Bearer oauth-jwt-token
+A data warehouse that syncs all customers nightly.
+
+**v1 List and Pagination:**
+```http
+GET /v1/customers?limit=100&offset=0 HTTP/1.1
 ```
 
-#### Error Responses for Authentication
 ```json
-// v1 - Invalid API key
-HTTP/1.1 401 Unauthorized
-Content-Type: application/problem+json
-
 {
-  "type": "https://example.com/problems/invalid-api-key",
-  "title": "Invalid API Key",
-  "status": 401,
-  "detail": "The provided API key is invalid or expired"
-}
-
-// v2 - Invalid OAuth token
-HTTP/1.1 401 Unauthorized
-Content-Type: application/problem+json
-
-{
-  "type": "https://example.com/problems/invalid-token",
-  "title": "Invalid OAuth Token",
-  "status": 401,
-  "detail": "The provided OAuth token is invalid or expired"
+  "customers": [...],
+  "total": 5420,
+  "limit": 100,
+  "offset": 0
 }
 ```
 
-## Migration Timeline Template
+**v2 Cursor Pagination:**
+```http
+GET /v2/customers?limit=100 HTTP/1.1
+```
 
-### Week 1-2: Preparation
-- [ ] Design v2 API contract
-- [ ] Update OpenAPI specification
-- [ ] Implement v2 endpoints
-- [ ] Create automated tests
+```json
+{
+  "data": [...],
+  "pagination": {
+    "hasMore": true,
+    "nextCursor": "eyJpZCI6ImN1c3QtMTAwIn0=",
+    "totalCount": 5420
+  }
+}
+```
 
-### Week 3-4: Deployment
-- [ ] Deploy v2 alongside v1
-- [ ] Add deprecation headers to v1
-- [ ] Update API documentation
-- [ ] Notify existing clients
+**Migration effort:** High. Pagination logic must change from offset to cursor-based.
 
-### Month 2-3: Migration Support
-- [ ] Monitor v1 usage metrics
-- [ ] Provide migration assistance
-- [ ] Update client libraries
-- [ ] Send migration reminders
+---
 
-### Month 4-6: Sunset Preparation
-- [ ] Analyze remaining v1 traffic
-- [ ] Contact high-usage clients
-- [ ] Set firm sunset date
-- [ ] Prepare 410 Gone responses
+## Migration Timeline Example
 
-### Month 6+: Sunset
-- [ ] Return 410 Gone for v1
-- [ ] Remove v1 implementation
-- [ ] Update monitoring dashboards
-- [ ] Archive v1 documentation
+A realistic 6-month migration timeline for the Customer API.
 
-## Best Practices Summary
+### Month 1: Preparation
 
-1. **Plan migrations carefully** - Consider client impact before making breaking changes
-2. **Provide clear timelines** - Give clients adequate time to migrate
-3. **Monitor usage** - Track which clients are using deprecated versions
-4. **Document everything** - Provide clear migration guides and examples
-5. **Test thoroughly** - Ensure both versions work correctly during transition
-6. **Communicate proactively** - Keep clients informed throughout the process
-7. **Support clients** - Offer help with migration challenges
-8. **Be consistent** - Use the same patterns for all version migrations
+| Week | Activity |
+|------|----------|
+| 1 | Design v2 API contract, get stakeholder review |
+| 2 | Create OpenAPI specification for v2 |
+| 3 | Build v2 implementation, internal testing |
+| 4 | Deploy v2 to staging, integration testing |
+
+### Month 2: Launch
+
+| Week | Activity |
+|------|----------|
+| 1 | Deploy v2 to production alongside v1 |
+| 2 | Add deprecation headers to v1 responses |
+| 3 | Publish migration guide and documentation |
+| 4 | Notify all registered API consumers |
+
+**Email notification sent to clients:**
+```
+Subject: Customer API v2 Now Available - v1 Deprecation Notice
+
+The Customer API v2 is now available with improved structure 
+and new features.
+
+Key dates:
+- v2 available now: https://api.example.com/v2
+- v1 deprecated: July 1, 2024
+- v1 sunset: January 31, 2025
+
+Please migrate to v2 before the sunset date.
+Migration guide: https://docs.example.com/migrate-v1-to-v2
+```
+
+### Months 3-4: Active Migration
+
+| Week | Activity |
+|------|----------|
+| Ongoing | Monitor v1 usage decline |
+| Ongoing | Provide migration support via help desk |
+| Bi-weekly | Send migration progress reports |
+| As needed | Help high-volume clients with migration |
+
+**Weekly dashboard metrics tracked:**
+- v1 request volume (target: declining)
+- v2 request volume (target: increasing)
+- Clients still using v1 (target: approaching zero)
+- Migration support tickets (target: decreasing)
+
+### Month 5: Pre-Sunset
+
+| Week | Activity |
+|------|----------|
+| 1 | Identify remaining v1 clients |
+| 2 | Direct outreach to unmigrated clients |
+| 3 | Final migration assistance |
+| 4 | Add 30-day warning headers |
+
+### Month 6: Sunset
+
+| Week | Activity |
+|------|----------|
+| 1 | Final reminders to remaining clients |
+| 2 | Return 410 Gone for v1 requests |
+| 3 | Monitor for issues, provide support |
+| 4 | Decommission v1 infrastructure |
+
+---
+
+## Migration Checklist
+
+Use this checklist when planning a version migration.
+
+### Before Launching v2
+
+- [ ] v2 API contract documented in OpenAPI
+- [ ] All breaking changes identified and documented
+- [ ] v2 implementation complete and tested
+- [ ] v2 deployed and accessible alongside v1
+- [ ] Migration guide created with before/after examples
+- [ ] Client notification template prepared
+
+### At v1 Deprecation
+
+- [ ] Deprecation headers added to all v1 responses
+- [ ] Sunset date set (minimum 6 months for public APIs)
+- [ ] Documentation updated to mark v1 as deprecated
+- [ ] All registered clients notified
+- [ ] Monitoring dashboards track v1 vs v2 usage
+
+### During Migration Period
+
+- [ ] Weekly usage reports generated
+- [ ] High-volume clients offered migration support
+- [ ] FAQ updated with common migration questions
+- [ ] Support team trained on migration issues
+
+### At Sunset
+
+- [ ] Final notification sent 30 days before sunset
+- [ ] 410 Gone responses configured for v1
+- [ ] Support ready for post-sunset questions
+- [ ] v1 infrastructure scheduled for decommission
+
+---
+
+## Best Practices
+
+1. **Minimize breaking changes** — Batch multiple breaking changes into one major version
+2. **Provide long notice periods** — 6 months minimum for public APIs, 12 months for high-traffic endpoints
+3. **Make migration easy** — Provide clear examples, SDKs updates, and migration tools
+4. **Monitor relentlessly** — Track migration progress and reach out to stragglers
+5. **Keep v1 stable** — Don't add features to deprecated versions, only security fixes
+6. **Document everything** — Clear docs reduce support burden significantly
+7. **Test both paths** — Ensure v1 and v2 work correctly throughout the migration
+
+---
+
+## Related Documentation
+
+- **Version Strategy**: [API Version Strategy](../../foundations/api-version-strategy.md) — When and how to version
+- **Deprecation Reference**: [Deprecation Policies](../../reference/versioning/deprecation-policies.md) — Complete header specifications
+- **Troubleshooting**: [Common Problems](../../troubleshooting/versioning/common-problems.md) — Migration issues and solutions

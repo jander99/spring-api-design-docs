@@ -9,6 +9,17 @@
 > 
 > **📊 Complexity:** 14.4 grade level • 1.3% technical density • moderate
 
+## Executive Summary
+
+**What this covers:** Complete API versioning strategy including when to version, how to implement version negotiation, and managing version lifecycles.
+
+**Key takeaways:**
+- Use URI path versioning (`/v1/resource`) for most APIs—it's visible, cache-friendly, and easy to route
+- Only create new major versions for breaking changes; additive changes don't require new versions
+- Deprecate versions with at least 6 months notice using standard HTTP headers (`Deprecation`, `Sunset`)
+
+**When to use this guide:** Reference when designing a new API's versioning strategy or planning breaking changes to existing APIs.
+
 ## Why Version Your APIs?
 
 APIs change over time. Versioning lets you add features without breaking existing clients. With versions, you can:

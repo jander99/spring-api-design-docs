@@ -34,11 +34,22 @@ com.example.{service-name}
 ### API Design Standards (`/api-design/`) - Language Agnostic
 Universal HTTP/REST principles with no programming language dependencies:
 - **maturity-model/**: Richardson Maturity Model assessment framework for API evaluation
-- **foundations/**: Core API design principles (resource naming, versioning)
-- **request-response/**: HTTP patterns, error formats, pagination, streaming
-- **security/**: Security standards and authentication patterns
-- **advanced-patterns/**: Reactive, event-driven, and streaming architectures
-- **documentation/**: OpenAPI standards, testing, and tooling
+- **foundations/**: Core API design principles (resource naming, versioning, data modeling, lifecycle management)
+- **request-response/**: HTTP patterns, error formats, pagination, streaming, HTTP client best practices
+- **security/**: Security standards, rate limiting, and authentication patterns
+- **advanced-patterns/**: Reactive, event-driven, streaming, async/batch, multi-tenancy, and performance patterns
+- **documentation/**: OpenAPI standards, testing, tooling, and API governance
+- **quick-reference/**: Quick reference cards for HTTP methods, status codes, and headers
+- **examples/**: Practical examples including e-commerce, user management, streaming, and versioning scenarios
+
+**Key Documents Added:**
+- `http-client-best-practices.md`: Retry patterns, circuit breakers, connection pooling
+- `performance-standards.md`: Response time budgets, caching, optimization patterns
+- `data-modeling-standards.md`: JSON conventions, schema evolution, field naming
+- `async-batch-patterns.md`: Background jobs, bulk operations, polling patterns
+- `api-lifecycle-management.md`: Version lifecycle, deprecation, sunset policies
+- `api-governance.md`: Review processes, design consistency, compliance
+- `multi-tenancy-patterns.md`: Tenant isolation, data partitioning, routing
 
 **Note**: All API design documentation uses only JSON, YAML, and HTTP examples. No programming language code is included.
 
@@ -47,7 +58,7 @@ Spring Boot-specific patterns organized into:
 - **architecture/**: Architectural patterns and dependency injection
 - **project-structure/**: Package organization and DDD patterns
 - **controllers/**: Web layer patterns for MVC and WebFlux
-- **error-handling/**: Exception management and RFC 7807 implementation
+- **error-handling/**: Exception management and RFC 9457 implementation
 - **security/**: OAuth 2.1, authorization, and security headers
 - **configuration/**: Application config, profiles, and observability
 - **testing/**: Unit, integration, and specialized testing (organized by type)
@@ -61,6 +72,9 @@ Complete examples and setup guides:
 - **Root examples/**: Cross-cutting examples (testing, CI/CD)
 - **Topic-specific examples/**: Configuration and pattern examples
 - **API design examples**: HTTP/JSON/YAML examples only, no code
+- **api-design/examples/**: E-commerce order API, user management API examples
+- **api-design/examples/streaming/**: Real-time notifications, live dashboards, bulk processing
+- **api-design/examples/versioning/**: Migration examples and version transition guides
 
 #### **Reference Directories** (`/reference/`, `/*/reference/`)
 Complete technical specifications and comparisons:
@@ -110,7 +124,7 @@ Before publishing new documentation:
 
 ## Technology Stack
 
-**API Standards**: HTTP/REST, OpenAPI 3.1+, OAuth 2.1/OIDC, RFC 7807, JSON Schema
+**API Standards**: HTTP/REST, OpenAPI 3.1+, OAuth 2.1/OIDC, RFC 9457, JSON Schema
 **Spring Stack**: Spring Boot 3.x, WebFlux, Spring Security, Micrometer, springdoc-openapi v2
 
 ## Richardson Maturity Model Integration

@@ -9,6 +9,17 @@
 > 
 > **📊 Complexity:** 17.2 grade level • 1.5% technical density • very difficult
 
+## Executive Summary
+
+**What this covers:** Standard patterns for paginating, filtering, and sorting API collection responses with consistent metadata structures.
+
+**Key takeaways:**
+- Use offset pagination (`?page=0&size=20`) for small datasets; use cursor pagination for large or real-time datasets
+- Always include pagination metadata (`totalElements`, `totalPages`) and echo applied filters in responses
+- Set sensible defaults (page size: 20) and limits (max size: 100) to prevent resource exhaustion
+
+**When to use this guide:** Reference when implementing any endpoint that returns collections of resources.
+
 ## Overview
 
 This document defines the essential patterns for pagination, filtering, and sorting in collection responses. These patterns ensure consistent behavior across all APIs that return multiple resources.

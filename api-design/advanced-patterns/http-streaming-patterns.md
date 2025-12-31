@@ -9,6 +9,17 @@
 > 
 > **Complexity:** Advanced technical content for real-time API design
 
+## Executive Summary
+
+**What this covers:** HTTP-based streaming protocols including NDJSON streams, Server-Sent Events (SSE), and WebSocket integration patterns.
+
+**Key takeaways:**
+- Offer both standard (`/orders`) and streaming (`/orders/stream`) endpoints for collections
+- Use SSE for server-to-client real-time updates; use WebSockets for bi-directional communication
+- Implement flow control with batch sizes and backpressure to prevent client overwhelm
+
+**When to use this guide:** Reference when building APIs that need real-time data delivery or must handle large datasets efficiently.
+
 ## Overview
 
 This document outlines HTTP streaming patterns for building reactive APIs that handle real-time data flow efficiently. These patterns focus on HTTP-based streaming protocols, Server-Sent Events (SSE), and WebSocket integrations that can be implemented in any technology stack.
