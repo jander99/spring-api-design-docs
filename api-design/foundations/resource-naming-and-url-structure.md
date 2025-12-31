@@ -292,6 +292,122 @@ When implementing these URL structures:
 
 The principles outlined here are based on REST architectural constraints and HTTP standards, making them universally applicable.
 
+## Common Mistakes
+
+### ❌ Verbs in Resource URLs
+
+**Problem:**
+```http
+GET /getOrders HTTP/1.1
+GET /fetchCustomerById/123 HTTP/1.1
+POST /createNewOrder HTTP/1.1
+```
+
+**Why it's wrong:** URLs should identify resources, not actions. HTTP methods already express the action (GET retrieves, POST creates). Adding verbs creates redundancy and inconsistency.
+
+**✅ Correct approach:**
+```http
+GET /orders HTTP/1.1
+GET /customers/123 HTTP/1.1
+POST /orders HTTP/1.1
+```
+
+---
+
+### ❌ Inconsistent Pluralization
+
+**Problem:**
+```http
+GET /order/123 HTTP/1.1
+GET /customers HTTP/1.1
+GET /product/456/review HTTP/1.1
+```
+
+**Why it's wrong:** Mixing singular and plural forms confuses API consumers. They must memorize which resources use which form instead of following a predictable pattern.
+
+**✅ Correct approach:**
+```http
+GET /orders/123 HTTP/1.1
+GET /customers HTTP/1.1
+GET /products/456/reviews HTTP/1.1
+```
+
+---
+
+### ❌ Deep URL Nesting
+
+**Problem:**
+```http
+GET /companies/123/departments/456/employees/789/timesheets/2024/entries/42 HTTP/1.1
+```
+
+**Why it's wrong:** Deep nesting creates long, fragile URLs. Changes to parent resources break child paths. It also implies tight coupling that may not exist in the domain.
+
+**✅ Correct approach:**
+```http
+GET /timesheet-entries/42 HTTP/1.1
+GET /timesheet-entries?employeeId=789&year=2024 HTTP/1.1
+```
+
+---
+
+### ❌ Query Parameters for Resource Identification
+
+**Problem:**
+```http
+GET /orders?orderId=123 HTTP/1.1
+DELETE /customers?id=456 HTTP/1.1
+```
+
+**Why it's wrong:** Resource identifiers belong in the path, not query parameters. Query parameters are for filtering collections, not identifying specific resources.
+
+**✅ Correct approach:**
+```http
+GET /orders/123 HTTP/1.1
+DELETE /customers/456 HTTP/1.1
+```
+
+---
+
+### ❌ File Extensions in URLs
+
+**Problem:**
+```http
+GET /orders/123.json HTTP/1.1
+GET /customers.xml HTTP/1.1
+```
+
+**Why it's wrong:** Content format should be negotiated via headers, not embedded in URLs. This creates duplicate URLs for the same resource and complicates caching.
+
+**✅ Correct approach:**
+```http
+GET /orders/123 HTTP/1.1
+Accept: application/json
+
+GET /customers HTTP/1.1
+Accept: application/xml
+```
+
+---
+
+### ❌ Inconsistent Case Styles
+
+**Problem:**
+```http
+GET /OrderItems HTTP/1.1
+GET /shipping_addresses HTTP/1.1
+GET /CustomerOrders HTTP/1.1
+```
+
+**Why it's wrong:** Mixed case styles (PascalCase, snake_case, camelCase) force developers to check documentation for every endpoint. URLs should use lowercase with kebab-case for multi-word resources.
+
+**✅ Correct approach:**
+```http
+GET /order-items HTTP/1.1
+GET /shipping-addresses HTTP/1.1
+GET /customer-orders HTTP/1.1
+```
+
 ## Related Documentation
 
 ### Core Standards

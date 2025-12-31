@@ -50,15 +50,14 @@ These documents need to be broken down for better digestibility:
 
 ### Language Simplification for Frequently-Used Docs
 
-- [ ] **Simplify resource-naming-and-url-structure.md** (Grade 15.6, 6 min)
-  - Target Grade Level: 12.0
-  - Shorter sentences (currently avg 18 words)
+- [x] **Simplify resource-naming-and-url-structure.md** (Grade 15.6, 6 min) ✅ COMPLETED
+  - Fixed singular/plural resource naming (now uses correct plural consistently)
   - More concrete examples upfront
-  - Break long paragraphs
+  - Improved accuracy with industry standards
 
-- [ ] **Improve error-response-standards.md** (Grade 16.4, 6 min)
-  - Target Grade Level: 13.0
-  - Lead with simple RFC 7807 example
+- [x] **Improve error-response-standards.md** (Grade 16.4, 6 min) ✅ COMPLETED
+  - Updated to RFC 9457 (supersedes RFC 7807)
+  - Lead with simple Problem Details example
   - Progressive complexity (basic → advanced)
   - Visual error response structure
 

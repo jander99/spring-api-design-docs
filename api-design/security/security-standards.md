@@ -237,6 +237,167 @@ These security standards are based on industry best practices and modern authent
 
 This security standards document provides a foundation for consistent security implementation across all APIs in our ecosystem, aligned with modern authentication standards and HTTP security best practices.
 
+## Common Mistakes
+
+### ❌ Tokens in URLs
+
+**Problem:**
+```http
+GET /orders?access_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9... HTTP/1.1
+GET /customers/123?api_key=sk_live_abc123 HTTP/1.1
+```
+
+**Why it's wrong:** URLs appear in browser history, server logs, referrer headers, and proxy logs. Tokens in URLs are easily leaked and cannot be automatically scrubbed.
+
+**✅ Correct approach:**
+```http
+GET /orders HTTP/1.1
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+
+GET /customers/123 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+---
+
+### ❌ Wildcard CORS in Production
+
+**Problem:**
+```http
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: *
+Access-Control-Allow-Headers: *
+```
+
+**Why it's wrong:** Allows any website to make authenticated requests to your API. Attackers can create malicious sites that steal user data through the browser.
+
+**✅ Correct approach:**
+```http
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: https://app.example.com
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE
+Access-Control-Allow-Headers: Authorization, Content-Type
+Access-Control-Allow-Credentials: true
+```
+
+---
+
+### ❌ Missing Security Headers
+
+**Problem:**
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"data": {...}}
+```
+
+**Why it's wrong:** Without security headers, responses are vulnerable to MIME sniffing, clickjacking, and content injection attacks.
+
+**✅ Correct approach:**
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Cache-Control: no-store
+
+{"data": {...}}
+```
+
+---
+
+### ❌ Exposing Sensitive Data in Error Messages
+
+**Problem:**
+```http
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+
+{
+  "error": "Invalid password for user admin@example.com",
+  "sql_query": "SELECT * FROM users WHERE email='admin@example.com'",
+  "stack_trace": "at com.example.auth.UserService.authenticate..."
+}
+```
+
+**Why it's wrong:** Confirms valid usernames to attackers, exposes database schema, and reveals implementation details useful for exploitation.
+
+**✅ Correct approach:**
+```http
+HTTP/1.1 401 Unauthorized
+Content-Type: application/problem+json
+
+{
+  "type": "https://api.example.com/problems/authentication-failed",
+  "title": "Authentication Failed",
+  "status": 401,
+  "detail": "Invalid credentials provided"
+}
+```
+
+---
+
+### ❌ Long-Lived Access Tokens
+
+**Problem:**
+```http
+POST /oauth/token HTTP/1.1
+
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIs...",
+  "token_type": "Bearer",
+  "expires_in": 31536000
+}
+```
+
+**Why it's wrong:** A one-year token gives attackers extended access if compromised. There's no way to revoke access without a complex token revocation system.
+
+**✅ Correct approach:**
+```http
+POST /oauth/token HTTP/1.1
+
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIs...",
+  "token_type": "Bearer",
+  "expires_in": 900,
+  "refresh_token": "dGhpcyBpcyBhIHJlZnJlc2ggdG9rZW4..."
+}
+```
+
+---
+
+### ❌ No Rate Limit Headers
+
+**Problem:**
+```http
+HTTP/1.1 429 Too Many Requests
+Content-Type: application/json
+
+{"error": "Rate limit exceeded"}
+```
+
+**Why it's wrong:** Clients have no way to know their limits or when to retry. This leads to aggressive retry loops that worsen the problem.
+
+**✅ Correct approach:**
+```http
+HTTP/1.1 429 Too Many Requests
+Content-Type: application/problem+json
+Retry-After: 60
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 0
+X-RateLimit-Reset: 1640995200
+
+{
+  "type": "https://api.example.com/problems/rate-limit-exceeded",
+  "title": "Rate Limit Exceeded",
+  "status": 429,
+  "detail": "You have exceeded the rate limit. Please retry after 60 seconds."
+}
+```
+
 ## Related Documentation
 
 ### Core Security

@@ -249,6 +249,200 @@ When implementing these request/response formats:
 
 These patterns are based on HTTP and JSON standards and work with any REST framework.
 
+## Common Mistakes
+
+### ❌ Inconsistent Response Envelopes
+
+**Problem:**
+```http
+GET /orders/123 HTTP/1.1
+
+{
+  "id": "123",
+  "status": "SHIPPED"
+}
+
+GET /customers/456 HTTP/1.1
+
+{
+  "data": {
+    "id": "456",
+    "name": "Acme Corp"
+  },
+  "meta": { ... }
+}
+```
+
+**Why it's wrong:** Clients cannot rely on a consistent structure. Some responses have envelopes, others don't. This forces special handling for each endpoint.
+
+**✅ Correct approach:**
+```http
+GET /orders/123 HTTP/1.1
+
+{
+  "data": {
+    "id": "123",
+    "status": "SHIPPED"
+  },
+  "meta": {
+    "timestamp": "2024-07-15T14:32:22Z"
+  }
+}
+```
+
+---
+
+### ❌ Returning Null Instead of Empty Collections
+
+**Problem:**
+```http
+GET /customers/123/orders HTTP/1.1
+
+{
+  "data": null
+}
+```
+
+**Why it's wrong:** Clients must add null checks before iterating. This creates ambiguity—does `null` mean "no orders" or "orders not loaded"?
+
+**✅ Correct approach:**
+```http
+GET /customers/123/orders HTTP/1.1
+
+{
+  "data": [],
+  "meta": {
+    "pagination": {
+      "totalElements": 0,
+      "totalPages": 0
+    }
+  }
+}
+```
+
+---
+
+### ❌ Missing Content-Type Headers
+
+**Problem:**
+```http
+POST /orders HTTP/1.1
+
+{"customerId": "123", "items": [...]}
+```
+
+**Why it's wrong:** Without `Content-Type`, servers may reject the request or misparse the body. Responses without this header leave clients guessing the format.
+
+**✅ Correct approach:**
+```http
+POST /orders HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+{"customerId": "123", "items": [...]}
+```
+
+---
+
+### ❌ Embedding Metadata in Resource Objects
+
+**Problem:**
+```http
+GET /orders/123 HTTP/1.1
+
+{
+  "id": "123",
+  "status": "SHIPPED",
+  "timestamp": "2024-07-15T14:32:22Z",
+  "requestId": "req-12345",
+  "serverVersion": "2.1.0"
+}
+```
+
+**Why it's wrong:** Mixing resource data with request metadata pollutes the domain model. Clients cannot easily separate business data from operational data.
+
+**✅ Correct approach:**
+```http
+GET /orders/123 HTTP/1.1
+
+{
+  "data": {
+    "id": "123",
+    "status": "SHIPPED"
+  },
+  "meta": {
+    "timestamp": "2024-07-15T14:32:22Z",
+    "requestId": "req-12345"
+  }
+}
+```
+
+---
+
+### ❌ Inconsistent Date Formats
+
+**Problem:**
+```http
+GET /orders/123 HTTP/1.1
+
+{
+  "data": {
+    "createdDate": "07/15/2024",
+    "shippedAt": "2024-07-16T10:30:00Z",
+    "deliveryDate": "July 18, 2024"
+  }
+}
+```
+
+**Why it's wrong:** Multiple date formats require clients to implement multiple parsers. Locale-specific formats cause confusion across regions.
+
+**✅ Correct approach:**
+```http
+GET /orders/123 HTTP/1.1
+
+{
+  "data": {
+    "createdDate": "2024-07-15T08:00:00Z",
+    "shippedAt": "2024-07-16T10:30:00Z",
+    "deliveryDate": "2024-07-18T14:00:00Z"
+  }
+}
+```
+
+---
+
+### ❌ Using Arrays as Root Response Element
+
+**Problem:**
+```http
+GET /orders HTTP/1.1
+
+[
+  {"id": "123", "status": "SHIPPED"},
+  {"id": "124", "status": "PENDING"}
+]
+```
+
+**Why it's wrong:** No room for pagination metadata, timestamps, or links. Adding metadata later breaks existing clients. Also vulnerable to JSON hijacking in older browsers.
+
+**✅ Correct approach:**
+```http
+GET /orders HTTP/1.1
+
+{
+  "data": [
+    {"id": "123", "status": "SHIPPED"},
+    {"id": "124", "status": "PENDING"}
+  ],
+  "meta": {
+    "pagination": {
+      "page": 0,
+      "totalElements": 2
+    }
+  }
+}
+```
+
 ## Related Documentation
 
 ### Core Standards

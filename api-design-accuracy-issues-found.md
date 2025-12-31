@@ -2,41 +2,22 @@
 
 ## Critical Issues Found
 
-### 1. **Resource Naming Convention Error** ❌
+### 1. **Resource Naming Convention Error** ✅ FIXED
 **File**: `api-design/foundations/resource-naming-and-url-structure.md`  
 **Line**: 32  
-**Issue**: Documentation suggests using singular nouns for specific resources (`/order/{orderId}`)  
+**Issue**: Documentation suggested using singular nouns for specific resources (`/order/{orderId}`)  
 **Industry Standard**: Use plural nouns throughout (`/orders/{orderId}`)  
 **Severity**: HIGH - This contradicts REST best practices  
 
-**Current (Incorrect)**:
-```
-| Use singular for specific resources | `/order/{orderId}` | Endpoints returning a single resource use singular nouns |
-```
+**Status**: ✅ **FIXED** - Documentation now correctly uses plural nouns (`/orders/{orderId}`) throughout.
 
-**Should Be**:
-```  
-| Use consistent plural resources | `/orders/{orderId}` | All resource endpoints use plural nouns for consistency |
-```
-
-### 2. **Error Response Format Not RFC 7807 Compliant** ❌
+### 2. **Error Response Format Not RFC 7807 Compliant** ✅ FIXED
 **File**: `api-design/request-response/error-response-standards.md`  
 **Lines**: 35-50  
 **Issue**: Custom error format instead of RFC 7807 Problem Details standard  
 **Severity**: HIGH - Doesn't follow established web standards  
 
-**Current (Non-compliant)**:
-```json
-{
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "The request contains invalid parameters",
-    "details": [...]
-  }
-}
-```
-
-**Should Be (RFC 7807 Compliant)**:
+**Status**: ✅ **FIXED** - Documentation now uses RFC 9457 (the updated standard that obsoletes RFC 7807) Problem Details format:
 ```json
 {
   "type": "https://example.com/problems/validation-error",
@@ -79,10 +60,10 @@
 
 ## Recommendations
 
-### Immediate Fixes Required
-1. **Update Resource Naming**: Change all singular resource examples to plural
-2. **Implement RFC 7807**: Replace custom error format with standard Problem Details
-3. **Consistency Review**: Ensure all examples use plural resource naming
+### ✅ Completed Fixes
+1. ~~**Update Resource Naming**: Change all singular resource examples to plural~~ ✅ DONE
+2. ~~**Implement RFC 7807/9457**: Replace custom error format with standard Problem Details~~ ✅ DONE
+3. **Consistency Review**: Ensure all examples use plural resource naming - IN PROGRESS
 
 ### Documentation Standards Review
 4. **Cross-reference Verification**: Establish process to verify against authoritative sources
@@ -91,18 +72,18 @@
 
 ## Impact Assessment
 
-### High Impact Issues
-- **Resource naming error**: Could lead to inconsistent API implementations
-- **Non-RFC 7807 compliance**: Reduces interoperability with standard tooling
+### High Impact Issues - RESOLVED
+- ~~**Resource naming error**: Could lead to inconsistent API implementations~~ ✅ FIXED
+- ~~**Non-RFC 7807 compliance**: Reduces interoperability with standard tooling~~ ✅ FIXED (now using RFC 9457)
 
-### Mitigation
-- Update documentation immediately
+### Mitigation - COMPLETED
+- ✅ Updated documentation with correct standards
 - Create migration guide for existing implementations
 - Add accuracy verification to review process
 
 ## Next Steps
 
-1. Fix identified accuracy issues in documentation
+1. ~~Fix identified accuracy issues in documentation~~ ✅ COMPLETED
 2. Continue systematic analysis of remaining sections
 3. Create accuracy verification checklist for future updates
 4. Establish quarterly review process for external standards compliance

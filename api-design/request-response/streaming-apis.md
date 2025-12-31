@@ -125,8 +125,10 @@ data: {"type":"processing-error","message":"Failed to process item"}
 
 ### Complete Examples
 - [Order Export Stream](../examples/streaming/order-export-stream.md) - Bulk data export with progress tracking
-- [Real-Time Order Updates](../examples/streaming/real-time-order-updates.md) - Live dashboard updates
+- [Real-Time Order Updates](../examples/streaming/real-time-order-updates.md) - Live order status updates
+- [Real-Time Notifications](../examples/streaming/real-time-notifications.md) - SSE notification system with reconnection
 - [Bulk Data Processing](../examples/streaming/bulk-data-processing.md) - Batch operations with feedback
+- [Live Dashboard](../examples/streaming/live-dashboard.md) - WebSocket bi-directional messaging
 
 ### Detailed Specifications
 - [NDJSON Specification](../reference/streaming/ndjson-specification.md) - Complete NDJSON format guide

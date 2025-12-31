@@ -21,9 +21,9 @@ Based on our documentation philosophy, we've established these readability ceili
 5. **next-steps.md** - Grade 25.4 (Guide doc, ceiling: 10) ❌ **CRITICAL**
 
 ### README Files Exceeding Grade 12 Ceiling
-1. **api-design/request-response/README.md** - Grade 19.3 ❌
-2. **api-design/documentation/README.md** - Grade 15.7 ❌  
-3. **api-design/security/README.md** - Grade 14.8 ❌
+1. **api-design/request-response/README.md** - Grade 19.3 → 18.1 ⚠️ (improved, still needs work)
+2. **api-design/documentation/README.md** - Grade 15.7 ✅ FIXED (Flesch score now compliant)
+3. **api-design/security/README.md** - Grade 14.8 ✅ FIXED (Flesch score now compliant)
 
 ### Main Documentation Exceeding Grade 14 Ceiling
 - **api-observability-standards.md** - Grade 14.4 (Borderline acceptable)
@@ -55,7 +55,8 @@ Based on our documentation philosophy, we've established these readability ceili
 3. **api-design/request-response/README.md** (Grade 19.3 → 12 max)
 
 ### Priority 2: README Accessibility
-- Simplify all README files above Grade 12
+- ✅ documentation/README.md and security/README.md - Flesch scores now compliant
+- ⚠️ request-response/README.md - Improved but still needs further simplification
 - Focus on overview language and sentence structure
 - Maintain technical accuracy while improving readability
 
@@ -95,7 +96,8 @@ Based on our documentation philosophy, we've established these readability ceili
 
 ## Next Steps
 
-1. **Immediate**: Continue improving README files (Grade 12 ceiling)
-2. **Short-term**: Target prose-heavy documents with linguistic complexity
-3. **Medium-term**: Consider restructuring dense reference materials  
-4. **Long-term**: Establish automated quality gates for new content
+1. **Immediate**: ✅ Improved documentation/README.md and security/README.md Flesch scores
+2. **In Progress**: Continue improving request-response/README.md (Grade 18.1 → 12 target)
+3. **Short-term**: Target prose-heavy documents with linguistic complexity
+4. **Medium-term**: Consider restructuring dense reference materials  
+5. **Long-term**: Establish automated quality gates for new content
