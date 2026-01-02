@@ -106,6 +106,8 @@ Content-Type: application/json
 {"operationId": "op-456", "status": "COMPLETED", "result": {"orderId": "order-789"}}
 ```
 
+**For detailed async operation patterns**, see [Async Operations](./Async-Operations.md) which covers polling strategies, webhooks, progress tracking, and job management in depth.
+
 ## Server-Sent Events (SSE)
 
 ### Basic SSE Implementation

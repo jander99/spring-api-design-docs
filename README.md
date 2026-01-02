@@ -1,106 +1,139 @@
-# Spring Boot Microservices Architecture Reference
+# Software Design Documentation
 
-Comprehensive guidelines for building Spring Boot microservices using Domain-Driven Design principles, supporting both imperative (Spring MVC) and reactive (Spring WebFlux) approaches.
+Comprehensive guides for designing software systems and APIs. This repository contains both abstract design theory and language-specific implementations.
+
+## 📚 Table of Contents
+
+### **Design Guides** (Theory & Principles)
+
+The `guides/` directory contains language-agnostic design theory and standards:
+
+- **[API Design](guides/api-design/)** - REST/HTTP design principles, standards, and patterns
+  - Maturity Model assessment, foundations, request/response, security, advanced patterns, documentation
+- **[Architecture](guides/architecture/)** - System architecture patterns beyond REST APIs
+  - Event-driven architecture, CQRS, event sourcing, saga patterns
+- **[Observability](guides/observability/)** - Monitoring, metrics, logging, and tracing standards
+  - Three pillars of observability, distributed tracing, correlation IDs, SLOs
+- **Domain-Driven Design** *(coming soon)* - Business logic modeling and bounded contexts
+- **Hexagonal Architecture** *(coming soon)* - Separating domain logic from external systems
+
+### **Language-Specific Implementations**
+
+The `languages/` directory contains practical implementations for specific technologies:
+
+- **[Spring](languages/spring/)** - Spring Boot microservices with DDD, MVC/WebFlux, testing, and observability
+  - Architecture, project structure, controllers, security, configuration, testing, error handling
+
+### **Examples** (Format-Agnostic)
+
+The `examples/` directory contains practical examples using standard formats (JSON, YAML, etc.) that apply across languages and frameworks.
+
+---
 
 ## 🎯 Richardson Maturity Model - Find Your API's Level
 
-**New!** Assess your API's maturity and get a personalized improvement roadmap:
+Assess your API's maturity and get a personalized improvement roadmap:
 
 <div align="center">
 
 | 📍 **Where is Your API?** | 🚀 **Quick Assessment** |
 |---------------------------|-------------------------|
-| [**Level 0** - Single endpoint, RPC-style](api-design/maturity-model/level-0/) | [Take 5-minute assessment](api-design/maturity-model/assessment-guide.md) |
-| [**Level 1** - Multiple resources](api-design/maturity-model/level-1/) | [View maturity levels](api-design/maturity-model/) |
-| [**Level 2** - HTTP verbs (Industry Standard)](api-design/maturity-model/level-2/) | [See improvement paths](api-design/maturity-model/#quick-assessment) |
-| [**Level 3** - HATEOAS (True REST)](api-design/maturity-model/level-3/) | [Check best practices](api-design/maturity-model/level-3/best-practices.md) |
+| [**Level 0** - Single endpoint, RPC-style](guides/api-design/maturity-model/level-0/) | [Take 5-minute assessment](guides/api-design/maturity-model/assessment-guide.md) |
+| [**Level 1** - Multiple resources](guides/api-design/maturity-model/level-1/) | [View maturity levels](guides/api-design/maturity-model/) |
+| [**Level 2** - HTTP verbs (Industry Standard)](guides/api-design/maturity-model/level-2/) | [See improvement paths](guides/api-design/maturity-model/#quick-assessment) |
+| [**Level 3** - HATEOAS (True REST)](guides/api-design/maturity-model/level-3/) | [Check best practices](guides/api-design/maturity-model/level-3/best-practices.md) |
 
 </div>
 
 Most modern APIs are at Level 2, and that's perfectly fine! Use our guide to understand where you are and decide if moving up makes sense for your use case.
 
-## Project Structure
+---
 
-### API Design Standards (Framework-Agnostic)
+## 🚀 Quick Start Paths
 
-- **[🎯 Maturity Assessment](api-design/maturity-model/)** - Richardson Maturity Model framework
-- **[🏗️ Foundations](api-design/foundations/)** - API versioning, resource naming, URL structure
-- **[🔄 Request/Response](api-design/request-response/)** - Content types, errors (RFC 7807), pagination, streaming
-- **[🔐 Security](api-design/security/)** - Authentication, authorization, API protection
-- **[🚀 Advanced Patterns](api-design/advanced-patterns/)** - Event-driven, reactive, streaming architectures
-- **[📚 Documentation](api-design/documentation/)** - OpenAPI standards, tools, testing
+### For API Design
 
-### Spring Implementation Standards
+1. **Assess Your API**: [Richardson Maturity Model assessment](guides/api-design/maturity-model/assessment-guide.md) (5 minutes)
+2. **Learn Foundations**: [API versioning, resource naming, URL structure](guides/api-design/foundations/)
+3. **Request/Response Patterns**: [Content types, errors (RFC 7807), pagination, streaming](guides/api-design/request-response/)
+4. **Security**: [Authentication and authorization standards](guides/api-design/security/)
+5. **Advanced Patterns**: [Event-driven, reactive, streaming](guides/api-design/advanced-patterns/)
 
-- **[🏗️ Project Structure](spring-design/project-structure/)** - DDD package organization, imperative/reactive examples
-- **[🎯 Architecture](spring-design/architecture/)** - Dependency injection, component management
-- **[🎮 Controllers](spring-design/controllers/)** - MVC/WebFlux patterns, request mapping, testing
-- **[⚠️ Error Handling](spring-design/error-handling/)** - Exception hierarchy, RFC 7807, validation
-- **[🔐 Security](spring-design/security/)** - OAuth 2.1, authorization, CORS, rate limiting
-- **[⚙️ Configuration](spring-design/configuration/)** - Profiles, database, external services, observability
-- **[📊 Observability](spring-design/observability/)** - Logging, monitoring, metrics
-- **[🧪 Testing](spring-design/testing/)** - Unit, integration, and specialized testing patterns
+### For Spring Implementation
 
-## Getting Started
+1. **Project Setup**: [DDD package organization](languages/spring/project-structure/)
+2. **Choose Your Style**: [Imperative (MVC)](languages/spring/project-structure/Imperative-Examples.md) or [Reactive (WebFlux)](languages/spring/project-structure/Reactive-Examples.md)
+3. **Architecture**: [Dependency injection and component management](languages/spring/architecture/)
+4. **Controllers**: [Implement request handling](languages/spring/controllers/)
+5. **Error Handling**: [Exception hierarchy and RFC 7807](languages/spring/error-handling/)
+6. **Security**: [OAuth 2.1 and authorization](languages/spring/security/)
+7. **Testing**: [Unit, integration, and specialized tests](languages/spring/testing/)
+8. **Production Ready**: [Configuration, observability, monitoring](languages/spring/configuration/)
 
-### 🚀 Quick Start Path
+---
 
-1. **Assess Your API**: Use the [Richardson Maturity Model assessment](api-design/maturity-model/assessment-guide.md) (5 minutes)
-2. **API Design**: Review [foundations](api-design/foundations/) and [request/response patterns](api-design/request-response/)
-3. **Architecture**: Set up [DDD package structure](spring-design/project-structure/Package-Organization.md)
-4. **Implementation**: Choose [imperative](spring-design/project-structure/Imperative-Examples.md) or [reactive](spring-design/project-structure/Reactive-Examples.md)
-5. **Controllers**: Implement using [controller patterns](spring-design/controllers/)
-6. **Error Handling**: Apply [error handling](spring-design/error-handling/) with RFC 7807
-7. **Security**: Configure [OAuth 2.1](spring-design/security/OAuth2-Resource-Server.md) and [authorization](spring-design/security/)
-8. **Testing**: Follow [testing patterns](spring-design/testing/) (unit, integration, specialized)
-9. **Production**: Add [observability](spring-design/observability/) and [configuration](spring-design/configuration/)
+## 🏗️ Core Principles
 
-## Key Architecture Principles
-
+- **API-First Design**: Define clear contracts before implementation
 - **Domain-Driven Design**: Code organized around business domains
-- **Hexagonal Architecture**: Domain logic separated from external concerns
-- **API-First Development**: Contracts defined before implementation
+- **Hexagonal Architecture**: Separate domain logic from external concerns
 - **Consistent Patterns**: Same patterns across all services
 - **Security by Design**: Security as core requirement
+
+---
+
+## 📖 Complete Navigation
+
+### API Design Standards
+
+- **[🎯 Maturity Assessment](guides/api-design/maturity-model/)** - Richardson Maturity Model framework
+- **[🏗️ Foundations](guides/api-design/foundations/)** - API versioning, resource naming, URL structure
+- **[🔄 Request/Response](guides/api-design/request-response/)** - Content types, errors (RFC 7807), pagination, streaming
+- **[🔐 Security](guides/api-design/security/)** - Authentication, authorization, API protection
+- **[🚀 Advanced Patterns](guides/api-design/advanced-patterns/)** - Event-driven, reactive, streaming architectures
+- **[📚 Documentation](guides/api-design/documentation/)** - OpenAPI standards, tools, testing
+
+### Spring Implementation
+
+- **[🏗️ Project Structure](languages/spring/project-structure/)** - DDD package organization, imperative/reactive examples
+- **[🎯 Architecture](languages/spring/architecture/)** - Dependency injection, component management
+- **[🎮 Controllers](languages/spring/controllers/)** - MVC/WebFlux patterns, request mapping, testing
+- **[⚠️ Error Handling](languages/spring/error-handling/)** - Exception hierarchy, RFC 7807, validation
+- **[🔐 Security](languages/spring/security/)** - OAuth 2.1, authorization, CORS, rate limiting
+- **[⚙️ Configuration](languages/spring/configuration/)** - Profiles, database, external services, observability
+- **[📊 Observability](languages/spring/observability/)** - Logging, monitoring, metrics
+- **[🧪 Testing](languages/spring/testing/)** - Unit, integration, and specialized testing patterns
+
+---
 
 ## Technology Stack
 
 **API Standards**: HTTP/REST, OpenAPI 3.1+, OAuth 2.1/OIDC, RFC 7807, JSON Schema
 
-**Spring Stack**: Spring Boot 3.x, WebFlux, Spring Security, Micrometer, springdoc-openapi v2, Spring Cloud Contract
+**Spring**: Spring Boot 3.x, WebFlux, Spring Security, Micrometer, springdoc-openapi v2, Spring Cloud Contract
 
-## Testing Strategy
+---
 
-- **[Unit Testing](spring-design/testing/unit-testing/)**: Fast, isolated component tests
-- **[Integration Testing](spring-design/testing/integration-testing/)**: Component interaction with real infrastructure
-- **[Specialized Testing](spring-design/testing/specialized-testing/)**: Reactive, contract, security testing
+## Repository Structure
 
-All testing patterns support both imperative (MVC) and reactive (WebFlux) implementations.
+```
+software-design-docs/
+├── guides/                    # Language-agnostic design theory
+│   └── api-design/            # REST/HTTP design standards and patterns
+├── languages/                 # Language-specific implementations
+│   └── spring/                # Spring Boot reference implementation
+├── examples/                  # Format-agnostic examples (JSON, YAML, etc.)
+├── _reference/                # Work-in-progress and reference materials
+└── scripts/                   # Utility scripts for documentation maintenance
+```
 
-## Supporting Resources
+---
 
-Each main documentation section includes:
-- **📁 Examples**: Complete implementations and setup guides
-- **📚 Reference**: Technical specifications and comparisons
-- **🔧 Troubleshooting**: Common issues and solutions
+## Contributing
 
-Key directories:
-- [Testing Examples & Reference](examples/testing/)
-- [Event-Driven Patterns](api-design/advanced-patterns/examples/event-driven/)
-- [Streaming Implementations](api-design/examples/streaming/)
-- [Documentation Tools](api-design/documentation/examples/documentation-tools/)
-
-## Quick Navigation
-
-### By Development Phase
-
-| Phase | Framework-Agnostic | Spring Implementation |
-|-------|-------------------|----------------------|
-| **Assessment** | [Maturity Model](api-design/maturity-model/) | - |
-| **API Design** | [API Standards](api-design/) | [Controllers](spring-design/controllers/) |
-| **Project Setup** | [Foundations](api-design/foundations/) | [Project Structure](spring-design/project-structure/) |
-| **Error Handling** | [Error Standards](api-design/request-response/Error-Response-Standards.md) | [Error Handling](spring-design/error-handling/) |
-| **Security** | [Security Standards](api-design/security/) | [Security Implementation](spring-design/security/) |
-| **Testing** | [Documentation Testing](api-design/documentation/Documentation-Testing.md) | [Testing Patterns](spring-design/testing/) |
-| **Production** | [Advanced Patterns](api-design/advanced-patterns/) | [Observability](spring-design/observability/) |
+When adding new content:
+- **Theory**: Add to `guides/` with language-agnostic principles
+- **Implementation**: Add to `languages/[framework]/` with specific technology details
+- **Examples**: Use standard formats (JSON, YAML) in the `examples/` directory
+- **Readability**: Follow reading level guidelines (see `scripts/READING_LEVEL_GUIDELINES.md`)
 

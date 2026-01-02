@@ -25,6 +25,22 @@ Good request and response formats make APIs easy to use. These standards show ho
 - HATEOAS link patterns
 - How to handle empty fields
 
+### 🔤 [Schema Conventions](Schema-Conventions.md)
+**JSON field naming and data format standards**
+- Field naming conventions (camelCase, snake_case)
+- Date and time format standards
+- Null handling strategies
+- Enum representation patterns
+- Boolean and numeric conventions
+
+### 🔄 [Content Negotiation](Content-Negotiation.md)
+**Media type selection and content negotiation patterns**
+- Accept header handling
+- Media type versioning
+- Language negotiation
+- Character encoding selection
+- Compression negotiation
+
 ### ❌ [Error Response Standards](Error-Response-Standards.md)
 **How to handle errors properly**
 - HTTP status codes
@@ -121,6 +137,13 @@ All patterns are based on HTTP and JSON standards, working with any REST framewo
 - **Errors**: `application/problem+json` (RFC 7807)
 - **Streaming**: `application/x-ndjson`, `text/event-stream`
 - **Files**: `multipart/form-data`, `application/octet-stream`
+
+### Schema Conventions
+- **Field Naming**: camelCase for JSON fields
+- **Dates**: ISO 8601 format (`YYYY-MM-DDTHH:mm:ssZ`)
+- **Nulls**: Omit null fields from responses
+- **Enums**: String values in UPPER_SNAKE_CASE
+- **Booleans**: Use `true`/`false`, never `1`/`0`
 
 ### HTTP Status Codes
 - **200**: Success with response body
