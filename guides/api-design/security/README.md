@@ -15,7 +15,7 @@ This directory contains comprehensive security standards and guidelines for prot
 
 ## Files
 
-### [Security Standards.md](Security%20Standards.md)
+### [Security Standards.md](security-standards.md)
 Comprehensive security guidelines covering OAuth 2.1/OIDC implementation, authentication patterns, authorization strategies, and API protection mechanisms. Includes standards for HTTP security headers, token management, and security best practices.
 
 ## Navigation

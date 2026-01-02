@@ -8,7 +8,7 @@ This directory contains comprehensive guidelines for implementing observability 
 
 ### Core Observability Documentation
 
-- **[Logging and Monitoring](Logging%20and%20Monitoring.md)**: Complete guide to structured logging, metrics collection, health checks, and monitoring best practices for both imperative and reactive Spring Boot applications.
+- **[Logging and Monitoring](logging-and-monitoring.md)**: Complete guide to structured logging, metrics collection, health checks, and monitoring best practices for both imperative and reactive Spring Boot applications.
 
 ## Key Observability Principles
 
@@ -197,10 +197,10 @@ management:
 ## Related Documentation
 
 ### API Design Standards (Language-Agnostic)
-- [API Observability Standards](../../api-design/advanced-patterns/API-Observability-Standards.md) - Protocol-level observability patterns
+- [API Observability Standards](../../../guides/api-design/advanced-patterns/api-observability-standards.md) - Protocol-level observability patterns
 
 ### Spring Implementation
-- [Observability Configuration](../configuration/Observability-Configuration.md)
-- [Error Logging and Monitoring](../error-handling/Error-Logging-and-Monitoring.md)  
-- [Infrastructure Testing](../testing/specialized-testing/Infrastructure-Testing.md)
-- [Security Context Propagation](../security/Security-Context-Propagation.md)
+- [Observability Configuration](../configuration/observability-configuration.md)
+- [Error Logging and Monitoring](../error-handling/error-logging-and-monitoring.md)  
+- [Infrastructure Testing](../testing/specialized-testing/infrastructure-testing.md)
+- [Security Context Propagation](../security/security-context-propagation.md)

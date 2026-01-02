@@ -15,13 +15,13 @@ This directory contains comprehensive standards and guidelines for creating, mai
 
 ## Files
 
-### [OpenAPI-Standards.md](OpenAPI-Standards.md)
+### [OpenAPI-Standards.md](openapi-standards.md)
 Comprehensive OpenAPI 3.1+ standards and requirements for creating thorough API specifications. Covers specification format, schema definitions, documentation requirements, and best practices for API contract design.
 
-### [Documentation-Testing.md](Documentation-Testing.md)
+### [Documentation-Testing.md](documentation-testing.md)
 Standards and methodologies for testing API documentation accuracy and completeness. Includes contract testing, documentation validation, and ensuring documentation stays synchronized with implementation.
 
-### [Documentation-Tools-and-Integration.md](Documentation-Tools-and-Integration.md)
+### [Documentation-Tools-and-Integration.md](documentation-tools-and-integration.md)
 Guidelines for documentation tooling, generation workflows, and integration with development processes. Covers tool selection, automation strategies, and maintaining documentation as part of the development lifecycle.
 
 ## Navigation

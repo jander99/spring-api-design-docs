@@ -37,7 +37,7 @@ Our configuration approach follows these core principles:
 
 ## Configuration Areas
 
-### 1. [Configuration Principles](Configuration-Principles.md)
+### 1. [Configuration Principles](configuration-principles.md)
 
 **Core configuration concepts and type-safe properties**
 
@@ -54,7 +54,7 @@ Our configuration approach follows these core principles:
 - Feature flags and conditional beans
 - Configuration testing best practices
 
-### 2. [Environment Profiles](Environment-Profiles.md)
+### 2. [Environment Profiles](environment-profiles.md)
 
 **Environment-specific configuration management**
 
@@ -71,7 +71,7 @@ Our configuration approach follows these core principles:
 - Testing with profiles
 - Profile combination strategies
 
-### 3. [Security Configuration](Security-Configuration.md)
+### 3. [Security Configuration](security-configuration.md)
 
 **JWT, CORS, and security setup patterns**
 
@@ -88,7 +88,7 @@ Our configuration approach follows these core principles:
 - Security expression evaluation
 - Authentication and authorization patterns
 
-### 4. [Database Configuration](Database-Configuration.md)
+### 4. [Database Configuration](database-configuration.md)
 
 **JPA, R2DBC, and multiple datasource patterns**
 
@@ -105,7 +105,7 @@ Our configuration approach follows these core principles:
 - Database health monitoring
 - Testing database configurations
 
-### 5. [External Services](External-Services.md)
+### 5. [External Services](external-services.md)
 
 **WebClient and service integration patterns**
 
@@ -122,7 +122,7 @@ Our configuration approach follows these core principles:
 - Error handling and fallback strategies
 - Integration testing with external services
 
-### 6. [Observability Configuration](Observability-Configuration.md)
+### 6. [Observability Configuration](observability-configuration.md)
 
 **Metrics, tracing, and monitoring setup**
 
@@ -356,10 +356,10 @@ class ProfileConfigurationTest {
 
 ## Related Spring Boot Documentation
 
-- [Configuration Principles](Configuration-Principles.md) - Start here for core concepts
+- [Configuration Principles](configuration-principles.md) - Start here for core concepts
 - [Spring Boot Configuration Reference](https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html)
 - [Spring Security Configuration](../security/) - Detailed security patterns
-- [Spring Boot Testing](../testing/Unit-Testing-Fundamentals.md) - Configuration testing patterns
+- [Spring Boot Testing](../testing/unit-testing/unit-testing-fundamentals.md) - Configuration testing patterns
 
 ## Integration Points
 
@@ -368,6 +368,6 @@ This configuration documentation integrates with other Spring Boot design areas:
 - **[Controllers](../controllers/)**: Request/response configuration patterns
 - **[Error Handling](../error-handling/)**: Error configuration and logging
 - **[Security](../security/)**: Detailed security implementation patterns
-- **[Testing](../testing/Unit-Testing-Fundamentals.md)**: Configuration testing strategies
+- **[Testing](../testing/unit-testing/unit-testing-fundamentals.md)**: Configuration testing strategies
 
 The configuration patterns in this guide ensure that Spring Boot microservices are properly configured for all environments while maintaining security, performance, and maintainability standards.

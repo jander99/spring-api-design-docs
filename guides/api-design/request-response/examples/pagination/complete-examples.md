@@ -329,6 +329,6 @@ For very large datasets or real-time data, consider cursor-based pagination:
 
 ## Related Documentation
 
-- [Main Pagination Guide](../../Pagination-and-Filtering.md)
+- [Main Pagination Guide](../../pagination-and-filtering.md)
 - [Advanced Patterns](../reference/pagination/advanced-patterns.md)
 - [Common Issues](../troubleshooting/pagination/common-issues.md)

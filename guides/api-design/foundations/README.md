@@ -15,22 +15,22 @@ This directory contains the fundamental principles and standards for API design 
 
 ## Files
 
-### [HTTP-Fundamentals.md](HTTP-Fundamentals.md)
+### [HTTP-Fundamentals.md](http-fundamentals.md)
 Core HTTP protocol concepts and REST principles. Covers HTTP methods (GET, POST, PUT, DELETE, PATCH), status codes (2xx, 3xx, 4xx, 5xx), headers, and the complete request-response lifecycle. Essential foundation for all API design work.
 
-### [Resource Naming and URL Structure.md](Resource%20Naming%20and%20URL%20Structure.md)
+### [Resource Naming and URL Structure.md](resource-naming-and-url-structure.md)
 Comprehensive guidelines for designing RESTful and Reactive API endpoints with predictable patterns. Covers resource naming conventions, URL structure standards, and best practices for creating intuitive, maintainable APIs.
 
-### [API Version Strategy.md](API%20Version%20Strategy.md)
+### [API Version Strategy.md](api-version-strategy.md)
 Detailed versioning strategy for API evolution and backward compatibility. Includes URI-based versioning patterns, migration strategies, and version lifecycle management.
 
-### [API-Lifecycle.md](API-Lifecycle.md)
+### [API-Lifecycle.md](api-lifecycle.md)
 Complete guide to managing API evolution from design through deprecation. Covers breaking change detection, RFC 8594 Sunset header usage, deprecation communication strategies, migration patterns, and version lifecycle states. Includes practical examples of deprecation headers and sunset timelines.
 
-### [Idempotency-and-Safety.md](Idempotency-and-Safety.md)
+### [Idempotency-and-Safety.md](idempotency-and-safety.md)
 Comprehensive guide to HTTP method safety and idempotency guarantees. Covers safe vs unsafe operations, idempotent design patterns, retry safety, idempotency keys for POST operations, and client retry strategies.
 
-### [API-Governance.md](API-Governance.md)
+### [API-Governance.md](api-governance.md)
 Design standards enforcement and organizational consistency policies. Covers API review processes, automated linting, design guidelines enforcement, governance workflows, and maintaining consistency across multiple teams and services.
 
 ## Navigation

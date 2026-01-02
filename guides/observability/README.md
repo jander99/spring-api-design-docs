@@ -15,13 +15,13 @@ This directory contains standards for making systems observable. Learn how to un
 
 ## Files
 
-### [Observability-Standards.md](Observability-Standards.md)
+### [Observability-Standards.md](observability-standards.md)
 Framework for the three pillars: metrics, logs, and tracing. Covers correlation IDs and monitoring patterns. Standards work with any language or framework.
 
 ## Related Documentation
 
 For HTTP API-specific observability patterns (health checks, metrics endpoints, trace propagation), see:
-- [/guides/api-design/advanced-patterns/API-Observability-Standards.md](../api-design/advanced-patterns/API-Observability-Standards.md)
+- [/guides/api-design/advanced-patterns/API-Observability-Standards.md](../api-design/advanced-patterns/api-observability-standards.md)
 
 ## Navigation
 

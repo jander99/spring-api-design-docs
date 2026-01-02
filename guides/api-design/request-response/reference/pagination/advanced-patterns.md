@@ -618,7 +618,7 @@ class CursorGenerator {
 
 ## Related Documentation
 
-- [Main Pagination Guide](../../Pagination-and-Filtering.md)
+- [Main Pagination Guide](../../pagination-and-filtering.md)
 - [Complete Examples](../examples/pagination/complete-examples.md)
 - [Common Issues](../troubleshooting/pagination/common-issues.md)
 - [Performance Problems](../troubleshooting/pagination/performance-problems.md)
