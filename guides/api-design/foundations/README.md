@@ -21,6 +21,12 @@ Comprehensive guidelines for designing RESTful and Reactive API endpoints with p
 ### [API Version Strategy.md](API%20Version%20Strategy.md)
 Detailed versioning strategy for API evolution and backward compatibility. Includes URI-based versioning patterns, migration strategies, and version lifecycle management.
 
+### [API-Lifecycle.md](API-Lifecycle.md)
+Complete guide to managing API evolution from design through deprecation. Covers breaking change detection, RFC 8594 Sunset header usage, deprecation communication strategies, migration patterns, and version lifecycle states. Includes practical examples of deprecation headers and sunset timelines.
+
+### [Idempotency-and-Safety.md](Idempotency-and-Safety.md)
+Comprehensive guide to HTTP method safety and idempotency guarantees. Covers safe vs unsafe operations, idempotent design patterns, retry safety, idempotency keys for POST operations, and client retry strategies.
+
 ## Navigation
 
 - [← Back to API Design](../README.md)
