@@ -4,137 +4,201 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## Repository Overview
 
-This is a **documentation repository** for API design standards and Spring Boot microservices. It has guides for building APIs and microservices using both imperative and reactive approaches. The repository contains only documentation files (`.md` format) and serves as architectural reference.
+This is a **documentation repository** organized as a multi-layered design system:
 
-**Important**: The API design section (`/api-design/`) works with any programming language. It contains no language-specific code. It focuses purely on HTTP/REST principles and standards that work with any technology.
+1. **Guides** (`/guides/`) - Language-agnostic theory and design principles
+2. **Languages** (`/languages/`) - Technology-specific implementations (Spring, Java, etc.)
+3. **Examples** (`/examples/`) - Format-agnostic examples (JSON, YAML, HTTP, etc.)
 
-## Architecture Standards
+The repository contains only documentation files (`.md` format) and serves as an architectural reference for building well-designed software systems and APIs.
 
-### Domain-Driven Design Structure
-All microservices follow this standardized package structure:
+**Core Principle**: Each concrete implementation in a language should have a corresponding abstract theory in guides. Conversely, abstract theory should have concrete implementations in language-specific sections.
+
+## Repository Structure
 
 ```
-com.example.{service-name}
-├── domain           # Domain model and business logic
-├── application      # Application services/use cases
-├── infrastructure   # Technical implementations
-├── interfaces       # API controllers and external interfaces
-└── config           # Application configuration
+software-design-docs/
+├── guides/                         # Language-agnostic design theory
+│   └── api-design/                 # REST/HTTP design principles and standards
+│       ├── maturity-model/         # Richardson Maturity Model framework
+│       ├── foundations/            # API versioning, resource naming, URL structure
+│       ├── request-response/       # Content types, errors (RFC 7807), pagination, streaming
+│       ├── security/               # Authentication, authorization standards
+│       ├── advanced-patterns/      # Event-driven, reactive, streaming architectures
+│       ├── documentation/          # OpenAPI standards, testing, tooling
+│       ├── examples/               # HTTP/JSON/YAML examples (format-agnostic)
+│       ├── reference/              # Detailed technical specifications
+│       └── troubleshooting/        # Common issues and solutions
+├── languages/                      # Technology-specific implementations
+│   └── spring/                     # Spring Boot microservices reference implementation
+│       ├── architecture/           # DI patterns, component management
+│       ├── project-structure/      # DDD package organization, imperative/reactive examples
+│       ├── controllers/            # MVC/WebFlux patterns, request mapping
+│       ├── error-handling/         # Exception hierarchy, RFC 7807
+│       ├── security/               # OAuth 2.1, authorization, CORS, rate limiting
+│       ├── configuration/          # Profiles, database, external services
+│       ├── observability/          # Logging, monitoring, metrics
+│       ├── testing/                # Unit, integration, specialized testing
+│       ├── examples/               # Complete Spring implementations
+│       ├── reference/              # Spring-specific specifications
+│       └── troubleshooting/        # Spring-specific issues and solutions
+├── examples/                       # Format-agnostic examples
+├── _archive/                       # Work-in-progress artifacts and temporary reports
+├── _reference/                     # Content to review and organize later
+├── scripts/                        # Utility scripts (reading level analyzer, etc.)
+└── CLAUDE.md                       # This file
 ```
 
-### Core Principles
-- **Hexagonal Architecture**: Keep domain logic separate from external systems
-- **API-First Development**: Define clear API contracts before building
-- **Security by Design**: OAuth 2.1/OIDC and resource-based authorization
-- **Dual Implementation Support**: Imperative (Spring MVC) and Reactive (WebFlux) patterns
-- **Framework-Agnostic Design**: API standards that work with any technology
+## Core Principles
 
-## Documentation Structure
+### Three-Layer Architecture
 
-### API Design Standards (`/api-design/`) - Language Agnostic
+1. **Guide Layer** (`/guides/api-design/`)
+   - Language and framework agnostic
+   - Pure design principles and theory
+   - Uses HTTP, JSON, YAML examples only (no programming code)
+   - Applicable to any technology stack
+
+2. **Language Layer** (`/languages/spring/`)
+   - Spring Boot specific
+   - Concrete implementations of guide theory
+   - Java code examples and patterns
+   - Must have analogous topic in guide layer
+
+3. **Example Layer** (`/examples/`)
+   - Format-agnostic (JSON, YAML, HTTP, TOML, XML, etc.)
+   - Practical demonstrations
+   - Can reference both theory and implementations
+
+### Content Relationship Rules
+
+- **Every Spring pattern** should have an abstract analog in API design guides
+- **Every API design theory** should have a Spring implementation example
+- **If a topic exists only in Spring**, create the abstract theory version in guides
+- **If a theory exists without implementation**, create the Spring-specific version
+
+## API Design Standards (`/guides/api-design/`)
+
 Universal HTTP/REST principles with no programming language dependencies:
-- **maturity-model/**: Richardson Maturity Model assessment framework for API evaluation
-- **foundations/**: Core API design principles (resource naming, versioning)
+
+- **maturity-model/**: Richardson Maturity Model assessment framework
+- **foundations/**: Core API design (resource naming, versioning, URL structure)
 - **request-response/**: HTTP patterns, error formats, pagination, streaming
-- **security/**: Security standards and authentication patterns
-- **advanced-patterns/**: Reactive, event-driven, and streaming architectures
-- **documentation/**: OpenAPI standards, testing, and tooling
+- **security/**: Security standards, authentication, authorization
+- **advanced-patterns/**: Event-driven, reactive, streaming architectures
+- **documentation/**: OpenAPI standards, tools, testing
 
-**Note**: All API design documentation uses only JSON, YAML, and HTTP examples. No programming language code is included.
+**Important Note**: All API design documentation uses only JSON, YAML, and HTTP examples. No programming code is included.
 
-### Spring Implementation Standards (`/spring-design/`)
+## Spring Implementation Standards (`/languages/spring/`)
+
 Spring Boot-specific patterns organized into:
-- **architecture/**: Architectural patterns and dependency injection
-- **project-structure/**: Package organization and DDD patterns
+
+- **architecture/**: Dependency injection and component management
+- **project-structure/**: DDD package organization and project layout
 - **controllers/**: Web layer patterns for MVC and WebFlux
-- **error-handling/**: Exception management and RFC 7807 implementation
-- **security/**: OAuth 2.1, authorization, and security headers
-- **configuration/**: Application config, profiles, and observability
-- **testing/**: Unit, integration, and specialized testing (organized by type)
+- **error-handling/**: Exception hierarchy and RFC 7807 implementation
+- **security/**: OAuth 2.1, authorization, CORS, rate limiting
+- **configuration/**: Application config, profiles, database, external services
 - **observability/**: Logging, monitoring, and operational patterns
+- **testing/**: Unit, integration, and specialized testing patterns
 
-### Modular Supporting Structure
-The documentation uses a modular approach with supporting directories:
+### Spring Dual-Implementation Support
 
-#### **Examples Directories** (`/examples/`, `/*/examples/`)
-Complete examples and setup guides:
-- **Root examples/**: Cross-cutting examples (testing, CI/CD)
-- **Topic-specific examples/**: Configuration and pattern examples
-- **API design examples**: HTTP/JSON/YAML examples only, no code
+Spring documentation supports both patterns:
+- **Imperative**: Spring MVC traditional request-response
+- **Reactive**: Spring WebFlux non-blocking streams
 
-#### **Reference Directories** (`/reference/`, `/*/reference/`)
-Complete technical specifications and comparisons:
-- **Tool comparisons**: Feature matrices and selection criteria
-- **Detailed specifications**: Complete technical references
-- **Advanced patterns**: Complex implementation details
+Each pattern includes:
+- Project structure examples
+- Controller implementation examples
+- Testing strategies
+- Error handling approaches
 
-#### **Troubleshooting Directories** (`/troubleshooting/`, `/*/troubleshooting/`)
-Common issues, solutions, and debugging guides:
-- **Problem-solution pairs**: Specific issues with actionable solutions
-- **Debugging strategies**: Systematic approaches to problem-solving
-- **Prevention techniques**: Best practices to avoid common pitfalls
+## Supporting Directories
 
-### Documentation Philosophy
-- **Main files**: Concise, scannable content at high school reading level
-- **Supporting files**: Detailed implementations for different skill levels
-- **Progressive disclosure**: Core concepts easy to access, depth available when needed
-- **Modular maintenance**: Easy to update sections without affecting other docs
+### Examples (`/examples/`)
 
-### Readability Standards
+Format-agnostic examples using standard data/configuration formats:
+- JSON for data structures
+- YAML for configuration
+- HTTP requests/responses
+- Other standard formats (TOML, XML, etc.)
+
+These examples apply across languages and frameworks.
+
+### Reference & Troubleshooting
+
+Located within each section:
+- `/guides/api-design/reference/`: Detailed API design specifications
+- `/guides/api-design/troubleshooting/`: Common API design issues
+- `/languages/spring/reference/`: Spring-specific technical details
+- `/languages/spring/troubleshooting/`: Spring-specific issues
+
+### Archive (`/_archive/`)
+
+Work-in-progress and temporary artifacts:
+- Analysis reports
+- Reading level assessments
+- TODO lists and tracking files
+
+### Review Later (`/_reference/`)
+
+Content that needs future organization:
+- Examples and reference materials to integrate
+- Materials from early stages of content creation
+
+## Readability Standards
+
 All documentation must follow these readability limits for accessibility:
 
-#### **Grade Level Ceilings**
+### Grade Level Ceilings
 - **Main documentation files**: Maximum Grade 14 (college sophomore level)
 - **README and overview files**: Maximum Grade 12 (high school senior level)
 - **Getting started guides**: Maximum Grade 10 (high school sophomore level)
-- **Reference and troubleshooting**: Maximum Grade 16 (college level acceptable for deep technical content)
+- **Reference and troubleshooting**: Maximum Grade 16 (acceptable for deep technical content)
 
-#### **Flesch Reading Ease Minimums**
+### Flesch Reading Ease Minimums
 - **Main documentation**: Minimum 30 (Difficult but readable)
 - **README and overview**: Minimum 40 (Fairly difficult but accessible)
 - **Getting started guides**: Minimum 50 (Fairly easy to read)
 
-#### **Writing Guidelines**
+### Writing Guidelines
 1. **Sentence length**: Average maximum 20 words per sentence
 2. **Paragraph length**: Maximum 4 sentences per paragraph
 3. **Technical density**: Maximum 3% technical terms for main docs
 4. **Active voice**: Use active voice when possible
 5. **Plain language**: Replace jargon with simpler words when possible
 
-#### **Quality Gates**
+### Quality Gates
 Before publishing new documentation:
-1. Run reading level analysis with `node scripts/reading-level-analyzer.js file [path]`
+1. Run: `node scripts/reading-level-analyzer.js file [path]`
 2. Check grade level meets ceiling requirements
 3. If above ceiling, simplify language while keeping technical accuracy
-4. Update reading guide with accurate metrics
-
-## Technology Stack
-
-**API Standards**: HTTP/REST, OpenAPI 3.1+, OAuth 2.1/OIDC, RFC 7807, JSON Schema
-**Spring Stack**: Spring Boot 3.x, WebFlux, Spring Security, Micrometer, springdoc-openapi v2
+4. Include reading guide metrics in your documentation
 
 ## Richardson Maturity Model Integration
 
-The repository includes a **Richardson Maturity Model (RMM) assessment framework** to help developers understand their API's REST maturity level:
+The repository includes a **Richardson Maturity Model (RMM) assessment framework** at `/guides/api-design/maturity-model/`:
 
-### Assessment Framework (`/api-design/maturity-model/`)
 - **Level Assessment**: 5-minute survey to find current API maturity
 - **Level-specific Documentation**: Detailed guides for each RMM level (0-3)
 - **Migration Paths**: Step-by-step instructions for moving between levels
 - **"You Are Here" Navigation**: Clear identification of current state and next steps
 
-### RMM Integration Points
+### RMM Levels
 - **Level 0**: Single endpoint, RPC-style → Transition to resources
 - **Level 1**: Multiple resources → Add HTTP verbs
 - **Level 2**: HTTP verbs (Industry standard) → Add hypermedia (optional)
 - **Level 3**: HATEOAS/Hypermedia controls → True REST implementation
 
-When working with API design topics, consider the user's likely maturity level. Reference the right RMM documentation.
+When working with API design topics, consider the user's likely maturity level and reference the right RMM documentation.
 
-## Important Distinction
+## Technology Stack
 
-- **api-design/**: Universal principles applicable to any REST framework (language-agnostic, no code)
-- **spring-design/**: Specific to Spring Boot implementations with concrete Java code examples
+**API Standards**: HTTP/REST, OpenAPI 3.1+, OAuth 2.1/OIDC, RFC 7807, JSON Schema
+
+**Spring**: Spring Boot 3.x, WebFlux, Spring Security, Micrometer, springdoc-openapi v2, Spring Cloud Contract
 
 ## Maintenance Guidelines
 
