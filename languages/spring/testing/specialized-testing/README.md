@@ -8,11 +8,11 @@ This directory contains guidelines for specialized testing approaches in Spring 
 
 ### Specialized Testing Documentation
 
-- **[Reactive Testing](Reactive-Testing.md)**: Comprehensive guide to testing reactive streams, WebFlux applications, and asynchronous operations using StepVerifier and reactive test patterns.
+- **[Reactive Testing](reactive-testing.md)**: Comprehensive guide to testing reactive streams, WebFlux applications, and asynchronous operations using StepVerifier and reactive test patterns.
 
-- **[Infrastructure Testing](Infrastructure-Testing.md)**: Testing infrastructure components, external adapters, repository implementations, and technical integrations with proper isolation and verification.
+- **[Infrastructure Testing](infrastructure-testing.md)**: Testing infrastructure components, external adapters, repository implementations, and technical integrations with proper isolation and verification.
 
-- **[Contract Testing Standards](Contract%20Testing%20Standards.md)**: Consumer-driven contract testing using Spring Cloud Contract, API contract verification, and provider-consumer testing patterns.
+- **[Contract Testing Standards](contract-testing-standards.md)**: Consumer-driven contract testing using Spring Cloud Contract, API contract verification, and provider-consumer testing patterns.
 
 ## Key Specialized Testing Concepts
 
@@ -342,7 +342,7 @@ void shouldRetry_whenExternalServiceFails() {
 
 ## Related Documentation
 
-- [Reactive Controllers](../../controllers/Reactive-Controllers.md)
-- [External Services Configuration](../../configuration/External-Services.md)
-- [Reactive Error Handling](../../error-handling/Reactive-Error-Handling.md)
-- [Security Testing](../../security/Security-Testing.md)
+- [Reactive Controllers](../../controllers/reactive-controllers.md)
+- [External Services Configuration](../../configuration/external-services.md)
+- [Reactive Error Handling](../../error-handling/reactive-error-handling.md)
+- [Security Testing](../../security/security-testing.md)

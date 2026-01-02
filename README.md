@@ -62,7 +62,7 @@ Most modern APIs are at Level 2, and that's perfectly fine! Use our guide to und
 ### For Spring Implementation
 
 1. **Project Setup**: [DDD package organization](languages/spring/project-structure/)
-2. **Choose Your Style**: [Imperative (MVC)](languages/spring/project-structure/Imperative-Examples.md) or [Reactive (WebFlux)](languages/spring/project-structure/Reactive-Examples.md)
+2. **Choose Your Style**: [Imperative (MVC)](languages/spring/project-structure/imperative-examples.md) or [Reactive (WebFlux)](languages/spring/project-structure/reactive-examples.md)
 3. **Architecture**: [Dependency injection and component management](languages/spring/architecture/)
 4. **Controllers**: [Implement request handling](languages/spring/controllers/)
 5. **Error Handling**: [Exception hierarchy and RFC 7807](languages/spring/error-handling/)

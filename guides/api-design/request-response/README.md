@@ -17,7 +17,7 @@ Good request and response formats make APIs easy to use. These standards show ho
 
 ## Documentation Structure
 
-### 📄 [Content Types and Structure](Content-Types-and-Structure.md)
+### 📄 [Content Types and Structure](content-types-and-structure.md)
 **How to structure API requests and responses**
 - Standard content types and alternatives
 - How to validate requests
@@ -25,7 +25,7 @@ Good request and response formats make APIs easy to use. These standards show ho
 - HATEOAS link patterns
 - How to handle empty fields
 
-### 🔤 [Schema Conventions](Schema-Conventions.md)
+### 🔤 [Schema Conventions](schema-conventions.md)
 **JSON field naming and data format standards**
 - Field naming conventions (camelCase, snake_case)
 - Date and time format standards
@@ -33,7 +33,7 @@ Good request and response formats make APIs easy to use. These standards show ho
 - Enum representation patterns
 - Boolean and numeric conventions
 
-### 🔄 [Content Negotiation](Content-Negotiation.md)
+### 🔄 [Content Negotiation](content-negotiation.md)
 **Media type selection and content negotiation patterns**
 - Accept header handling
 - Media type versioning
@@ -41,7 +41,7 @@ Good request and response formats make APIs easy to use. These standards show ho
 - Character encoding selection
 - Compression negotiation
 
-### ❌ [Error Response Standards](Error-Response-Standards.md)
+### ❌ [Error Response Standards](error-response-standards.md)
 **How to handle errors properly**
 - HTTP status codes
 - Standardized error response formats
@@ -49,7 +49,7 @@ Good request and response formats make APIs easy to use. These standards show ho
 - Error code naming conventions
 - Framework-agnostic error handling patterns
 
-### 📊 [Pagination and Filtering](Pagination-and-Filtering.md)
+### 📊 [Pagination and Filtering](pagination-and-filtering.md)
 **Collection response patterns for lists and search results**
 - Pagination response structures
 - Filtering and search patterns
@@ -57,7 +57,7 @@ Good request and response formats make APIs easy to use. These standards show ho
 - Advanced query capabilities
 - Performance optimization guidelines
 
-### 🌊 [Streaming APIs](Streaming-APIs.md)
+### 🌊 [Streaming APIs](streaming-apis.md)
 **Streaming response formats for real-time and bulk data**
 - NDJSON streaming patterns
 - Server-Sent Events (SSE) implementation
@@ -187,9 +187,9 @@ These standards are framework-agnostic and can be implemented using any REST fra
 ## Related Documentation
 
 - **[API Design Standards](../)**: Complete API design documentation
-- **[Spring Design Standards](../../spring-design/)**: Spring Boot-specific implementation patterns
-- **[Security Standards](../security/Security Standards.md)**: Security implementation standards
-- **[API Version Strategy](../foundations/API Version Strategy.md)**: Versioning strategies and patterns
+- **[Spring Design Standards](../../../languages/spring/)**: Spring Boot-specific implementation patterns
+- **[Security Standards](../security/security-standards.md)**: Security implementation standards
+- **[API Version Strategy](../foundations/api-version-strategy.md)**: Versioning strategies and patterns
 
 ## Usage Examples
 

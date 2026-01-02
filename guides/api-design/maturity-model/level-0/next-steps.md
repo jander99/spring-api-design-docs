@@ -151,7 +151,7 @@ Start with these easy transformations:
 
 ## 🔗 Related Resources
 
-- [Resource Naming Guide](../../foundations/Resource-Naming-and-URL-Structure.md)
+- [Resource Naming Guide](../../foundations/resource-naming-and-url-structure.md)
 - [URL Design Patterns](../../request-response/)
 - [Migration Strategies](../../examples/versioning/)
 

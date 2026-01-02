@@ -16,7 +16,7 @@ Our security implementation follows these core principles:
 
 ## Documentation Structure
 
-### 1. [OAuth2 Resource Server](OAuth2-Resource-Server.md)
+### 1. [OAuth2 Resource Server](oauth2-resource-server.md)
 **OAuth 2.0/OIDC Authentication Configuration**
 
 - JWT token validation and signature verification
@@ -31,7 +31,7 @@ Our security implementation follows these core principles:
 - Token validation properties
 - Security context setup
 
-### 2. [Authorization Patterns](Authorization-Patterns.md)
+### 2. [Authorization Patterns](authorization-patterns.md)
 **Binary Resource-Based Authorization Implementation**
 
 - Custom binary resource permission model
@@ -46,7 +46,7 @@ Our security implementation follows these core principles:
 - Access decision logic
 - Authorization anti-patterns to avoid
 
-### 3. [Security Context Propagation](Security-Context-Propagation.md)
+### 3. [Security Context Propagation](security-context-propagation.md)
 **Service-to-Service Security and Context Management**
 
 - OAuth 2.0 client configuration for service communication
@@ -61,7 +61,7 @@ Our security implementation follows these core principles:
 - Service account setup
 - Request correlation and tracing
 
-### 4. [CORS and Headers](CORS-and-Headers.md)
+### 4. [CORS and Headers](cors-and-headers.md)
 **Cross-Origin Resource Sharing and Security Headers**
 
 - Environment-specific CORS configuration
@@ -76,7 +76,7 @@ Our security implementation follows these core principles:
 - CSP policy building
 - Header validation and compliance
 
-### 5. [Rate Limiting and Protection](Rate-Limiting-and-Protection.md)
+### 5. [Rate Limiting and Protection](rate-limiting-and-protection.md)
 **Rate Limiting and Attack Protection Mechanisms**
 
 - Redis-based rate limiting with Bucket4j
@@ -91,7 +91,7 @@ Our security implementation follows these core principles:
 - Input sanitization services
 - Security monitoring and logging
 
-### 6. [Security Testing](Security-Testing.md)
+### 6. [Security Testing](security-testing.md)
 **Comprehensive Security Testing Patterns**
 
 - Authentication and authorization testing
@@ -318,9 +318,9 @@ spec:
 
 ## Related Documentation
 
-- [Configuration Principles](../configuration/Configuration-Principles.md)
-- [Logging and Monitoring](../observability/Logging and Monitoring.md)
-- [Integration Testing Fundamentals](../testing/integration-testing/Integration-Testing-Fundamentals.md)
+- [Configuration Principles](../configuration/configuration-principles.md)
+- [Logging and Monitoring](../observability/logging-and-monitoring.md)
+- [Integration Testing Fundamentals](../testing/integration-testing/integration-testing-fundamentals.md)
 
 ---
 

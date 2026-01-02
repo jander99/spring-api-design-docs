@@ -649,7 +649,7 @@ function analyzeQuery(query, sort, page, size) {
 
 ## Related Documentation
 
-- [Main Pagination Guide](../../Pagination-and-Filtering.md)
+- [Main Pagination Guide](../../pagination-and-filtering.md)
 - [Complete Examples](../examples/pagination/complete-examples.md)
 - [Advanced Patterns](../reference/pagination/advanced-patterns.md)
-- [Error Response Standards](../../Error-Response-Standards.md)
+- [Error Response Standards](../../error-response-standards.md)

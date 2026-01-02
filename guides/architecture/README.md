@@ -15,7 +15,7 @@ This directory contains architectural patterns and principles for building distr
 
 ## Files
 
-### [Event-Driven-Architecture.md](Event-Driven-Architecture.md)
+### [Event-Driven-Architecture.md](event-driven-architecture.md)
 Comprehensive guide to event-driven architecture patterns. Covers Event Sourcing, CQRS, Saga patterns for distributed transactions, message brokers (Kafka, RabbitMQ), event schemas, and asynchronous communication strategies.
 
 ## Navigation

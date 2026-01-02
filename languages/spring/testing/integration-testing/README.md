@@ -8,13 +8,13 @@ This directory contains comprehensive guidelines for integration testing in Spri
 
 ### Core Integration Testing Documentation
 
-- **[Integration Testing Fundamentals](Integration-Testing-Fundamentals.md)**: Core principles, setup, testing strategies, and best practices for integration testing in Spring Boot applications.
+- **[Integration Testing Fundamentals](integration-testing-fundamentals.md)**: Core principles, setup, testing strategies, and best practices for integration testing in Spring Boot applications.
 
-- **[Database Integration Testing](Database-Integration-Testing.md)**: Comprehensive guide to testing with real databases, repository testing, transaction management, and data persistence verification using Testcontainers.
+- **[Database Integration Testing](database-integration-testing.md)**: Comprehensive guide to testing with real databases, repository testing, transaction management, and data persistence verification using Testcontainers.
 
-- **[API Integration Testing](API-Integration-Testing.md)**: End-to-end API testing patterns, HTTP request/response testing, and full application context integration testing.
+- **[API Integration Testing](api-integration-testing.md)**: End-to-end API testing patterns, HTTP request/response testing, and full application context integration testing.
 
-- **[External Service Testing](External-Service-Testing.md)**: Testing external service integrations using WireMock, service virtualization, and fault tolerance testing patterns.
+- **[External Service Testing](external-service-testing.md)**: Testing external service integrations using WireMock, service virtualization, and fault tolerance testing patterns.
 
 ## Key Integration Testing Principles
 
@@ -300,7 +300,7 @@ class OrderIntegrationTest {
 
 ## Related Documentation
 
-- [Database Configuration](../../configuration/Database-Configuration.md)
-- [External Services Configuration](../../configuration/External-Services.md)
+- [Database Configuration](../../configuration/database-configuration.md)
+- [External Services Configuration](../../configuration/external-services.md)
 - [Error Handling Standards](../../error-handling/README.md)
-- [Security Testing](../../security/Security-Testing.md)
+- [Security Testing](../../security/security-testing.md)
