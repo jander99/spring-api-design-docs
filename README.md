@@ -10,9 +10,12 @@ The `guides/` directory contains language-agnostic design theory and standards:
 
 - **[API Design](guides/api-design/)** - REST/HTTP design principles, standards, and patterns
   - Maturity Model assessment, foundations, request/response, security, advanced patterns, documentation
+- **[Architecture](guides/architecture/)** - System architecture patterns beyond REST APIs
+  - Event-driven architecture, CQRS, event sourcing, saga patterns
+- **[Observability](guides/observability/)** - Monitoring, metrics, logging, and tracing standards
+  - Three pillars of observability, distributed tracing, correlation IDs, SLOs
 - **Domain-Driven Design** *(coming soon)* - Business logic modeling and bounded contexts
 - **Hexagonal Architecture** *(coming soon)* - Separating domain logic from external systems
-- **Cross-Cutting Concerns** *(coming soon)* - Security, observability, and operational patterns
 
 ### **Language-Specific Implementations**
 

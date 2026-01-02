@@ -20,7 +20,7 @@ This directory contains advanced architectural patterns and specialized techniqu
 Comprehensive guide to asynchronous operation patterns for long-running tasks. Covers 202 Accepted pattern, polling strategies, webhook callbacks, WebSocket status updates, and job management. Includes practical patterns for progress tracking, cancellation, and completion handling.
 
 ### [Event-Driven-Architecture.md](Event-Driven-Architecture.md)
-Comprehensive guide to event-driven architecture patterns for building reactive APIs. Covers event types, routing strategies, caching mechanisms, and patterns for scalable, loosely-coupled systems with asynchronous processing.
+HTTP-based event delivery patterns including webhooks, Server-Sent Events (SSE), and polling strategies. Focuses on implementing event-driven communication over HTTP protocols. For broader event-driven architectural patterns, see [/guides/architecture/Event-Driven-Architecture.md](../../architecture/Event-Driven-Architecture.md).
 
 ### [HTTP-Streaming-Patterns.md](HTTP-Streaming-Patterns.md)
 Detailed patterns for implementing HTTP streaming protocols in APIs. Includes Server-Sent Events (SSE), WebSockets, and HTTP/2 streaming techniques for real-time data delivery.
@@ -46,6 +46,10 @@ Comprehensive guide to HTTP rate limiting patterns using standard headers and re
 ### [HTTP-Caching.md](HTTP-Caching.md) ⭐ NEW
 **⏱️ 19 min read • 🔴 Advanced**  
 Complete guide to HTTP caching strategies, Cache-Control directives, ETags, conditional requests, and CDN integration patterns. Covers validation patterns (304 Not Modified), cache invalidation strategies, and best practices for building performant, scalable APIs with effective caching.
+
+### [Hypermedia-Controls.md](Hypermedia-Controls.md) ⭐ NEW
+**⏱️ 15 min read • 🔴 Advanced**  
+Complete guide to hypermedia controls for building self-descriptive APIs. Covers HATEOAS principles, HAL and JSON:API formats, link relations (IANA registry), affordances, and Richardson Maturity Model Level 3. Includes practical patterns for hypermedia-driven client navigation and state transitions.
 
 ## Navigation
 

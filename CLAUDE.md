@@ -19,16 +19,20 @@ The repository contains only documentation files (`.md` format) and serves as an
 ```
 software-design-docs/
 ├── guides/                         # Language-agnostic design theory
-│   └── api-design/                 # REST/HTTP design principles and standards
-│       ├── maturity-model/         # Richardson Maturity Model framework
-│       ├── foundations/            # API versioning, resource naming, URL structure
-│       ├── request-response/       # Content types, errors (RFC 7807), pagination, streaming
-│       ├── security/               # Authentication, authorization standards
-│       ├── advanced-patterns/      # Event-driven, reactive, streaming architectures
-│       ├── documentation/          # OpenAPI standards, testing, tooling
-│       ├── examples/               # HTTP/JSON/YAML examples (format-agnostic)
-│       ├── reference/              # Detailed technical specifications
-│       └── troubleshooting/        # Common issues and solutions
+│   ├── api-design/                 # REST/HTTP design principles and standards
+│   │   ├── maturity-model/         # Richardson Maturity Model framework
+│   │   ├── foundations/            # HTTP fundamentals, idempotency, versioning, governance
+│   │   ├── request-response/       # Content types, schemas, errors, pagination, streaming
+│   │   ├── security/               # Authentication, authorization standards
+│   │   ├── advanced-patterns/      # Caching, rate limiting, async, batch, hypermedia
+│   │   ├── documentation/          # OpenAPI standards, testing
+│   │   ├── examples/               # HTTP/JSON/YAML examples (format-agnostic)
+│   │   ├── reference/              # Detailed technical specifications
+│   │   └── troubleshooting/        # Common issues and solutions
+│   ├── architecture/               # System architecture patterns
+│   │   └── Event-Driven-Architecture.md  # CQRS, event sourcing, saga patterns
+│   └── observability/              # Monitoring and operational practices
+│       └── Observability-Standards.md    # Metrics, logging, tracing
 ├── languages/                      # Technology-specific implementations
 │   └── spring/                     # Spring Boot microservices reference implementation
 │       ├── architecture/           # DI patterns, component management
@@ -38,10 +42,7 @@ software-design-docs/
 │       ├── security/               # OAuth 2.1, authorization, CORS, rate limiting
 │       ├── configuration/          # Profiles, database, external services
 │       ├── observability/          # Logging, monitoring, metrics
-│       ├── testing/                # Unit, integration, specialized testing
-│       ├── examples/               # Complete Spring implementations
-│       ├── reference/              # Spring-specific specifications
-│       └── troubleshooting/        # Spring-specific issues and solutions
+│       └── testing/                # Unit, integration, specialized testing
 ├── examples/                       # Format-agnostic examples
 ├── _archive/                       # Work-in-progress artifacts and temporary reports
 ├── _reference/                     # Content to review and organize later
@@ -77,18 +78,32 @@ software-design-docs/
 - **If a topic exists only in Spring**, create the abstract theory version in guides
 - **If a theory exists without implementation**, create the Spring-specific version
 
-## API Design Standards (`/guides/api-design/`)
+## Guide Standards
+
+### API Design Standards (`/guides/api-design/`)
 
 Universal HTTP/REST principles with no programming language dependencies:
 
 - **maturity-model/**: Richardson Maturity Model assessment framework
-- **foundations/**: Core API design (resource naming, versioning, URL structure)
-- **request-response/**: HTTP patterns, error formats, pagination, streaming
+- **foundations/**: HTTP fundamentals, idempotency, versioning, lifecycle, governance
+- **request-response/**: Content types, schemas, errors, pagination, filtering, streaming, negotiation
 - **security/**: Security standards, authentication, authorization
-- **advanced-patterns/**: Event-driven, reactive, streaming architectures
-- **documentation/**: OpenAPI standards, tools, testing
+- **advanced-patterns/**: Caching, rate limiting, batch operations, async operations, hypermedia, streaming
+- **documentation/**: OpenAPI standards, testing
 
 **Important Note**: All API design documentation uses only JSON, YAML, and HTTP examples. No programming code is included.
+
+### Architecture Standards (`/guides/architecture/`)
+
+System architecture patterns that go beyond HTTP/REST APIs:
+
+- **Event-Driven-Architecture.md**: Event sourcing, CQRS, saga patterns, message broker architectures
+
+### Observability Standards (`/guides/observability/`)
+
+Comprehensive observability practices for production systems:
+
+- **Observability-Standards.md**: Three pillars (metrics, logs, traces), distributed tracing, correlation, SLOs
 
 ## Spring Implementation Standards (`/languages/spring/`)
 

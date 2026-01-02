@@ -15,6 +15,9 @@ This directory contains the fundamental principles and standards for API design 
 
 ## Files
 
+### [HTTP-Fundamentals.md](HTTP-Fundamentals.md)
+Core HTTP protocol concepts and REST principles. Covers HTTP methods (GET, POST, PUT, DELETE, PATCH), status codes (2xx, 3xx, 4xx, 5xx), headers, and the complete request-response lifecycle. Essential foundation for all API design work.
+
 ### [Resource Naming and URL Structure.md](Resource%20Naming%20and%20URL%20Structure.md)
 Comprehensive guidelines for designing RESTful and Reactive API endpoints with predictable patterns. Covers resource naming conventions, URL structure standards, and best practices for creating intuitive, maintainable APIs.
 
@@ -26,6 +29,9 @@ Complete guide to managing API evolution from design through deprecation. Covers
 
 ### [Idempotency-and-Safety.md](Idempotency-and-Safety.md)
 Comprehensive guide to HTTP method safety and idempotency guarantees. Covers safe vs unsafe operations, idempotent design patterns, retry safety, idempotency keys for POST operations, and client retry strategies.
+
+### [API-Governance.md](API-Governance.md)
+Design standards enforcement and organizational consistency policies. Covers API review processes, automated linting, design guidelines enforcement, governance workflows, and maintaining consistency across multiple teams and services.
 
 ## Navigation
 
