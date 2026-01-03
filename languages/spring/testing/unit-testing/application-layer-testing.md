@@ -2,18 +2,18 @@
 
 ## Overview
 
-Application layer testing focuses on testing application services that orchestrate business operations. These tests verify that services correctly coordinate between domain logic, repositories, and external services while maintaining proper transaction boundaries.
+Application layer testing checks services that coordinate business operations. These tests verify that services call domain logic, repositories, and external services in the right way and at the right time.
 
 ## Core Principles
 
-1. **Mock all dependencies**: Repository, domain services, and external services
-2. **Verify proper interactions**: Ensure correct method calls and parameters
-3. **Test transaction boundaries**: Verify rollback behavior on failures
-4. **Focus on orchestration**: Test coordination logic, not business rules
+1. **Mock all dependencies**: Mock repositories, domain services, and external APIs
+2. **Verify proper interactions**: Check that the right methods get called with correct data
+3. **Test transaction boundaries**: Verify rollback when failures happen
+4. **Focus on orchestration**: Test how services coordinate work, not what they calculate
 
 ## Basic Application Service Testing
 
-Application services should be tested with all dependencies mocked to verify orchestration logic in isolation.
+Test application services with all dependencies mocked. This lets you check the orchestration logic without running real code.
 
 ### Testing Service Orchestration
 
@@ -134,7 +134,7 @@ class OrderApplicationServiceTest {
 
 ## Testing Complex Workflows
 
-Application services often coordinate complex workflows involving multiple domain services and external systems.
+Services often need to coordinate work between multiple domain services and external systems. These require special test setup.
 
 ### Testing Multi-Step Operations
 
@@ -311,7 +311,7 @@ class OrderProcessingServiceTest {
 
 ## Testing Event Publishing
 
-Application services often publish domain events. Verify that events are published with correct data.
+Services often publish events to notify other parts of the system. Check that the right events get sent with the right data.
 
 ### Testing Event Publication
 
@@ -375,7 +375,7 @@ class OrderApplicationServiceTest {
 
 ## Testing Error Handling
 
-Application services should handle various error scenarios gracefully and ensure data consistency.
+Services must handle errors properly and keep data safe. Test what happens when things go wrong.
 
 ### Testing Exception Handling
 
@@ -524,59 +524,67 @@ class OrderQueryServiceTest {
 
 ### 1. Focus on Orchestration Logic
 
+Test how services coordinate work between components. Do not test business math—that belongs in domain tests.
+
 ```java
-// Good: Testing coordination between services
+// Good: Test coordination between services
 @Test
 void shouldCoordinateOrderCreationWorkflow() {
-    // Test the sequence of calls and their interactions
+    // Check the sequence of calls
     when(inventoryService.checkAvailability(any())).thenReturn(true);
     when(paymentService.authorize(any())).thenReturn(authResult);
     when(orderRepository.save(any())).thenReturn(savedOrder);
     
     orderService.createOrder(request);
     
-    // Verify the correct sequence
+    // Verify the correct order
     InOrder inOrder = inOrder(inventoryService, paymentService, orderRepository);
     inOrder.verify(inventoryService).checkAvailability(any());
     inOrder.verify(paymentService).authorize(any());
     inOrder.verify(orderRepository).save(any());
 }
 
-// Bad: Testing business logic (belongs in domain layer)
+// Bad: Test business logic (domain tests should do this)
 @Test
 void shouldCalculateOrderTotal() {
-    // This belongs in domain entity tests, not application service tests
+    // Do not test math calculations here
 }
 ```
 
 ### 2. Use Specific Mocking
 
+Mock specific values, not wildcards. This makes tests more precise and easier to understand.
+
 ```java
-// Good: Specific expectations
+// Good: Specific test data
 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
 when(paymentService.processPayment(order.getPaymentRequest())).thenReturn(paymentResult);
 
-// Bad: Overly generic mocking
+// Bad: Too general with wildcards
 when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 when(paymentService.processPayment(any())).thenReturn(paymentResult);
 ```
 
 ### 3. Verify Important Interactions
 
+Check only the method calls that matter. Do not verify every single action the code takes.
+
 ```java
-// Good: Verify key interactions that matter for correctness
+// Good: Check important method calls
 verify(orderRepository).save(order);
 verify(eventPublisher).publishEvent(any(OrderCreatedEvent.class));
 
-// Bad: Over-verification of every method call
+// Bad: Check too many things
 verify(orderRepository).findById(orderId);
 verify(order).getCustomerId();
 verify(order).getItems();
 verify(order).setStatus(OrderStatus.CREATED);
-// ... too many verifications
+// ... too many checks makes tests brittle
 ```
 
 ### 4. Test Data Setup
+
+Create helper methods to build test data. This keeps tests clean and easy to read.
 
 ```java
 private OrderCreationRequest createOrderCreationRequest() {

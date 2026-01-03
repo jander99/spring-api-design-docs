@@ -2,21 +2,21 @@
 
 ## Overview
 
-Contract tests verify that services interact correctly according to agreed-upon contracts. This document outlines our standards for contract testing in our microservices ecosystem.
+Contract tests check that services work together correctly. They verify services follow agreed rules. This document shows how to write and manage these tests.
 
 ## Core Principles
 
-1. **Consumer-Driven Contracts**: Define contracts from the consumer perspective
-2. **Provider Verification**: Verify provider implementation meets defined contracts
-3. **Independent Evolution**: Allow services to evolve independently
-4. **Version Management**: Track contract versions alongside API versions
+1. **Consumer-Driven Contracts**: Focus on consumer needs
+2. **Provider Verification**: Test providers meet contracts
+3. **Independent Evolution**: Let services evolve safely
+4. **Version Management**: Track contracts with API versions
 
 ## Contract Testing Framework
 
-- Use Spring Cloud Contract for contract testing
-- Store contracts in provider service repositories
-- Generate client stubs from contracts
-- Verify provider implementation against contracts
+- Use Spring Cloud Contract for testing
+- Store contracts in provider folders
+- Build fake clients from contracts
+- Verify provider code matches the contract
 
 ## Structure and Organization
 
@@ -81,85 +81,85 @@ response:
 
 ## Consumer-Side Testing
 
-- Generate and use stubs from contract
-- Test client code against contract stubs
-- Verify error handling behaves correctly
-- Ensure backward compatibility with older contracts
+- Generate fake providers from the contract
+- Test client code against fake providers
+- Check that error handling works correctly
+- Ensure code works with older contract versions
 
 ## Provider-Side Testing
 
-- Verify implementation against contracts
-- Extend contract test base classes
-- Ensure all contract conditions are met
-- Test contract compatibility across versions
+- Check that code matches the contract
+- Use Spring Cloud Contract base classes
+- Verify all contract promises are kept
+- Test multiple contract versions
 
 ## Contract Versioning
 
 ### Version Management
 
-- Store contracts with API version prefix
-- Maintain backward compatibility when possible
-- Implement contract breaking change process
-- Include deprecation notices in contracts
+- Add API version to filenames
+- Support old contracts when possible
+- Have a breaking change process
+- Notify users of contract removal
 
 ### Contract Breaking Changes
 
-- Communicate breaking changes to consumer teams
-- Allow for transition period with dual support
-- Version contracts alongside API versions
-- Track contract dependencies between services
+- Warn teams before breaking a contract
+- Support old and new versions temporarily
+- Match contract and API versions
+- Document dependencies
 
 ## Contract Testing in CI/CD
 
-- Run consumer contract tests before integration tests
-- Verify provider implementations against contracts in CI
-- Block deployments that break contract compatibility
-- Use contract testing for pre-deployment verification
+- Run consumer tests first
+- Verify code matches contracts in CI
+- Block bad deployments
+- Catch issues before deployment
 
 ## Contract Registry
 
-- Store published contracts in central registry
-- Make contract stubs available to consumers
-- Track contract versions and compatibility
-- Document contract dependencies between services
+- Save contracts centrally
+- Share test stubs with teams
+- Track compatibility
+- Document dependencies
 
 ## Common Contract Testing Patterns
 
 ### Basic REST API Contracts
 
-- Define request/response structure
-- Include required and optional fields
-- Specify validation rules
-- Define error responses
+- Define request and response structure
+- Mark required and optional fields
+- List data validation rules
+- Document possible API errors
 
 ### Reactive Endpoints Contracts
 
-- Define streaming endpoint behavior
+- Define streaming behavior
 - Specify backpressure handling
-- Include connection management
-- Define error scenarios
+- Explain connection management
+- Document error scenarios
 
 ### Messaging Contracts
 
 - Define message structure
-- Specify routing information
-- Include message headers
-- Define acknowledgment behavior
+- Specify routing rules
+- List required headers
+- Document acknowledgment behavior
 
 ## Common Anti-patterns to Avoid
 
-1. **Provider-driven contracts**: Focus on consumer needs
-2. **Excessive contract specificity**: Allow for implementation flexibility
-3. **Missing error cases**: Include failure scenarios in contracts
-4. **Testing implementation details**: Focus on interface behavior
-5. **Stale contracts**: Keep contracts updated with API changes
+1. **Provider-driven contracts**: Write for consumer needs
+2. **Over-specification**: Don't limit provider options
+3. **Missing errors**: Document what fails
+4. **Testing internals**: Test behavior, not implementation
+5. **Stale contracts**: Keep contracts current
 
 ## Organizational Aspects
 
-- Define contract ownership and maintenance roles
-- Establish process for contract breaking changes
-- Implement contract review in API design process
-- Train teams on contract-first development
+- Assign owners to contracts
+- Create a breaking change process
+- Review contracts in design
+- Teach contracts-first approach
 
 ## Related Documentation
 

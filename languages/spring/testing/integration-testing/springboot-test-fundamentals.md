@@ -2,18 +2,17 @@
 
 ## Overview
 
-Spring Boot API testing with `@SpringBootTest` validates complete HTTP request cycles from endpoint to database. These tests exercise the full application context with real Spring infrastructure. This guide covers imperative API testing using `TestRestTemplate`.
+Use `@SpringBootTest` to test your complete API. This approach tests real HTTP requests from your endpoint to your database. This guide shows how to test imperative APIs using `TestRestTemplate`.
 
 ## When to Use @SpringBootTest
 
-Use `@SpringBootTest` when you need to:
+Use `@SpringBootTest` for these situations:
 
-- Test complete request-to-response cycles with real infrastructure
-- Verify API contracts match specifications
-- Test HTTP semantics (status codes, headers, content types)
-- Validate error handling across all layers
-- Test with real databases using Testcontainers
-- Mock only external services while keeping internal Spring context
+- Full request-to-response testing with real infrastructure
+- Verifying HTTP status codes, headers, and content types
+- Testing error handling in all layers
+- Testing with real databases using Testcontainers
+- Mocking external services while keeping your Spring context
 
 ## Basic Setup
 
@@ -52,11 +51,11 @@ class OrderApiIntegrationTest {
 ```
 
 **Key Points:**
-- `RANDOM_PORT` starts embedded server on random available port
-- `TestRestTemplate` auto-configured with correct port
-- `@Testcontainers` manages database lifecycle
-- `@MockBean` replaces external service beans
-- Real database tests actual persistence behavior
+- `RANDOM_PORT` starts a server on a random port
+- `TestRestTemplate` is set up with the correct port
+- `@Testcontainers` manages your database lifecycle
+- `@MockBean` replaces external services
+- Real databases verify actual data saving
 
 ## Testing CRUD Operations
 
@@ -96,11 +95,11 @@ void shouldCreateOrderViaApi() {
 ```
 
 **Best Practices:**
-- Verify correct status code (201 Created)
-- Check Location header points to new resource
-- Validate response body structure
-- Confirm data persisted correctly in database
-- Mock external dependencies to isolate test
+- Check for status code 201 Created
+- Verify Location header points to the new resource
+- Check the response body structure
+- Confirm data was saved in the database
+- Mock external services in tests
 
 ### Reading Resources (GET)
 
@@ -182,9 +181,9 @@ void shouldReturnValidationErrorForInvalidRequest() {
 **Validation Testing Checklist:**
 - Test missing required fields
 - Test invalid data formats
-- Test business rule violations
-- Verify error messages contain field names
-- Confirm 400 Bad Request status code
+- Test broken business rules
+- Check error messages have field names
+- Verify 400 Bad Request status code
 
 ## Testing Error Handling
 
@@ -407,196 +406,51 @@ void shouldEnforceRoleBasedAccess() {
 
 ### 1. Test Complete Request Cycles
 
-```java
-// Good: Test full HTTP cycle
-@Test
-void shouldCreateOrderEndToEnd() {
-    ResponseEntity<OrderResponse> response = restTemplate.postForEntity(
-        "/v1/orders", request, OrderResponse.class);
-    
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-    assertThat(response.getBody().getId()).isNotNull();
-    
-    // Verify persistence
-    Order savedOrder = orderRepository.findById(response.getBody().getId()).orElseThrow();
-    assertThat(savedOrder.getCustomerId()).isEqualTo(request.getCustomerId());
-}
+Test the full HTTP path from request to database save. Don't just test the controller logic.
 
-// Bad: Test only controller logic without HTTP layer
-@Test
-void shouldReturnOrder() {
-    // This belongs in controller unit tests
-}
-```
+**Good:** Test full HTTP cycle and verify data saves.
+
+**Bad:** Test only the controller without checking the database.
 
 ### 2. Mock External Dependencies
 
-```java
-// Good: Mock external services
-@MockBean
-private PaymentService paymentService;
+Mock external services like payment processors. This speeds up tests and removes dependencies.
 
-@MockBean
-private NotificationService notificationService;
+**Good:** Mock external services in tests.
 
-@Test
-void shouldCreateOrder() {
-    when(paymentService.processPayment(any())).thenReturn(PaymentResult.success("txn-123"));
-    // Test API behavior
-}
-
-// Bad: Use real external services
-@Test
-void shouldCreateOrder() {
-    // Calling real payment service makes test slow and unreliable
-}
-```
+**Bad:** Call real payment services in tests. This makes tests slow and unreliable.
 
 ### 3. Verify HTTP Semantics
 
-```java
-@Test
-void shouldFollowHttpSemantics() {
-    // POST should return 201 with Location header
-    ResponseEntity<OrderResponse> createResponse = restTemplate.postForEntity(
-        "/v1/orders", request, OrderResponse.class);
-    
-    assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-    assertThat(createResponse.getHeaders().getLocation()).isNotNull();
-    
-    // GET should return 200
-    ResponseEntity<OrderResponse> getResponse = restTemplate.getForEntity(
-        createResponse.getHeaders().getLocation(), OrderResponse.class);
-    
-    assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-    
-    // PUT should return 200 or 204
-    ResponseEntity<OrderResponse> updateResponse = restTemplate.exchange(
-        createResponse.getHeaders().getLocation(), HttpMethod.PUT, 
-        new HttpEntity<>(updateRequest), OrderResponse.class);
-    
-    assertThat(updateResponse.getStatusCode())
-        .isIn(HttpStatus.OK, HttpStatus.NO_CONTENT);
-}
-```
+Check status codes and headers, not just response bodies.
+
+- POST should return 201 with a Location header
+- GET should return 200
+- PUT should return 200 or 204
 
 ### 4. Use Test Data Builders
 
-```java
-private CreateOrderRequest createValidOrderRequest() {
-    return CreateOrderRequest.builder()
-        .customerId(UUID.randomUUID())
-        .items(List.of(CreateOrderItemRequest.builder()
-            .productId(UUID.randomUUID())
-            .quantity(2)
-            .build()))
-        .build();
-}
-
-private Order createTestOrder() {
-    return Order.builder()
-        .customerId(UUID.randomUUID())
-        .status(OrderStatus.CREATED)
-        .totalAmount(BigDecimal.valueOf(100.00))
-        .createdDate(OffsetDateTime.now())
-        .items(List.of())
-        .build();
-}
-
-private Order createTestOrder(UUID customerId) {
-    return Order.builder()
-        .customerId(customerId)
-        .status(OrderStatus.CREATED)
-        .totalAmount(BigDecimal.valueOf(100.00))
-        .createdDate(OffsetDateTime.now())
-        .items(List.of())
-        .build();
-}
-```
+Create helper methods to build test data. This makes tests easier to read.
 
 ## Common Pitfalls
 
 ### Pitfall 1: Not Verifying Persistence
 
-```java
-// Bad: Only check response
-@Test
-void shouldCreateOrder() {
-    ResponseEntity<OrderResponse> response = restTemplate.postForEntity(
-        "/v1/orders", request, OrderResponse.class);
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-}
+**Bad:** Only check the HTTP response.
 
-// Good: Verify data was persisted
-@Test
-void shouldCreateOrder() {
-    ResponseEntity<OrderResponse> response = restTemplate.postForEntity(
-        "/v1/orders", request, OrderResponse.class);
-    
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-    
-    Order saved = orderRepository.findById(response.getBody().getId()).orElseThrow();
-    assertThat(saved.getCustomerId()).isEqualTo(request.getCustomerId());
-}
-```
+**Good:** Also check that data was saved in the database. Use your repository to query the saved data.
 
 ### Pitfall 2: Ignoring HTTP Headers
 
-```java
-// Bad: Only check body
-@Test
-void shouldCreateOrder() {
-    ResponseEntity<OrderResponse> response = restTemplate.postForEntity(
-        "/v1/orders", request, OrderResponse.class);
-    assertThat(response.getBody()).isNotNull();
-}
+**Bad:** Only check the response body.
 
-// Good: Verify status, headers, and body
-@Test
-void shouldCreateOrder() {
-    ResponseEntity<OrderResponse> response = restTemplate.postForEntity(
-        "/v1/orders", request, OrderResponse.class);
-    
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-    assertThat(response.getHeaders().getLocation()).isNotNull();
-    assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-    assertThat(response.getBody()).isNotNull();
-}
-```
+**Good:** Also verify status codes, headers, and content types. Headers carry important information.
 
 ### Pitfall 3: Testing Too Much in One Test
 
-```java
-// Bad: Testing multiple scenarios in one test
-@Test
-void shouldHandleOrders() {
-    // Creates order
-    // Gets order
-    // Updates order
-    // Deletes order
-    // Tests validation
-    // Tests errors
-}
+**Bad:** Test multiple scenarios in one test. For example, create, read, update, and delete all in one test.
 
-// Good: Separate focused tests
-@Test
-void shouldCreateOrder() { }
-
-@Test
-void shouldGetOrder() { }
-
-@Test
-void shouldUpdateOrder() { }
-
-@Test
-void shouldDeleteOrder() { }
-
-@Test
-void shouldValidateOrderRequest() { }
-
-@Test
-void shouldHandleNotFoundError() { }
-```
+**Good:** Write separate focused tests for each scenario. This makes it easier to find failures.
 
 ## Related Documentation
 

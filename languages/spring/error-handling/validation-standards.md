@@ -4,13 +4,13 @@
 
 ## Overview
 
-This document outlines validation standards and patterns for Spring Boot applications, covering both Bean Validation (JSR-380) and custom validation approaches for both imperative and reactive applications.
+This document covers validation in Spring Boot. It shows how to use built-in validation tools. It also covers custom validation for specific business rules. Examples include both synchronous (imperative) and asynchronous (reactive) applications.
 
-## Bean Validation (JSR-380)
+## Bean Validation
 
 ### Basic Validation Annotations
 
-Use standard JSR-380 annotations for common validation scenarios:
+Spring includes built-in validation annotations for common checks. These annotations handle most validation needs without custom code:
 
 ```java
 @Data
@@ -62,23 +62,23 @@ public class CreateOrderRequest {
 
 ### Common Validation Annotations
 
-| Annotation | Purpose | Example |
-|------------|---------|---------|
-| `@NotNull` | Field cannot be null | `@NotNull private UUID id;` |
-| `@NotEmpty` | Collection/String cannot be null or empty | `@NotEmpty private List<String> items;` |
-| `@NotBlank` | String cannot be null, empty, or whitespace | `@NotBlank private String name;` |
-| `@Size` | String/Collection size constraints | `@Size(min = 1, max = 50) private String name;` |
-| `@Min`/`@Max` | Numeric value constraints | `@Min(1) @Max(100) private Integer quantity;` |
-| `@DecimalMin`/`@DecimalMax` | Decimal value constraints | `@DecimalMin("0.01") private BigDecimal price;` |
-| `@Pattern` | Regex pattern matching | `@Pattern(regexp = "^[A-Z]{2}$") private String country;` |
-| `@Email` | Email format validation | `@Email private String email;` |
-| `@Valid` | Nested object validation | `@Valid private AddressRequest address;` |
+| Annotation | What It Checks |
+|------------|--------|
+| `@NotNull` | Field is required |
+| `@NotEmpty` | Collection or string is required |
+| `@NotBlank` | String is required and not spaces |
+| `@Size` | String or list size limits |
+| `@Min`/`@Max` | Number range limits |
+| `@DecimalMin`/`@DecimalMax` | Decimal number range limits |
+| `@Pattern` | Text pattern matching |
+| `@Email` | Email format |
+| `@Valid` | Check nested objects |
 
 ## Custom Validators
 
 ### Creating Custom Validation Annotations
 
-For complex validation logic, implement custom validators:
+Built-in annotations work for simple checks. For complex business logic, create custom validators. Custom validators let you write code that checks business rules:
 
 ```java
 package com.example.validation;
@@ -122,7 +122,7 @@ public class OrderDateValidator implements ConstraintValidator<ValidOrderDate, L
 
 ### Cross-Field Validation
 
-Create validators that operate on multiple fields:
+Some validations need to check multiple fields together. For example, an end date must be after a start date. Create validators that compare related fields:
 
 ```java
 package com.example.validation;
@@ -193,7 +193,7 @@ public class DateRangeValidator implements ConstraintValidator<ValidDateRange, O
 
 ### Business Rule Validation
 
-For complex business rule validation, implement service-level validation:
+Some checks need to access the database or external systems. You cannot do this with simple annotations. Instead, implement these checks in your service layer. This keeps validation logic near your business logic:
 
 ```java
 @Service
@@ -260,7 +260,7 @@ public class OrderValidator {
 
 ### Reactive Service-Level Validation
 
-For reactive applications, use reactive validation patterns:
+Reactive applications work differently. They do not block while waiting for database calls. Use async validation patterns with Mono and Flux instead of direct method calls:
 
 ```java
 @Service
@@ -352,7 +352,7 @@ public class ReactiveOrderValidator {
 
 ### Defining Validation Groups
 
-Use validation groups to apply different validation rules in different contexts:
+Different operations need different rules. For example, when you create an order, the ID must be empty. When you update an order, the ID must exist. Use validation groups to handle these different rules:
 
 ```java
 public interface CreateValidation {}
@@ -399,263 +399,55 @@ public class OrderController {
 
 ### Global Validation Configuration
 
-Configure validation behavior globally:
-
-```java
-@Configuration
-public class ValidationConfig {
-    
-    @Bean
-    public LocalValidatorFactoryBean validator() {
-        LocalValidatorFactoryBean factory = new LocalValidatorFactoryBean();
-        factory.setValidationMessageSource(messageSource());
-        return factory;
-    }
-    
-    @Bean
-    public MessageSource messageSource() {
-        ReloadableResourceBundleMessageSource messageSource = 
-            new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:validation-messages");
-        messageSource.setDefaultEncoding("UTF-8");
-        return messageSource;
-    }
-    
-    @Bean
-    public MethodValidationPostProcessor methodValidationPostProcessor() {
-        MethodValidationPostProcessor processor = new MethodValidationPostProcessor();
-        processor.setValidator(validator());
-        return processor;
-    }
-}
-```
+Configure how validation works across your entire application. Set up message sources and factories in one location. This keeps your validation consistent. See [Configuration Principles](../configuration/configuration-principles.md) for detailed examples.
 
 ### Custom Validation Messages
 
-Create custom validation messages in `validation-messages.properties`:
-
-```properties
-# Custom validation messages
-customer.id.required=Customer ID is required and must be a valid UUID
-order.items.required=Order must contain at least one item
-order.amount.minimum=Order total must be at least {value}
-product.stock.insufficient=Insufficient stock for product {productName}. Available: {available}, Requested: {requested}
-```
+Create custom messages in `validation-messages.properties`. These messages show to users when validation fails. Always use clear language that users can understand and act on.
 
 ## Method-Level Validation
 
 ### Validating Method Parameters
 
-```java
-@Service
-@Validated
-public class OrderService {
-    
-    public OrderDto createOrder(@Valid OrderCreationDto orderDto) {
-        // Service logic
-    }
-    
-    public OrderDto getOrder(@NotNull UUID orderId) {
-        // Service logic
-    }
-    
-    public List<OrderDto> getOrdersByCustomer(
-            @NotNull UUID customerId,
-            @Min(0) int page,
-            @Min(1) @Max(100) int size) {
-        // Service logic
-    }
-}
-```
+You can validate method parameters in your service classes. This works without HTTP requests. Add `@Validated` to the class and use annotations on the method parameters.
 
 ### Validating Return Values
 
-```java
-@Service
-@Validated
-public class OrderService {
-    
-    @NotNull
-    public OrderDto createOrder(@Valid OrderCreationDto orderDto) {
-        // Service logic
-    }
-    
-    @NotEmpty
-    public List<OrderDto> getActiveOrders() {
-        // Service logic
-    }
-}
-```
+You can also validate what a method returns to callers. This ensures the method never returns invalid data. Add validation annotations to the return type.
 
 ## Testing Validation
 
 ### Unit Testing Custom Validators
 
-```java
-@ExtendWith(MockitoExtension.class)
-public class OrderDateValidatorTest {
-    
-    private OrderDateValidator validator;
-    
-    @Mock
-    private ConstraintValidatorContext context;
-    
-    @BeforeEach
-    void setUp() {
-        validator = new OrderDateValidator();
-    }
-    
-    @Test
-    void shouldReturnTrue_WhenDateIsInFuture() {
-        // Given
-        LocalDate futureDate = LocalDate.now().plusDays(1);
-        
-        // When
-        boolean result = validator.isValid(futureDate, context);
-        
-        // Then
-        assertThat(result).isTrue();
-    }
-    
-    @Test
-    void shouldReturnFalse_WhenDateIsInPast() {
-        // Given
-        LocalDate pastDate = LocalDate.now().minusDays(1);
-        
-        // When
-        boolean result = validator.isValid(pastDate, context);
-        
-        // Then
-        assertThat(result).isFalse();
-    }
-    
-    @Test
-    void shouldReturnTrue_WhenDateIsNull() {
-        // Given
-        LocalDate nullDate = null;
-        
-        // When
-        boolean result = validator.isValid(nullDate, context);
-        
-        // Then
-        assertThat(result).isTrue();
-    }
-}
-```
+Test custom validators in isolation. Write tests that check they accept valid data and reject invalid data. This ensures your business logic works correctly.
 
 ### Integration Testing Validation
 
-```java
-@WebMvcTest(OrderController.class)
-public class OrderControllerValidationTest {
-    
-    @Autowired
-    private MockMvc mockMvc;
-    
-    @MockBean
-    private OrderService orderService;
-    
-    @Test
-    void shouldReturnBadRequest_WhenRequiredFieldsAreMissing() throws Exception {
-        // Given
-        CreateOrderRequest request = new CreateOrderRequest();
-        // Missing required fields
-        
-        // When & Then
-        mockMvc.perform(post("/v1/orders")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(request)))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.type").value("https://api.example.com/problems/validation-error"))
-            .andExpect(jsonPath("$.errors").isArray())
-            .andExpect(jsonPath("$.errors[?(@.field == 'customerId')]").exists())
-            .andExpect(jsonPath("$.errors[?(@.field == 'items')]").exists());
-    }
-    
-    @Test
-    void shouldReturnBadRequest_WhenNestedValidationFails() throws Exception {
-        // Given
-        CreateOrderRequest request = new CreateOrderRequest();
-        request.setCustomerId(UUID.randomUUID());
-        
-        OrderItemRequest item = new OrderItemRequest();
-        item.setProductId(UUID.randomUUID());
-        item.setQuantity(0); // Invalid quantity
-        
-        request.setItems(List.of(item));
-        
-        // When & Then
-        mockMvc.perform(post("/v1/orders")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(request)))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.errors[?(@.field == 'items[0].quantity')]").exists());
-    }
-}
-```
+Test validation in the full HTTP request flow. Verify that the API returns errors when validation fails. Check that error messages are clear to users. See [Validation Testing](../testing/validation-testing.md) for detailed examples and code.
 
 ## Best Practices
 
-1. **Use Standard Annotations**: Prefer JSR-380 annotations for common validation scenarios
-2. **Custom Validators for Complex Logic**: Create custom validators for business-specific validation
-3. **Validation Groups**: Use validation groups to apply different rules in different contexts
-4. **Service-Level Validation**: Implement complex business rule validation at the service level
-5. **Clear Error Messages**: Provide clear, actionable validation error messages
-6. **Fail Fast**: Validate input as early as possible in the request processing pipeline
-7. **Separate Concerns**: Keep validation logic separate from business logic
+1. **Use Built-in Annotations**: Use standard annotations for common checks. They are simple and fast.
+2. **Custom Validators for Business Logic**: Create custom validators only when built-in annotations do not work.
+3. **Use Validation Groups**: Apply different rules in different situations. Separate create and update logic.
+4. **Service-Level for Database Checks**: Validate against the database in the service layer. This is slower than annotations.
+5. **Clear Error Messages**: Write error messages users can understand and act on. Avoid technical jargon.
+6. **Validate Early**: Catch errors as soon as the request arrives. This stops bad data early.
+7. **Keep Separation**: Keep validation separate from business logic. This makes code easier to test.
 
 ## Common Validation Patterns
 
 ### Pattern: Conditional Validation
 
-```java
-@Data
-public class ConditionalValidationExample {
-    
-    private OrderType type;
-    
-    @NotNull(groups = ExpressOrderValidation.class)
-    private LocalDateTime deliveryTime;
-    
-    @NotNull(groups = StandardOrderValidation.class)
-    private String deliveryInstructions;
-}
-```
+Use validation groups when different fields are required in different situations. This lets you reuse the same class for multiple operations.
 
 ### Pattern: Collection Validation
 
-```java
-@Data
-public class CollectionValidationExample {
-    
-    @NotEmpty(message = "Items cannot be empty")
-    @Size(max = 50, message = "Cannot exceed 50 items")
-    @Valid
-    private List<OrderItemRequest> items;
-    
-    @NotEmpty(message = "Tags cannot be empty")
-    @Size(max = 10, message = "Cannot exceed 10 tags")
-    private Set<@NotBlank @Size(max = 50) String> tags;
-}
-```
+Use `@NotEmpty` for lists to require at least one item. Use `@Size` to limit the maximum number of items in a collection.
 
 ### Pattern: Dependent Field Validation
 
-```java
-@ValidPaymentInfo
-@Data
-public class PaymentRequest {
-    
-    @NotNull
-    private PaymentType paymentType;
-    
-    // Only required for CREDIT_CARD payment type
-    private String cardNumber;
-    
-    // Only required for BANK_TRANSFER payment type
-    private String bankAccount;
-}
-```
+When one field depends on another field's value, use custom validators. For example, payment type determines which payment fields are required. A credit card type needs a card number. A bank transfer type needs an account number.
 
 ## Related Documentation
 

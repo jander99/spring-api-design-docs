@@ -2,15 +2,20 @@
 
 ## Overview
 
-Effective logging and monitoring are crucial for maintaining operational visibility and troubleshooting issues in production. This document outlines our standards for implementing logging, metrics collection, and monitoring in both imperative and reactive Spring Boot microservices.
+Good logging and monitoring help you see what's happening in production. They let you find problems and fix them quickly.
+
+This guide covers three areas:
+- Logging: Recording what your application does
+- Metrics: Measuring performance and business activities
+- Health checks: Watching your service and its dependencies
 
 ## Logging Principles
 
-1. **Structured Logging**: Use structured logging format (JSON) for better analysis
-2. **Appropriate Log Levels**: Apply correct log levels for different types of information
-3. **Context Enrichment**: Include contextual information in logs
-4. **Correlation IDs**: Implement request tracing through correlation IDs
-5. **Security Awareness**: Avoid logging sensitive information
+1. **Structured Logging**: Use JSON format. This makes logs easier to search and analyze.
+2. **Correct Log Levels**: Use ERROR for failures, WARNING for problems that don't stop the app, INFO for important events, and DEBUG for detailed information.
+3. **Add Context**: Include user IDs, order numbers, and request IDs in your logs.
+4. **Trace Requests**: Add unique IDs to track requests across services.
+5. **Protect Secrets**: Never log passwords, tokens, or personal data.
 
 ## Logging Configuration
 
@@ -80,9 +85,11 @@ logging:
 
 ## Correlation ID Management
 
+A correlation ID is a unique string that tracks a request through your system. It helps you connect log entries from different services.
+
 ### Imperative (Servlet) Applications
 
-Implement correlation ID filter:
+Create a filter to add correlation IDs:
 
 ```java
 @Component
@@ -121,7 +128,7 @@ public class CorrelationIdFilter implements Filter {
 
 ### Reactive (WebFlux) Applications
 
-Implement correlation ID filter for WebFlux:
+For non-blocking applications, create a reactive filter:
 
 ```java
 @Component
@@ -154,7 +161,7 @@ public class ReactiveCorrelationIdFilter implements WebFilter {
 
 ### MDC Context for Reactive Applications
 
-Since MDC doesn't work naturally with reactive applications, implement a custom solution:
+MDC (Mapped Diagnostic Context) is a tool for adding context to logs. Reactive apps need special handling. Here's a helper class:
 
 ```java
 import lombok.extern.slf4j.Slf4j;
@@ -217,15 +224,15 @@ public class LoggingContextUtils {
 
 ## Log Levels and Usage
 
-Define clear guidelines for log levels:
+Use these log levels to describe what's happening:
 
-| Level | Usage | Example |
-|-------|-------|---------|
-| ERROR | Application failures requiring immediate action | `log.error("Payment processing failed", exception);` |
-| WARN | Potential issues that don't prevent operation | `log.warn("Retry {} of {}", attempt, maxRetries);` |
-| INFO | Significant business events and milestones | `log.info("Order {} created for customer {}", orderId, customerId);` |
-| DEBUG | Detailed information for troubleshooting | `log.debug("Processing order items: {}", items);` |
-| TRACE | Most detailed information (rarely used) | `log.trace("Request payload: {}", requestBody);` |
+| Level | When to Use | Example |
+|-------|-----------|---------|
+| ERROR | App crashes or services fail | `Payment processing failed` |
+| WARN | Something might be wrong but the app keeps working | `Retrying payment, attempt 2 of 3` |
+| INFO | Important business events | `Order 123 created for customer 456` |
+| DEBUG | Detailed info to help you find bugs | `Processing 5 order items` |
+| TRACE | Very detailed info (rarely used) | `Request body received` |
 
 ### Example Implementation
 
@@ -343,9 +350,11 @@ public class ReactiveOrderService {
 
 ## Metrics Collection
 
+Metrics measure how your app performs. Common metrics include response time, error count, and business events like orders created.
+
 ### Micrometer Integration
 
-Configure Micrometer for metrics collection:
+Micrometer is a library for collecting metrics. Configure it:
 
 ```java
 @Configuration
@@ -375,7 +384,7 @@ public class MetricsConfig {
 
 ### Custom Metrics
 
-Implement custom metrics for business-specific monitoring:
+Create metrics for your business. For example, track how many orders were created and how much time each took:
 
 ```java
 @Service
@@ -432,7 +441,7 @@ public class OrderMetricsService {
 }
 ```
 
-### Using Metrics in Services
+### Recording Metrics in Your Code
 
 ```java
 @Service
@@ -462,9 +471,9 @@ public class OrderService {
 }
 ```
 
-### Reactive Metrics
+### Metrics in Reactive Apps
 
-For reactive applications, use reactive-friendly metrics:
+For non-blocking apps, record metrics in reactive chains:
 
 ```java
 @Service
@@ -497,9 +506,11 @@ public class ReactiveOrderMetricsService {
 
 ## Health Monitoring
 
-### Spring Boot Actuator
+Health checks tell you if your app and its dependencies are working. Spring Boot provides an `/actuator/health` endpoint that returns the app's status.
 
-Configure Spring Boot Actuator for health monitoring:
+### Configure Spring Boot Actuator
+
+Add configuration to enable health endpoints:
 
 ```yaml
 # application.yml
@@ -533,9 +544,9 @@ management:
       enabled: true
 ```
 
-### Custom Health Indicators
+### Create Custom Health Checks
 
-Implement custom health indicators for external dependencies:
+Check external services like payment gateways:
 
 ```java
 @Component
@@ -578,7 +589,7 @@ public class PaymentServiceHealthIndicator implements HealthIndicator {
 }
 ```
 
-### Reactive Health Indicator
+### Health Checks for Reactive Apps
 
 ```java
 @Component
@@ -620,9 +631,11 @@ public class ReactivePaymentServiceHealthIndicator implements ReactiveHealthIndi
 
 ## Distributed Tracing
 
-### Spring Cloud Sleuth Configuration
+Tracing follows a single request as it moves through multiple services. This helps you understand where time is spent and find bottlenecks.
 
-Configure distributed tracing with Spring Cloud Sleuth and Zipkin:
+### Configure Spring Cloud Sleuth
+
+Add Sleuth and Zipkin to track requests:
 
 ```yaml
 # application.yml
@@ -640,9 +653,9 @@ spring:
       name: ${spring.application.name}
 ```
 
-### Trace Context Propagation
+### Propagate Trace Context
 
-Ensure trace context propagation in service calls:
+Add trace information to calls to other services:
 
 ```java
 @Service
@@ -662,9 +675,9 @@ public class CustomerClient {
 }
 ```
 
-### Reactive Tracing
+### Tracing for Reactive Apps
 
-For reactive applications, configure trace context propagation:
+For non-blocking apps, add trace context:
 
 ```java
 @Service
@@ -685,7 +698,9 @@ public class ReactiveCustomerClient {
 
 ## Alerting
 
-### Prometheus Alert Rules
+Alerts tell you when something is wrong. For example, alert if more than 5% of requests are failing or if response times are too slow.
+
+### Create Alert Rules
 
 Define Prometheus alert rules:
 
@@ -724,9 +739,11 @@ groups:
 
 ## Logging and Monitoring in Kubernetes
 
-### Container Log Configuration
+Kubernetes is a platform for running containers. It has its own way of handling logs and monitoring.
 
-Configure container log handling:
+### Configure Container Logs
+
+Set up how containers write logs:
 
 ```yaml
 # deployment.yaml
@@ -767,9 +784,9 @@ spec:
         emptyDir: {}
 ```
 
-### Log Collection with Fluentd
+### Collect Logs with Fluentd
 
-Configure log collection for Kubernetes:
+Fluentd gathers logs from containers and sends them to a central location:
 
 ```yaml
 # fluentd-configmap.yaml
@@ -802,11 +819,9 @@ data:
     </match>
 ```
 
-## Operational Dashboard Templates
+## Dashboards
 
-### Grafana Dashboard JSON
-
-Provide Grafana dashboard templates:
+Grafana is a tool for visualizing metrics. Below is a dashboard template that shows request rates and response times.
 
 ```json
 {
@@ -1037,31 +1052,31 @@ Provide Grafana dashboard templates:
 }
 ```
 
-## Common Patterns and Anti-patterns
+## Best Practices and Mistakes to Avoid
 
-### Patterns to Follow
+### Do This
 
-| Pattern | Example | Description |
-|---------|---------|-------------|
-| Structured Logging | JSON format | Use structured format for better analysis |
-| Contextual Logging | Include trace IDs | Add context to logs |
-| Appropriate Log Levels | ERROR for failures | Use correct log level for different information |
-| Business Metrics | Orders created | Track business-specific metrics |
-| Health Checks | Custom indicators | Monitor dependencies |
+| Good Practice | Why |
+|--------------|-----|
+| Use JSON format for logs | Easier to search and analyze |
+| Add request IDs to logs | Track requests across services |
+| Use the right log level | Reduces noise, makes logs useful |
+| Track business events | Understand what users are doing |
+| Check external services | Know when dependencies fail |
 
-### Anti-patterns to Avoid
+### Don't Do This
 
-| Anti-pattern | Example | Preferred Approach |
-|--------------|---------|-------------------|
-| Excessive Logging | Debug in production | Use appropriate log levels |
-| Sensitive Data Logging | Passwords in logs | Sanitize sensitive information |
-| String Concatenation | "Value=" + value | Use parameterized logging |
-| Generic Metrics | Generic counters | Use specific, meaningful metrics |
-| Missing Correlation IDs | No request tracing | Implement end-to-end request tracing |
+| Mistake | Problem | Fix |
+|--------|---------|-----|
+| Log passwords or tokens | Security risk | Remove sensitive data before logging |
+| Log too much in production | Wastes storage and time | Use INFO level only, use DEBUG locally |
+| String concatenation for logs | Hard to parse | Use parameterized logging |
+| Generic counters without tags | Can't tell what happened | Add tags like customer ID or region |
+| No request tracing | Can't follow requests | Add correlation IDs |
 
 ## Examples
 
-### Comprehensive Logging Example
+### Logging in a REST Controller
 
 ```java
 @RestController
@@ -1103,7 +1118,7 @@ public class OrderController {
 }
 ```
 
-### Metrics Example
+### Recording Metrics
 
 ```java
 @Service
@@ -1133,14 +1148,14 @@ public class OrderMetricsService {
 
 ## Related Documentation
 
-### API Design Standards (Language-Agnostic)
-- [API Observability Standards](../../../guides/api-design/advanced-patterns/api-observability-standards.md) - Protocol-level observability patterns and HTTP standards
+**API Design Standards**
+- [API Observability Standards](../../../guides/api-design/advanced-patterns/api-observability-standards.md) - General observability principles
 
-### Spring Implementation  
-- [Observability Configuration](../configuration/observability-configuration.md) - Configuration patterns for metrics and tracing
-- [Error Logging and Monitoring](../error-handling/error-logging-and-monitoring.md) - Error handling observability
-- [Infrastructure Testing](../testing/specialized-testing/infrastructure-testing.md) - Testing observability components
-- [Security Context Propagation](../security/security-context-propagation.md) - Security context in traces
-- [HTTP Client Patterns](../http-clients/http-client-patterns.md) - HTTP client metrics and observability
+**Spring Implementation**
+- [Observability Configuration](../configuration/observability-configuration.md) - How to configure metrics and tracing
+- [Error Logging and Monitoring](../error-handling/error-logging-and-monitoring.md) - How to log errors
+- [Infrastructure Testing](../testing/specialized-testing/infrastructure-testing.md) - How to test observability
+- [Security Context Propagation](../security/security-context-propagation.md) - How to include security info in traces
+- [HTTP Client Patterns](../http-clients/http-client-patterns.md) - How to add metrics to HTTP calls
 
-These logging and monitoring practices ensure comprehensive operational visibility into our microservices, enabling effective troubleshooting, performance analysis, and business intelligence.
+These practices help you see what's happening in production, find problems quickly, and understand how your app performs.

@@ -2,18 +2,25 @@
 
 ## Overview
 
-Reactive API testing verifies WebFlux endpoints using `WebTestClient`. These tests validate non-blocking request handling, streaming responses, backpressure, and reactive error handling. Use this approach for Spring WebFlux applications built with Project Reactor.
+Reactive API testing verifies WebFlux endpoints using `WebTestClient`. These tests validate:
+
+- Non-blocking request handling
+- Streaming responses
+- Backpressure (flow control)
+- Reactive error handling
+
+Use this approach for Spring WebFlux applications built with Project Reactor.
 
 ## When to Use Reactive API Testing
 
-Use reactive API testing when:
+Use this approach when you need to:
 
-- Testing Spring WebFlux controllers
-- Validating streaming endpoints (Server-Sent Events, NDJSON)
-- Testing backpressure handling
-- Verifying reactive error propagation
-- Testing reactive security contexts
-- Validating non-blocking database operations with R2DBC
+- Test Spring WebFlux controllers
+- Validate streaming endpoints (Server-Sent Events or NDJSON)
+- Test backpressure handling
+- Verify errors propagate through reactive chains
+- Test reactive security contexts
+- Validate non-blocking database operations with R2DBC
 
 ## Basic Setup
 
@@ -47,14 +54,14 @@ class ReactiveOrderApiIntegrationTest {
 ```
 
 **Key Points:**
-- `WebTestClient` auto-configured for reactive testing
-- R2DBC for non-blocking database access
-- `@MockBean` works with reactive services returning `Mono`/`Flux`
-- Testcontainers manages database lifecycle
+- `WebTestClient` is configured automatically for reactive testing
+- R2DBC provides non-blocking database access
+- `@MockBean` works with reactive services (returns `Mono` or `Flux`)
+- Testcontainers handles database startup and cleanup
 
 ## Testing Basic CRUD Operations
 
-### Creating Resources (POST)
+### Creating Resources
 
 ```java
 @Test
@@ -82,12 +89,12 @@ void shouldCreateOrderReactively() {
 ```
 
 **WebTestClient Features:**
-- Fluent API for building requests
-- Chained assertions on response
-- `.value()` callback for complex assertions
-- Automatic JSON serialization/deserialization
+- Easy method chaining for building requests
+- Chain assertions directly on response
+- Use `.value()` callback for complex checks
+- Handles JSON conversion automatically
 
-### Reading Resources (GET)
+### Reading Resources
 
 ```java
 @Test
@@ -167,10 +174,10 @@ void shouldStreamOrdersAsNdjson() {
 ```
 
 **NDJSON Characteristics:**
-- Each JSON object on separate line
-- Newline-delimited streaming format
-- Efficient for large datasets
-- Client can process line-by-line
+- Each JSON object goes on its own line
+- Format: newline-delimited JSON
+- Works well for large datasets
+- Clients can process one line at a time
 
 ### Server-Sent Events (SSE)
 
@@ -194,10 +201,10 @@ void shouldStreamOrderEventsAsServerSentEvents() {
 ```
 
 **SSE Testing Patterns:**
-- `StepVerifier` validates reactive sequences
-- `.take(n)` limits stream for testing
-- `.expectNextCount()` verifies event count
-- `.verifyComplete()` confirms stream completion
+- Use `StepVerifier` to check reactive streams
+- `.take(n)` limits how many events to test
+- `.expectNextCount()` checks how many events arrived
+- `.verifyComplete()` confirms the stream ended properly
 
 ### Testing Backpressure
 
@@ -223,10 +230,10 @@ void shouldHandleBackpressureInStreaming() {
 ```
 
 **Backpressure Testing:**
-- Verify limits work correctly
-- Test subscriber control over publisher
-- Confirm no buffer overflow
-- Validate graceful handling of slow consumers
+- Check that limits work as expected
+- Test if the subscriber can control the publisher
+- Make sure the buffer doesn't overflow
+- Verify slow clients are handled properly
 
 ## Testing Reactive Error Handling
 
@@ -338,17 +345,17 @@ void shouldStreamOrdersWithStepVerifier() {
 ```
 
 **StepVerifier Advantages:**
-- Fine-grained control over stream verification
-- Time-based testing with virtual time
-- Assertion on each emitted element
-- Verify completion signals
+- Check stream behavior in detail
+- Use virtual time for time-based tests
+- Add checks for each item in the stream
+- Verify that the stream ends correctly
 
 ### Testing with Virtual Time
 
 ```java
 @Test
 void shouldHandleDelayedEvents() {
-    // Use virtual time to speed up time-based tests
+    // Virtual time speeds up tests by skipping real delays
     StepVerifier.withVirtualTime(() -> 
         webTestClient.get()
             .uri("/v1/orders/events")
@@ -368,12 +375,12 @@ void shouldHandleDelayedEvents() {
 ```java
 @Test
 void shouldTimeoutLongRunningOperations() {
-    // Given
+    // Given: Service takes 10 seconds
     when(orderService.processOrder(any()))
         .thenReturn(Mono.delay(Duration.ofSeconds(10))
             .then(Mono.just(new OrderResponse())));
 
-    // When & Then
+    // When & Then: Client times out after 2 seconds
     webTestClient
         .mutate()
         .responseTimeout(Duration.ofSeconds(2))
@@ -437,7 +444,7 @@ void shouldPropagateSecurityContextInReactiveChain() {
         .expectStatus().isCreated()
         .expectBody(OrderResponse.class)
         .value(response -> {
-            // Verify user context was propagated through reactive chain
+            // Check that user info flows through the entire reactive chain
             assertThat(response.getCreatedBy()).isEqualTo("user123");
         });
 }
@@ -447,8 +454,9 @@ void shouldPropagateSecurityContextInReactiveChain() {
 
 ### 1. Use StepVerifier for Stream Testing
 
+**Good**: Use StepVerifier to check each item in the stream.
+
 ```java
-// Good: Use StepVerifier for detailed stream verification
 @Test
 void shouldStreamOrders() {
     Flux<OrderResponse> stream = webTestClient.get()
@@ -462,8 +470,11 @@ void shouldStreamOrders() {
         .expectNextCount(9)
         .verifyComplete();
 }
+```
 
-// Bad: Block on reactive streams in tests
+**Bad**: Don't block on reactive streams.
+
+```java
 @Test
 void shouldStreamOrders() {
     List<OrderResponse> orders = webTestClient.get()
@@ -472,14 +483,15 @@ void shouldStreamOrders() {
         .returnResult(OrderResponse.class)
         .getResponseBody()
         .collectList()
-        .block(); // Blocks - defeats purpose of reactive testing
+        .block(); // Blocks - defeats reactive testing
 }
 ```
 
 ### 2. Test Error Propagation
 
+**Good**: Verify errors move through the entire chain.
+
 ```java
-// Good: Verify errors propagate correctly through reactive chain
 @Test
 void shouldPropagateErrors() {
     when(paymentService.processPayment(any()))
@@ -491,38 +503,46 @@ void shouldPropagateErrors() {
         .exchange()
         .expectStatus().isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
 }
+```
 
-// Bad: Not testing error scenarios
+**Bad**: Don't skip error cases.
+
+```java
 @Test
 void shouldCreateOrder() {
-    // Only tests happy path
+    // Only tests the happy path - missing error checks
 }
 ```
 
 ### 3. Test Backpressure and Limits
 
+**Good**: Test that limits work as expected.
+
 ```java
-// Good: Test backpressure handling
 @Test
 void shouldRespectBackpressure() {
     webTestClient.get()
         .uri("/v1/orders/stream?limit=10")
         .exchange()
         .expectBodyList(OrderResponse.class)
-        .hasSize(10); // Verify limit applied
+        .hasSize(10); // Check that limit was applied
 }
+```
 
-// Bad: Assume unlimited streaming works
+**Bad**: Don't assume unlimited streaming works.
+
+```java
 @Test
 void shouldStreamOrders() {
-    // No verification of limits or backpressure
+    // No checks for limits or backpressure handling
 }
 ```
 
 ### 4. Use Virtual Time for Time-Based Tests
 
+**Good**: Use virtual time to run tests instantly.
+
 ```java
-// Good: Use virtual time to speed up tests
 @Test
 void shouldHandlePeriodicEvents() {
     StepVerifier.withVirtualTime(() -> orderEventPublisher.publishPeriodic())
@@ -530,11 +550,14 @@ void shouldHandlePeriodicEvents() {
         .expectNextCount(60)
         .verifyComplete();
 }
+```
 
-// Bad: Real delays make tests slow
+**Bad**: Don't use real delays in tests.
+
+```java
 @Test
 void shouldHandlePeriodicEvents() {
-    Thread.sleep(60000); // Blocks for 1 minute
+    Thread.sleep(60000); // Wastes 1 minute of test time
 }
 ```
 
@@ -542,8 +565,9 @@ void shouldHandlePeriodicEvents() {
 
 ### Pitfall 1: Blocking in Reactive Tests
 
+**Bad**: Blocking the reactive stream defeats the purpose of the test.
+
 ```java
-// Bad: Blocking defeats reactive testing
 @Test
 void shouldCreateOrder() {
     OrderResponse order = webTestClient.post()
@@ -552,10 +576,13 @@ void shouldCreateOrder() {
         .exchange()
         .returnResult(OrderResponse.class)
         .getResponseBody()
-        .blockFirst(); // Don't block!
+        .blockFirst(); // Don't do this!
 }
+```
 
-// Good: Use WebTestClient assertions
+**Good**: Use WebTestClient assertions instead.
+
+```java
 @Test
 void shouldCreateOrder() {
     webTestClient.post()
@@ -570,16 +597,20 @@ void shouldCreateOrder() {
 
 ### Pitfall 2: Not Testing Stream Completion
 
+**Bad**: Don't forget to check that the stream ends.
+
 ```java
-// Bad: Not verifying stream completes
 @Test
 void shouldStreamOrders() {
     StepVerifier.create(orderStream)
         .expectNextCount(10);
     // Missing .verifyComplete() or .verifyError()
 }
+```
 
-// Good: Always verify completion
+**Good**: Always verify the stream completes.
+
+```java
 @Test
 void shouldStreamOrders() {
     StepVerifier.create(orderStream)
@@ -590,14 +621,18 @@ void shouldStreamOrders() {
 
 ### Pitfall 3: Ignoring Security Context in Reactive Chains
 
+**Bad**: Don't skip testing that user info flows through.
+
 ```java
-// Bad: Not testing security context propagation
 @Test
 void shouldCreateOrder() {
-    // Creates order but doesn't verify user context propagated
+    // Creates order but doesn't check user context flows through
 }
+```
 
-// Good: Verify security context flows through chain
+**Good**: Verify user info flows through the entire chain.
+
+```java
 @Test
 void shouldPropagateSecurityContext() {
     webTestClient.post()
@@ -613,6 +648,8 @@ void shouldPropagateSecurityContext() {
 ```
 
 ## Test Data Helpers
+
+Helper methods simplify test setup:
 
 ```java
 private CreateOrderRequest createValidOrderRequest() {
@@ -636,10 +673,12 @@ private Order createTestOrder() {
 }
 ```
 
+These methods create realistic test data for your tests.
+
 ## Related Documentation
 
-- [Integration Testing Fundamentals](integration-testing-fundamentals.md) - Core integration testing principles
-- [Spring Boot Test Fundamentals](springboot-test-fundamentals.md) - Imperative API testing with TestRestTemplate
-- [Advanced API Testing](advanced-api-testing.md) - CORS, rate limiting, content negotiation
-- [Reactive Controllers](../../controllers/reactive-controllers.md) - Building WebFlux controllers
-- [Reactive Error Handling](../../error-handling/reactive-error-handling.md) - Error handling in reactive applications
+- [Integration Testing Fundamentals](integration-testing-fundamentals.md) — Core testing principles
+- [Spring Boot Test Fundamentals](springboot-test-fundamentals.md) — Traditional imperative API testing
+- [Advanced API Testing](advanced-api-testing.md) — CORS, rate limiting, content type testing
+- [Reactive Controllers](../../controllers/reactive-controllers.md) — How to build WebFlux controllers
+- [Reactive Error Handling](../../error-handling/reactive-error-handling.md) — Handling errors in reactive code

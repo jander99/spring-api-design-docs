@@ -2,21 +2,21 @@
 
 ## Overview
 
-Database integration testing verifies that repository implementations work correctly with real database systems. These tests focus on data persistence, complex queries, transaction behavior, and database constraints.
+Database integration testing checks that repositories work with real databases. Tests verify data storage, queries, transactions, and rules.
 
 ## Core Principles
 
-1. **Test Real Database Interactions**: Use actual database connections, not mocked repositories
-2. **Verify Complex Queries**: Test custom queries, joins, and database-specific features
-3. **Test Transaction Boundaries**: Verify commit/rollback behavior and isolation levels
-4. **Validate Constraints**: Test database constraints, foreign keys, and data integrity
-5. **Use Test Containers**: Provide realistic database environments for tests
+1. **Test Real Databases**: Use real databases, not fake ones
+2. **Test Custom Queries**: Check searches, joins, and special database features
+3. **Test Transactions**: Check that saves and rollbacks work
+4. **Check Database Rules**: Test rules, keys, and data correctness
+5. **Use Test Containers**: Run real databases in your tests
 
 ## JPA Repository Integration Testing
 
-Use `@DataJpaTest` for focused repository testing with embedded or containerized databases.
+Use `@DataJpaTest` for repository testing with real databases.
 
-### Basic Repository Testing
+### Simple Repository Tests
 
 ```java
 @DataJpaTest
@@ -44,39 +44,33 @@ class OrderRepositoryIntegrationTest {
 
     @Test
     void shouldSaveAndRetrieveOrder() {
-        // Given
         Order order = createTestOrder();
 
-        // When
         Order savedOrder = orderRepository.save(order);
         entityManager.flush();
         entityManager.clear();
 
-        // Then
-        Optional<Order> retrievedOrder = orderRepository.findById(savedOrder.getId());
-        assertThat(retrievedOrder).isPresent();
-        assertThat(retrievedOrder.get().getCustomerId()).isEqualTo(order.getCustomerId());
-        assertThat(retrievedOrder.get().getStatus()).isEqualTo(order.getStatus());
-        assertThat(retrievedOrder.get().getTotalAmount()).isEqualByComparingTo(order.getTotalAmount());
+        Optional<Order> retrieved = orderRepository.findById(savedOrder.getId());
+        assertThat(retrieved).isPresent();
+        assertThat(retrieved.get().getCustomerId()).isEqualTo(order.getCustomerId());
+        assertThat(retrieved.get().getStatus()).isEqualTo(order.getStatus());
+        assertThat(retrieved.get().getTotalAmount()).isEqualByComparingTo(order.getTotalAmount());
     }
 
     @Test
     void shouldFindOrdersByCustomerId() {
-        // Given
         UUID customerId = UUID.randomUUID();
         Order order1 = createTestOrder(customerId, OrderStatus.CREATED);
         Order order2 = createTestOrder(customerId, OrderStatus.CONFIRMED);
-        Order order3 = createTestOrder(UUID.randomUUID(), OrderStatus.CREATED); // Different customer
+        Order order3 = createTestOrder(UUID.randomUUID(), OrderStatus.CREATED);
 
         entityManager.persistAndFlush(order1);
         entityManager.persistAndFlush(order2);
         entityManager.persistAndFlush(order3);
         entityManager.clear();
 
-        // When
         List<Order> orders = orderRepository.findByCustomerId(customerId);
 
-        // Then
         assertThat(orders).hasSize(2);
         assertThat(orders).extracting(Order::getCustomerId)
             .containsOnly(customerId);
@@ -86,7 +80,6 @@ class OrderRepositoryIntegrationTest {
 
     @Test
     void shouldFindOrdersByStatusAndDateRange() {
-        // Given
         OffsetDateTime startDate = OffsetDateTime.now().minusDays(7);
         OffsetDateTime endDate = OffsetDateTime.now();
         
@@ -94,21 +87,19 @@ class OrderRepositoryIntegrationTest {
         order1.setCreatedDate(startDate.plusDays(1));
         
         Order order2 = createTestOrder(UUID.randomUUID(), OrderStatus.CONFIRMED);
-        order2.setCreatedDate(startDate.minusDays(1)); // Outside range
+        order2.setCreatedDate(startDate.minusDays(1));
         
         Order order3 = createTestOrder(UUID.randomUUID(), OrderStatus.CREATED);
-        order3.setCreatedDate(startDate.plusDays(2)); // Different status
+        order3.setCreatedDate(startDate.plusDays(2));
         
         entityManager.persistAndFlush(order1);
         entityManager.persistAndFlush(order2);
         entityManager.persistAndFlush(order3);
         entityManager.clear();
 
-        // When
         Page<Order> result = orderRepository.findByStatusAndCreatedDateBetween(
             OrderStatus.CONFIRMED, startDate, endDate, PageRequest.of(0, 10));
 
-        // Then
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getId()).isEqualTo(order1.getId());
         assertThat(result.getTotalElements()).isEqualTo(1);
@@ -130,7 +121,7 @@ class OrderRepositoryIntegrationTest {
 }
 ```
 
-### Testing Custom Queries
+### Custom Query Tests
 
 ```java
 @DataJpaTest
@@ -155,19 +146,16 @@ class OrderCustomQueryTest {
 
     @Test
     void shouldFindOrdersWithTotalAmountGreaterThan() {
-        // Given
-        Order lowValueOrder = createTestOrderWithAmount(BigDecimal.valueOf(50.00));
-        Order highValueOrder1 = createTestOrderWithAmount(BigDecimal.valueOf(150.00));
-        Order highValueOrder2 = createTestOrderWithAmount(BigDecimal.valueOf(200.00));
+        Order lowOrder = createTestOrderWithAmount(BigDecimal.valueOf(50.00));
+        Order highOrder1 = createTestOrderWithAmount(BigDecimal.valueOf(150.00));
+        Order highOrder2 = createTestOrderWithAmount(BigDecimal.valueOf(200.00));
 
-        entityManager.persistAndFlush(lowValueOrder);
-        entityManager.persistAndFlush(highValueOrder1);
-        entityManager.persistAndFlush(highValueOrder2);
+        entityManager.persistAndFlush(lowOrder);
+        entityManager.persistAndFlush(highOrder1);
+        entityManager.persistAndFlush(highOrder2);
 
-        // When
         List<Order> result = orderRepository.findOrdersWithTotalAmountGreaterThan(BigDecimal.valueOf(100.00));
 
-        // Then
         assertThat(result).hasSize(2);
         assertThat(result).extracting(Order::getTotalAmount)
             .allMatch(amount -> amount.compareTo(BigDecimal.valueOf(100.00)) > 0);
@@ -175,21 +163,18 @@ class OrderCustomQueryTest {
 
     @Test
     void shouldFindOrderStatistics() {
-        // Given
         UUID customerId = UUID.randomUUID();
         
-        Order order1 = createTestOrder(customerId, OrderStatus.CONFIRMED, BigDecimal.valueOf(100.00));
-        Order order2 = createTestOrder(customerId, OrderStatus.CONFIRMED, BigDecimal.valueOf(150.00));
-        Order order3 = createTestOrder(customerId, OrderStatus.CANCELLED, BigDecimal.valueOf(75.00));
+        Order o1 = createTestOrder(customerId, OrderStatus.CONFIRMED, BigDecimal.valueOf(100.00));
+        Order o2 = createTestOrder(customerId, OrderStatus.CONFIRMED, BigDecimal.valueOf(150.00));
+        Order o3 = createTestOrder(customerId, OrderStatus.CANCELLED, BigDecimal.valueOf(75.00));
 
-        entityManager.persistAndFlush(order1);
-        entityManager.persistAndFlush(order2);
-        entityManager.persistAndFlush(order3);
+        entityManager.persistAndFlush(o1);
+        entityManager.persistAndFlush(o2);
+        entityManager.persistAndFlush(o3);
 
-        // When
         OrderStatistics stats = orderRepository.findOrderStatisticsByCustomer(customerId);
 
-        // Then
         assertThat(stats.getTotalOrders()).isEqualTo(3);
         assertThat(stats.getConfirmedOrders()).isEqualTo(2);
         assertThat(stats.getTotalAmount()).isEqualByComparingTo(BigDecimal.valueOf(325.00));
@@ -198,30 +183,22 @@ class OrderCustomQueryTest {
 
     @Test
     void shouldFindTopCustomersByOrderValue() {
-        // Given
-        UUID customer1 = UUID.randomUUID();
-        UUID customer2 = UUID.randomUUID();
-        UUID customer3 = UUID.randomUUID();
+        UUID c1 = UUID.randomUUID();
+        UUID c2 = UUID.randomUUID();
+        UUID c3 = UUID.randomUUID();
 
-        // Customer 1: Total 300.00
-        entityManager.persistAndFlush(createTestOrder(customer1, OrderStatus.CONFIRMED, BigDecimal.valueOf(150.00)));
-        entityManager.persistAndFlush(createTestOrder(customer1, OrderStatus.CONFIRMED, BigDecimal.valueOf(150.00)));
+        entityManager.persistAndFlush(createTestOrder(c1, OrderStatus.CONFIRMED, BigDecimal.valueOf(150.00)));
+        entityManager.persistAndFlush(createTestOrder(c1, OrderStatus.CONFIRMED, BigDecimal.valueOf(150.00)));
+        entityManager.persistAndFlush(createTestOrder(c2, OrderStatus.CONFIRMED, BigDecimal.valueOf(500.00)));
+        entityManager.persistAndFlush(createTestOrder(c3, OrderStatus.CONFIRMED, BigDecimal.valueOf(100.00)));
 
-        // Customer 2: Total 500.00
-        entityManager.persistAndFlush(createTestOrder(customer2, OrderStatus.CONFIRMED, BigDecimal.valueOf(500.00)));
+        List<CustomerOrderSummary> top = orderRepository.findTopCustomersByOrderValue(PageRequest.of(0, 2));
 
-        // Customer 3: Total 100.00
-        entityManager.persistAndFlush(createTestOrder(customer3, OrderStatus.CONFIRMED, BigDecimal.valueOf(100.00)));
-
-        // When
-        List<CustomerOrderSummary> topCustomers = orderRepository.findTopCustomersByOrderValue(PageRequest.of(0, 2));
-
-        // Then
-        assertThat(topCustomers).hasSize(2);
-        assertThat(topCustomers.get(0).getCustomerId()).isEqualTo(customer2);
-        assertThat(topCustomers.get(0).getTotalValue()).isEqualByComparingTo(BigDecimal.valueOf(500.00));
-        assertThat(topCustomers.get(1).getCustomerId()).isEqualTo(customer1);
-        assertThat(topCustomers.get(1).getTotalValue()).isEqualByComparingTo(BigDecimal.valueOf(300.00));
+        assertThat(top).hasSize(2);
+        assertThat(top.get(0).getCustomerId()).isEqualTo(c2);
+        assertThat(top.get(0).getTotalValue()).isEqualByComparingTo(BigDecimal.valueOf(500.00));
+        assertThat(top.get(1).getCustomerId()).isEqualTo(c1);
+        assertThat(top.get(1).getTotalValue()).isEqualByComparingTo(BigDecimal.valueOf(300.00));
     }
 
     private Order createTestOrderWithAmount(BigDecimal amount) {
@@ -240,7 +217,7 @@ class OrderCustomQueryTest {
 }
 ```
 
-### Testing Database Constraints
+### Constraint Tests
 
 ```java
 @DataJpaTest
@@ -265,31 +242,26 @@ class OrderConstraintTest {
 
     @Test
     void shouldEnforceUniqueConstraints() {
-        // Given
-        String orderNumber = "ORD-12345";
-        Order order1 = createTestOrderWithNumber(orderNumber);
-        Order order2 = createTestOrderWithNumber(orderNumber); // Duplicate order number
+        String number = "ORD-12345";
+        Order o1 = createTestOrderWithNumber(number);
+        Order o2 = createTestOrderWithNumber(number);
 
-        // When
-        orderRepository.save(order1);
+        orderRepository.save(o1);
         
-        // Then
         assertThrows(DataIntegrityViolationException.class, () -> {
-            orderRepository.save(order2);
+            orderRepository.save(o2);
             entityManager.flush();
         });
     }
 
     @Test
     void shouldEnforceNotNullConstraints() {
-        // Given
         Order order = Order.builder()
-            .customerId(null) // Should violate NOT NULL constraint
+            .customerId(null)
             .status(OrderStatus.CREATED)
             .totalAmount(BigDecimal.valueOf(100.00))
             .build();
 
-        // When & Then
         assertThrows(DataIntegrityViolationException.class, () -> {
             orderRepository.save(order);
             entityManager.flush();
@@ -298,15 +270,13 @@ class OrderConstraintTest {
 
     @Test
     void shouldEnforceForeignKeyConstraints() {
-        // Given
         OrderItem item = OrderItem.builder()
-            .orderId(UUID.randomUUID()) // Non-existent order ID
+            .orderId(UUID.randomUUID())
             .productId(UUID.randomUUID())
             .quantity(1)
             .unitPrice(BigDecimal.valueOf(50.00))
             .build();
 
-        // When & Then
         assertThrows(DataIntegrityViolationException.class, () -> {
             entityManager.persist(item);
             entityManager.flush();
@@ -315,11 +285,9 @@ class OrderConstraintTest {
 
     @Test
     void shouldEnforceCheckConstraints() {
-        // Given
         Order order = createTestOrder();
-        order.setTotalAmount(BigDecimal.valueOf(-10.00)); // Should violate CHECK constraint
+        order.setTotalAmount(BigDecimal.valueOf(-10.00));
 
-        // When & Then
         assertThrows(DataIntegrityViolationException.class, () -> {
             orderRepository.save(order);
             entityManager.flush();
@@ -349,9 +317,9 @@ class OrderConstraintTest {
 
 ## R2DBC Repository Integration Testing
 
-Use `@DataR2dbcTest` for reactive repository testing.
+Use `@DataR2dbcTest` for testing reactive repositories.
 
-### Reactive Repository Testing
+### Reactive Tests
 
 ```java
 @DataR2dbcTest
@@ -377,32 +345,28 @@ class ReactiveOrderRepositoryIntegrationTest {
 
     @Test
     void shouldSaveAndRetrieveOrder() {
-        // Given
         Order order = createTestOrder();
 
-        // When & Then
         StepVerifier.create(
             orderRepository.save(order)
-                .flatMap(savedOrder -> orderRepository.findById(savedOrder.getId()))
+                .flatMap(saved -> orderRepository.findById(saved.getId()))
         )
-        .assertNext(retrievedOrder -> {
-            assertThat(retrievedOrder.getCustomerId()).isEqualTo(order.getCustomerId());
-            assertThat(retrievedOrder.getStatus()).isEqualTo(order.getStatus());
-            assertThat(retrievedOrder.getTotalAmount()).isEqualByComparingTo(order.getTotalAmount());
+        .assertNext(retrieved -> {
+            assertThat(retrieved.getCustomerId()).isEqualTo(order.getCustomerId());
+            assertThat(retrieved.getStatus()).isEqualTo(order.getStatus());
+            assertThat(retrieved.getTotalAmount()).isEqualByComparingTo(order.getTotalAmount());
         })
         .verifyComplete();
     }
 
     @Test
     void shouldStreamOrdersByStatus() {
-        // Given
         List<Order> orders = List.of(
             createTestOrder(OrderStatus.CREATED),
             createTestOrder(OrderStatus.CONFIRMED),
             createTestOrder(OrderStatus.CREATED)
         );
 
-        // When & Then
         StepVerifier.create(
             Flux.fromIterable(orders)
                 .flatMap(orderRepository::save)
@@ -415,22 +379,16 @@ class ReactiveOrderRepositoryIntegrationTest {
 
     @Test
     void shouldHandleTransactionRollback() {
-        // Given
         Order order = createTestOrder();
 
-        // When & Then
         StepVerifier.create(
             orderRepository.save(order)
-                .flatMap(savedOrder -> {
-                    // Simulate an error that should trigger rollback
-                    return Mono.error(new RuntimeException("Simulated error"));
-                })
+                .flatMap(saved -> Mono.error(new RuntimeException("Simulated error")))
                 .then(orderRepository.count())
         )
         .expectError(RuntimeException.class)
         .verify();
 
-        // Verify rollback occurred
         StepVerifier.create(orderRepository.count())
             .expectNext(0L)
             .verifyComplete();
@@ -451,23 +409,20 @@ class ReactiveOrderRepositoryIntegrationTest {
 }
 ```
 
-### Testing Reactive Streaming
+### Stream Tests
 
 ```java
 @Test
 void shouldStreamLargeDatasetWithBackpressure() {
-    // Given
-    int totalOrders = 1000;
-    Flux<Order> orderStream = Flux.range(1, totalOrders)
+    Flux<Order> orderStream = Flux.range(1, 1000)
         .map(i -> createTestOrder("order-" + i));
 
-    // When & Then
     StepVerifier.create(
         orderStream
             .flatMap(orderRepository::save)
             .then()
             .thenMany(orderRepository.findAll())
-            .take(100) // Take only first 100 to test backpressure
+            .take(100)
     )
     .expectNextCount(100)
     .verifyComplete();
@@ -475,35 +430,29 @@ void shouldStreamLargeDatasetWithBackpressure() {
 
 @Test
 void shouldHandleStreamingErrors() {
-    // Given
     Flux<Order> orderStream = Flux.range(1, 10)
         .map(i -> {
             if (i == 5) {
-                // Create invalid order that will cause constraint violation
                 return createInvalidOrder();
             }
             return createTestOrder("order-" + i);
         });
 
-    // When & Then
     StepVerifier.create(
         orderStream
             .flatMap(order -> orderRepository.save(order)
-                .onErrorResume(throwable -> {
-                    // Log error and continue with next order
-                    return Mono.empty();
-                }))
+                .onErrorResume(e -> Mono.empty()))
     )
-    .expectNextCount(9) // 10 orders - 1 invalid = 9 successful
+    .expectNextCount(9)
     .verifyComplete();
 }
 ```
 
 ## Transaction Testing
 
-Test transaction behavior, isolation levels, and rollback scenarios.
+Test how transactions behave, including rollbacks and isolation.
 
-### Testing Transactional Behavior
+### Transaction Behavior Tests
 
 ```java
 @SpringBootTest
@@ -526,15 +475,12 @@ class TransactionIntegrationTest {
     @Test
     @Rollback
     void shouldRollbackOnServiceException() {
-        // Given
-        OrderCreationDto orderDto = createOrderCreationDto();
+        OrderCreationDto dto = createOrderCreationDto();
         doThrow(new RuntimeException("Notification failed"))
             .when(notificationService).sendOrderConfirmation(any());
 
-        // When & Then
-        assertThrows(RuntimeException.class, () -> orderService.createOrderWithNotification(orderDto));
+        assertThrows(RuntimeException.class, () -> orderService.createOrderWithNotification(dto));
 
-        // Verify rollback occurred
         List<Order> orders = orderRepository.findAll();
         assertThat(orders).isEmpty();
     }
@@ -542,46 +488,38 @@ class TransactionIntegrationTest {
     @Test
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     void shouldCommitInSeparateTransaction() {
-        // Given
-        OrderCreationDto orderDto = createOrderCreationDto();
+        OrderCreationDto dto = createOrderCreationDto();
+        Order created = orderService.createOrder(dto);
 
-        // When
-        Order createdOrder = orderService.createOrder(orderDto);
-
-        // Then
-        assertThat(createdOrder.getId()).isNotNull();
+        assertThat(created.getId()).isNotNull();
         
-        // Verify data is committed in separate transaction
-        Order savedOrder = orderRepository.findById(createdOrder.getId()).orElseThrow();
-        assertThat(savedOrder.getStatus()).isEqualTo(OrderStatus.CREATED);
+        Order saved = orderRepository.findById(created.getId()).orElseThrow();
+        assertThat(saved.getStatus()).isEqualTo(OrderStatus.CREATED);
     }
 
     @Test
     void shouldHandleOptimisticLocking() {
-        // Given
         Order order = createTestOrder();
-        Order savedOrder = orderRepository.save(order);
+        Order saved = orderRepository.save(order);
 
-        // Simulate concurrent modification
-        Order order1 = orderRepository.findById(savedOrder.getId()).orElseThrow();
-        Order order2 = orderRepository.findById(savedOrder.getId()).orElseThrow();
+        Order o1 = orderRepository.findById(saved.getId()).orElseThrow();
+        Order o2 = orderRepository.findById(saved.getId()).orElseThrow();
 
-        order1.setStatus(OrderStatus.CONFIRMED);
-        orderRepository.save(order1);
+        o1.setStatus(OrderStatus.CONFIRMED);
+        orderRepository.save(o1);
 
-        order2.setStatus(OrderStatus.CANCELLED);
+        o2.setStatus(OrderStatus.CANCELLED);
 
-        // When & Then
-        assertThrows(OptimisticLockingFailureException.class, () -> orderRepository.save(order2));
+        assertThrows(OptimisticLockingFailureException.class, () -> orderRepository.save(o2));
     }
 }
 ```
 
 ## Performance Testing
 
-Test database performance characteristics and identify potential bottlenecks.
+Test how fast database queries run and find slow spots.
 
-### Query Performance Testing
+### Performance Tests
 
 ```java
 @DataJpaTest
@@ -599,9 +537,8 @@ class OrderRepositoryPerformanceTest {
 
     @Test
     void shouldPerformEfficientPaginatedQuery() {
-        // Given
-        int totalOrders = 10000;
-        List<Order> orders = IntStream.range(0, totalOrders)
+        int total = 10000;
+        List<Order> orders = IntStream.range(0, total)
             .mapToObj(i -> createTestOrder("order-" + i))
             .toList();
 
@@ -609,45 +546,40 @@ class OrderRepositoryPerformanceTest {
         entityManager.flush();
         entityManager.clear();
 
-        // When
-        long startTime = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
         Page<Order> page = orderRepository.findByStatus(OrderStatus.CREATED, PageRequest.of(100, 50));
-        long endTime = System.currentTimeMillis();
+        long end = System.currentTimeMillis();
 
-        // Then
         assertThat(page.getContent()).hasSize(50);
-        assertThat(endTime - startTime).isLessThan(1000); // Should complete within 1 second
+        assertThat(end - start).isLessThan(1000);
     }
 
     @Test
     void shouldUseIndexForCustomerQuery() {
-        // Given
-        UUID customerId = UUID.randomUUID();
+        UUID id = UUID.randomUUID();
         List<Order> orders = IntStream.range(0, 1000)
-            .mapToObj(i -> createTestOrder(customerId, "order-" + i))
+            .mapToObj(i -> createTestOrder(id, "order-" + i))
             .toList();
 
         orders.forEach(entityManager::persist);
         entityManager.flush();
         entityManager.clear();
 
-        // When
-        long startTime = System.currentTimeMillis();
-        List<Order> customerOrders = orderRepository.findByCustomerId(customerId);
-        long endTime = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
+        List<Order> found = orderRepository.findByCustomerId(id);
+        long end = System.currentTimeMillis();
 
-        // Then
-        assertThat(customerOrders).hasSize(1000);
-        assertThat(endTime - startTime).isLessThan(100); // Should be fast with index
+        assertThat(found).hasSize(1000);
+        assertThat(end - start).isLessThan(100);
     }
 }
 ```
 
 ## Database Migration Testing
 
-Test database schema migrations and data migrations.
+Test that schema and data migrations work correctly.
 
-### Schema Migration Testing
+### Migration Tests
 
 ```java
 @SpringBootTest
@@ -659,64 +591,57 @@ class DatabaseMigrationTest {
 
     @Test
     void shouldApplyAllMigrations() {
-        // Given - Container starts with empty database
-        
-        // When - Spring Boot applies migrations automatically
-        
-        // Then - Verify schema is correctly created
-        try (Connection connection = DriverManager.getConnection(
+        try (Connection conn = DriverManager.getConnection(
             postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword())) {
             
-            DatabaseMetaData metaData = connection.getMetaData();
+            DatabaseMetaData meta = conn.getMetaData();
             
-            // Verify tables exist
-            ResultSet tables = metaData.getTables(null, null, "orders", null);
+            ResultSet tables = meta.getTables(null, null, "orders", null);
             assertThat(tables.next()).isTrue();
             
-            ResultSet orderItems = metaData.getTables(null, null, "order_items", null);
-            assertThat(orderItems.next()).isTrue();
+            ResultSet items = meta.getTables(null, null, "order_items", null);
+            assertThat(items.next()).isTrue();
             
-            // Verify indexes exist
-            ResultSet indexes = metaData.getIndexInfo(null, null, "orders", false, false);
-            boolean customerIndexFound = false;
-            while (indexes.next()) {
-                if ("idx_orders_customer_id".equals(indexes.getString("INDEX_NAME"))) {
-                    customerIndexFound = true;
+            ResultSet idx = meta.getIndexInfo(null, null, "orders", false, false);
+            boolean found = false;
+            while (idx.next()) {
+                if ("idx_orders_customer_id".equals(idx.getString("INDEX_NAME"))) {
+                    found = true;
                     break;
                 }
             }
-            assertThat(customerIndexFound).isTrue();
+            assertThat(found).isTrue();
         }
     }
 }
 ```
 
-## Database Testing Best Practices
+## Best Practices
 
-### 1. Use Appropriate Test Slices
+### 1. Choose the Right Test Type
 
 ```java
 // Good: Use @DataJpaTest for repository testing
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class OrderRepositoryTest {
-    // Focus on repository behavior
+    // Test only repository behavior
 }
 
 // Bad: Use @SpringBootTest for simple repository tests
 @SpringBootTest
 class OrderRepositoryTest {
-    // Loads entire application context unnecessarily
+    // Loads unnecessary application context
 }
 ```
 
-### 2. Manage Test Data Properly
+### 2. Clean Up Test Data
 
 ```java
 // Good: Clean setup and teardown
 @BeforeEach
 void setUp() {
-    // Set up minimal test data
+    // Create fresh test data
 }
 
 @AfterEach
@@ -724,11 +649,11 @@ void tearDown() {
     orderRepository.deleteAll();
 }
 
-// Bad: Shared test data between tests
-static Order sharedOrder; // Can cause test dependencies
+// Bad: Share test data between tests
+static Order sharedOrder; // Causes test dependencies
 ```
 
-### 3. Test Real Database Scenarios
+### 3. Test Database Rules
 
 ```java
 // Good: Test actual database constraints
@@ -743,22 +668,22 @@ void shouldEnforceUniqueConstraint() {
         () -> orderRepository.save(order2));
 }
 
-// Bad: Testing only happy path scenarios
+// Bad: Test only success cases
 ```
 
-### 4. Use TestContainers for Realistic Testing
+### 4. Use TestContainers
 
 ```java
-// Good: Use actual database
+// Good: Use actual database container
 @Container
 static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15");
 
-// Bad: Use only embedded databases for all tests
+// Bad: Use only embedded databases
 // @AutoConfigureTestDatabase(replace = Replace.ANY) // H2 only
 ```
 
 ## Related Documentation
 
-- [Integration Testing Fundamentals](integration-testing-fundamentals.md) - Core integration testing principles
-- [API Integration Testing](api-integration-testing.md) - Testing complete API workflows
-- [Infrastructure Testing](../specialized-testing/infrastructure-testing.md) - Unit testing repository implementations
+- [Integration Testing Fundamentals](integration-testing-fundamentals.md) - Basic testing ideas
+- [API Integration Testing](api-integration-testing.md) - Testing API features
+- [Infrastructure Testing](../specialized-testing/infrastructure-testing.md) - Testing repositories
