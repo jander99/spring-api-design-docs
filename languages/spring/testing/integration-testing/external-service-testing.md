@@ -802,3 +802,5 @@ void shouldHandleAuthenticationFlows() {
 - [Integration Testing Fundamentals](integration-testing-fundamentals.md) - Core integration testing principles
 - [Infrastructure Testing](../specialized-testing/infrastructure-testing.md) - Unit testing external service clients
 - [API Integration Testing](api-integration-testing.md) - Testing complete API workflows
+- [HTTP Client Patterns](../../http-clients/http-client-patterns.md#testing-http-clients) - HTTP client testing strategies
+- [Client-Side Testing](../../../../guides/api-design/testing/client-side-testing.md) - Language-agnostic client testing patterns

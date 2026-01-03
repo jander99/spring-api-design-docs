@@ -746,5 +746,6 @@ class PaymentServiceClientIntegrationTest {
 - [Security Configuration](security-configuration.md) - Service authentication and authorization
 - [Observability Configuration](observability-configuration.md) - Service monitoring and tracing
 - [Environment Profiles](environment-profiles.md) - Environment-specific service configuration
+- [HTTP Client Patterns](../http-clients/http-client-patterns.md) - Complete HTTP client implementation guide
 
 This external service configuration ensures robust, resilient, and secure integration between microservices while maintaining high availability and performance.

@@ -796,5 +796,6 @@ Use RFC 7807 Problem Details format:
 - [Error Response Standards](../request-response/error-response-standards.md) - Detailed error handling patterns
 - [Resource Naming and URL Structure](resource-naming-and-url-structure.md) - URL design principles
 - [Content Types and Structure](../request-response/content-types-and-structure.md) - Request/response body formats
+- [Performance Standards](../advanced-patterns/performance-standards.md) - HTTP/2 and HTTP/3 performance benefits
 
 ---

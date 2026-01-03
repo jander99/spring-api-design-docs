@@ -133,3 +133,5 @@ Validate before deploying. Final check before release.
 
 - **[Documentation Tools and Integration](documentation-tools-and-integration.md)** - Tool selection and integration approaches
 - **[OpenAPI Standards](openapi-standards.md)** - Schema definition and validation requirements
+- **[Schema Testing](../testing/schema-testing.md)** - Comprehensive schema validation and compatibility testing
+- **[Client-Side Testing](../testing/client-side-testing.md)** - Testing API clients and integrations

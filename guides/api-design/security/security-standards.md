@@ -127,7 +127,7 @@ Rate limiting and throttling are primarily handled at the infrastructure level (
 1. **Infrastructure Level**: Primary rate limiting at gateway/proxy level
 2. **Application Level**: Additional protection for resource-intensive operations
 3. **Database Level**: Connection pooling and query timeout configurations
-4. **Circuit Breaker**: Implement circuit breaker patterns for external service calls
+4. **Circuit Breaker**: Implement circuit breaker patterns for external service calls (see [HTTP Client Best Practices](../advanced-patterns/http-client-best-practices.md))
 
 When rate limits are exceeded, return appropriate HTTP status codes:
 - `429 Too Many Requests` with `Retry-After` header

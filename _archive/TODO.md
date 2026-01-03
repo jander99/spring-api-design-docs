@@ -3,75 +3,34 @@
 ## Missing Documentation (High Priority)
 
 ### New Documents Needed - API Design (Language-Agnostic)
-- [x] **API Observability Standards** ⭐ NEW ✅ COMPLETE
-  - Health check endpoint standards (`/health`, `/ready`, `/live`)
-  - Metrics endpoint patterns (`/metrics`, `/prometheus`)
-  - OpenTelemetry header propagation standards
-  - Standard health check response formats
-  - Request correlation patterns (X-Request-ID, X-Trace-ID)
-  - SLA/SLO definitions for APIs
 
-- [ ] **Rate Limiting & Protection Standards** ⭐ NEW
-  - HTTP rate limiting headers (X-RateLimit-*)
-  - HTTP 429 Too Many Requests patterns
-  - Rate limiting algorithms at HTTP level
-  - DDoS protection patterns
-  - Per-user vs per-IP strategies
+**All high-priority documentation has been completed!**
 
-- [ ] **Data Modeling & Schema Design Standards**
-  - JSON Schema patterns
-  - OpenAPI schema evolution
-  - API field naming conventions
-  - Data type standards for APIs
-  - Schema versioning strategies
 
-- [ ] **API Lifecycle Management**
-  - Beyond versioning: complete lifecycle workflows
-  - Migration strategies and tooling
-  - Sunset procedures and timelines
-  - Client communication templates
-  - Deprecation workflow automation
-
-- [ ] **Performance Standards**
-  - HTTP caching strategies and headers
-  - Response time SLAs by endpoint type
-  - Pagination performance patterns
-  - Payload size optimization
-  - HTTP/2 and HTTP/3 considerations
-
-- [ ] **HTTP Client Best Practices** ⭐ NEW
-  - Retry patterns and exponential backoff
-  - Circuit breaker patterns at HTTP level
-  - Timeout standards
-  - Connection pooling guidelines
-  - Error recovery strategies
-
-- [ ] **API Governance**
-  - Review processes and approval workflows
-  - Compliance requirements
-  - Design review templates
-  - Quality gates and checklists
-  - Change management procedures
-
-- [ ] **Async/Batch Processing Patterns** (Partially Complete)
-  - Long-running operation handling
-  - Job queue integration patterns
-  - Polling vs webhook strategies
-  - Batch operation standards
-  - Progress tracking patterns
-
-- [ ] **Multi-tenancy Patterns** (if applicable)
-  - Tenant isolation strategies
-  - API-level data partitioning
-  - Security considerations
-  - URL structure for multi-tenant APIs
 
 ### ✅ Completed Documentation
-- [x] **API Observability Standards** (Language-agnostic) - Complete in `/api-design/advanced-patterns/API-Observability-Standards.md`
-- [x] **Observability Standards** (Spring-specific) - Complete in `/spring-design/observability/`
-- [x] **API Testing Standards** - Complete in `/spring-design/testing/` with comprehensive coverage
-- [x] **Event-Driven Architecture** - Complete in `/api-design/advanced-patterns/`
-- [x] **Richardson Maturity Model** - Complete in `/api-design/maturity-model/`
+- [x] **API Observability Standards** - Complete in `/guides/api-design/advanced-patterns/api-observability-standards.md`
+- [x] **Observability Standards** (Spring-specific) - Complete in `/languages/spring/observability/`
+- [x] **API Testing Standards** - Complete in `/languages/spring/testing/` with comprehensive coverage
+- [x] **Event-Driven Architecture** - Complete in `/guides/api-design/advanced-patterns/event-driven-architecture.md`
+- [x] **Richardson Maturity Model** - Complete in `/guides/api-design/maturity-model/`
+- [x] **Rate Limiting & Protection Standards** - Complete in `/guides/api-design/advanced-patterns/rate-limiting.md`
+- [x] **API Lifecycle Management** - Complete in `/guides/api-design/foundations/api-lifecycle.md`
+- [x] **API Governance** - Complete in `/guides/api-design/foundations/api-governance.md`
+- [x] **Async/Batch Processing Patterns** - Complete in `/guides/api-design/advanced-patterns/async-operations.md` and `batch-operations.md`
+- [x] **HTTP Fundamentals** - Complete in `/guides/api-design/foundations/http-fundamentals.md`
+- [x] **Idempotency and Safety** - Complete in `/guides/api-design/foundations/idempotency-and-safety.md`
+- [x] **Schema Conventions** - Complete in `/guides/api-design/request-response/schema-conventions.md`
+- [x] **Content Negotiation** - Complete in `/guides/api-design/request-response/content-negotiation.md`
+- [x] **HTTP Caching** - Complete in `/guides/api-design/advanced-patterns/http-caching.md`
+- [x] **Hypermedia Controls (HATEOAS)** - Complete in `/guides/api-design/advanced-patterns/hypermedia-controls.md`
+- [x] **HTTP Client Best Practices** - Complete in `/guides/api-design/advanced-patterns/http-client-best-practices.md`
+- [x] **Performance Standards** - Complete in `/guides/api-design/advanced-patterns/performance-standards.md`
+- [x] **Advanced Schema Design** - Complete in `/guides/api-design/request-response/advanced-schema-design.md`
+- [x] **Client-Side Testing** - Complete in `/guides/api-design/testing/client-side-testing.md`
+- [x] **Schema Testing** - Complete in `/guides/api-design/testing/schema-testing.md`
+- [x] **Spring HTTP Client Patterns** - Complete in `/languages/spring/http-clients/http-client-patterns.md`
+- [x] **Spring Schema Validation** - Complete in `/languages/spring/validation/schema-validation.md`
 
 ## Content Improvements (Medium Priority)
 
@@ -105,17 +64,17 @@
 
 ### Document-Specific Improvements
 - [x] **OpenAPI Standards** ✅ COMPLETE
-  - Already reorganized in `/api-design/documentation/OpenAPI-Standards.md`
+  - Already reorganized in `/guides/api-design/documentation/openapi-standards.md`
   - Has logical sections and practical examples
   - Includes security documentation and versioning
 
 - [x] **API Version Strategy** ✅ COMPLETE
-  - Well-documented in `/api-design/foundations/API Version Strategy.md`
-  - Examples in `/api-design/examples/versioning/`
-  - Deprecation policies in `/api-design/reference/versioning/`
+  - Well-documented in `/guides/api-design/foundations/api-version-strategy.md`
+  - Examples in `/guides/api-design/examples/versioning/`
+  - Deprecation policies in `/guides/api-design/reference/versioning/`
 
 - [x] **Request Response Format** ✅ COMPLETE
-  - Comprehensive coverage in `/api-design/request-response/`
+  - Comprehensive coverage in `/guides/api-design/request-response/`
   - Error handling with RFC 7807
   - Schema validation patterns included
 
@@ -253,8 +212,8 @@
 ## Notes for Contributors
 
 ### API Design vs Spring Design Distinction
-- **API Design** (`/api-design/`): Language-agnostic HTTP/REST principles only
-- **Spring Design** (`/spring-design/`): Spring-specific implementation details
+- **API Design** (`/guides/api-design/`): Language-agnostic HTTP/REST principles only
+- **Spring Design** (`/languages/spring/`): Spring-specific implementation details
 - New API design items should focus on protocol-level standards, not implementation
 
 ### Before Adding New Items

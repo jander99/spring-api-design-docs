@@ -924,3 +924,8 @@ with, yield
 - [Error Response Standards](error-response-standards.md) - Error handling with RFC 7807
 - [Pagination and Filtering](pagination-and-filtering.md) - Collection response patterns
 - [OpenAPI Standards](../documentation/openapi-standards.md) - API documentation with schema definitions
+- [Advanced Schema Design](advanced-schema-design.md) - Schema composition, versioning, and evolution strategies
+- [Schema Testing](../testing/schema-testing.md) - Schema validation and compatibility testing
+
+### Spring Implementation
+- [Schema Validation](../../../languages/spring/validation/schema-validation.md) - Jakarta Bean Validation implementation

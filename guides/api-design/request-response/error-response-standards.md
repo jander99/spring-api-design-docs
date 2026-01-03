@@ -315,3 +315,8 @@ These error standards work with any REST framework through standard HTTP respons
 - [Content Types and Structure](content-types-and-structure.md) - Basic request/response patterns
 - [Pagination and Filtering](pagination-and-filtering.md) - Collection response patterns
 - [Streaming APIs](streaming-apis.md) - Streaming response formats
+- [Schema Testing](../testing/schema-testing.md) - Testing error response schemas
+
+### Spring Implementation
+- [Schema Validation](../../../languages/spring/validation/schema-validation.md#integration-with-rfc-7807-error-responses) - RFC 7807 validation error handling
+- [Error Response Formats](../../../languages/spring/error-handling/error-response-formats.md) - Spring implementation details

@@ -51,6 +51,14 @@ Complete guide to HTTP caching strategies, Cache-Control directives, ETags, cond
 **⏱️ 15 min read • 🔴 Advanced**  
 Complete guide to hypermedia controls for building self-descriptive APIs. Covers HATEOAS principles, HAL and JSON:API formats, link relations (IANA registry), affordances, and Richardson Maturity Model Level 3. Includes practical patterns for hypermedia-driven client navigation and state transitions.
 
+### [HTTP-Client-Best-Practices.md](http-client-best-practices.md) ⭐ NEW
+**⏱️ 16 min read • 🔴 Advanced**  
+Complete guide to building resilient HTTP clients with retry patterns, circuit breakers, timeouts, and connection pooling. Covers exponential backoff with jitter, idempotency for safe retries, circuit breaker state management, timeout configuration hierarchy, connection pool optimization, and error recovery strategies. Includes practical HTTP examples for implementing client-side resilience patterns in any technology stack.
+
+### [Performance-Standards.md](performance-standards.md) ⭐ NEW
+**⏱️ 17 min read • 🔴 Advanced**  
+Comprehensive guide to API performance standards and optimization. Covers response time SLAs by endpoint type (CRUD, search, batch), pagination performance patterns (offset vs cursor), payload size optimization (compression, field filtering), HTTP/2 and HTTP/3 benefits (multiplexing, header compression, 0-RTT), and performance monitoring with Server-Timing headers and percentile tracking. Includes industry benchmarks and practical optimization strategies.
+
 ## Navigation
 
 - [← Back to API Design](../README.md)

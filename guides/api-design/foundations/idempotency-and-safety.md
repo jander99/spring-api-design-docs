@@ -603,3 +603,9 @@ Idempotency and safety are foundational properties that determine API reliabilit
 - **Servers must store and validate** idempotency keys consistently
 
 Proper implementation of these patterns ensures robust, fault-tolerant APIs that handle network failures gracefully.
+
+## Related Documentation
+
+- [HTTP Client Best Practices](../advanced-patterns/http-client-best-practices.md): Implementing safe retry operations with exponential backoff and circuit breakers
+- [Error Response Standards](../request-response/error-response-standards.md): Handling errors in idempotent operations
+- [API Version Strategy](./api-version-strategy.md): Versioning considerations for idempotency guarantees

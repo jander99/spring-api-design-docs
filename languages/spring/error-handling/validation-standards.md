@@ -1,5 +1,7 @@
 # Validation Standards
 
+> **Note**: For complete schema validation patterns including Jakarta Validation, JSON Schema, custom validators, and validation groups, see [Schema Validation](../validation/schema-validation.md).
+
 ## Overview
 
 This document outlines validation standards and patterns for Spring Boot applications, covering both Bean Validation (JSR-380) and custom validation approaches for both imperative and reactive applications.

@@ -887,6 +887,7 @@ Content-Type: application/xml
 - [HTTP Streaming Patterns](./http-streaming-patterns.md): Real-time data delivery patterns
 - [API Observability Standards](./api-observability-standards.md): Monitoring and metrics for cache performance
 - [Content Types and Structure](../request-response/content-types-and-structure.md): Response format considerations
+- [Performance Standards](./performance-standards.md): Response time optimization with caching strategies
 
 ## Implementation Notes
 

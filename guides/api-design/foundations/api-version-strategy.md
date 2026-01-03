@@ -89,6 +89,16 @@ For comprehensive guidance, see:
 - **Deprecation Reference**: [reference/versioning/](../reference/versioning/) - Detailed policies and HTTP headers
 - **Troubleshooting**: [troubleshooting/versioning/](../troubleshooting/versioning/) - Common problems and solutions
 
+## Schema Versioning
+
+When versioning your API, you must also version your schemas. For detailed schema versioning strategies including inline versioning, URL-based versioning, and backward compatibility patterns, see [Advanced Schema Design](../request-response/advanced-schema-design.md).
+
 ## Implementation Notes
 
 These principles apply to any REST API framework, regardless of implementation technology or programming language.
+
+## Related Documentation
+
+- [Advanced Schema Design](../request-response/advanced-schema-design.md) - Schema versioning and evolution strategies
+- [API Lifecycle](./api-lifecycle.md) - Deprecation and sunset procedures
+- [OpenAPI Standards](../documentation/openapi-standards.md) - Documenting API versions
