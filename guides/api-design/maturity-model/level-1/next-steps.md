@@ -1,8 +1,21 @@
 # Moving from Level 1 to Level 2: HTTP Verbs & Status Codes
 
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 3 minutes | **🟡 Level:** Intermediate
+> 
+> **📋 Prerequisites:** Basic REST API knowledge  
+> **🎯 Key Topics:** API Design
+> 
+> **📊 Complexity:** 10.9 grade level • 1.4% technical density • fairly easy
+
+## Quick Overview
+
+Level 2 means you use HTTP methods (GET, POST, PUT, DELETE) correctly. You also use proper status codes (200, 201, 404, etc.).
+
 ## 🎯 Goal: Use HTTP Properly
 
-Use HTTP methods and status codes the right way.
+Stop putting actions in your request body. Use HTTP methods instead. Use specific status codes for different results.
 
 ## Step 1: Use HTTP Methods
 
@@ -68,23 +81,35 @@ DELETE /users/123  → Delete user
 
 ## Step 4: How to Switch
 
-### Phase 1: Add New Methods
-- Support both old POST-based and new HTTP verb patterns
-- Keep existing endpoints operational
-- Add new HTTP method handlers
-- Ensure backward compatibility
+### Phase 1: Add New Methods (Week 1-2)
+
+Keep your old endpoints working. Add new endpoints that use HTTP methods. Support both patterns during the transition.
+
+**What to do:**
+- Add GET for read operations
+- Add PUT for updates
+- Add DELETE for removals
+- Keep old POST endpoints active
 
 ### Phase 2: Redirect Old Calls (Week 3-4)
-- Add deprecation headers to old endpoints
-- Forward POST-based calls to appropriate HTTP method handlers
-- Log usage of deprecated patterns
-- Monitor migration progress
+
+Point old endpoints to new ones. Track who still uses the old way.
+
+**What to do:**
+- Send deprecation headers from old endpoints
+- Forward POST calls to new HTTP method handlers
+- Log each use of old patterns
+- Check migration progress daily
 
 ### Phase 3: Deprecate POST Actions (Week 5-6)
-- Add deprecation warnings
-- Update all documentation
-- Notify clients of timeline
-- Monitor usage metrics
+
+Warn clients that old endpoints will stop working. Set a shutdown date.
+
+**What to do:**
+- Add warnings to old endpoints
+- Update your API docs
+- Email all API users
+- Track usage until it stops
 
 ## Step 5: Implementation Checklist
 
@@ -144,12 +169,18 @@ You've reached Level 2 when:
 - REST Best Practices
 - API Design Guidelines
 
-## Next Steps
+## What to Do After Level 2
 
-Once you've successfully implemented Level 2:
-1. Stabilize your API at this level
-2. Gather metrics and feedback
-3. Consider if Level 3 (Hypermedia) adds value
-4. Focus on other improvements (performance, security, documentation)
+You finished Level 2. Now stabilize your API. Gather metrics. Ask users for feedback.
 
-**Remember:** Level 2 is the industry standard. Most successful APIs operate at this level!
+**Should you move to Level 3?**
+
+Most APIs stay at Level 2. This is the industry standard. Only add hypermedia (Level 3) if clients really need it.
+
+**Focus on these instead:**
+1. Improve performance
+2. Strengthen security
+3. Write better documentation
+4. Add monitoring
+
+**Remember:** Level 2 works for most successful APIs!
