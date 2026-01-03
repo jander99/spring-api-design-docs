@@ -1,38 +1,78 @@
 # Spring Boot Architecture Standards
 
-## Overview
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 3 minutes | **🟢 Level:** Beginner-Friendly
+> 
+> **📋 Prerequisites:** Basic Java knowledge  
+> **🎯 Key Topics:** Dependency Injection, Component Management, Architecture
+> 
+> **📊 Complexity:** 8.8 grade level • 0.5% technical density • fairly difficult
 
-This directory contains architectural guidelines and patterns for building Spring Boot applications with a focus on dependency injection, component management, and hexagonal architecture principles.
+## Architecture Basics
 
-## Directory Contents
+Think of Spring architecture like building with Lego blocks. Each block does one job. You connect blocks to build something bigger. Spring helps you connect your code blocks together.
 
-### Core Architecture Documentation
+This connection system is called **dependency injection** (DI). Instead of each block finding its own pieces, Spring hands them what they need. This makes your code easier to test and change.
 
-- **[Dependency Injection and Component Management](dependency-injection-and-component-management.md)**: Comprehensive guide to Spring's dependency injection patterns, component scanning, configuration management, and best practices for managing application dependencies and lifecycle.
+## Why Architecture Matters
 
-## Key Architecture Principles
+Good architecture helps you:
+- Build features faster
+- Fix bugs easier
+- Test code without breaking things
+- Change one part without touching others
 
-### Hexagonal Architecture (Ports and Adapters)
-- **Domain Layer**: Core business logic independent of external concerns
-- **Application Layer**: Orchestrates domain operations and use cases
-- **Infrastructure Layer**: Technical implementations and external integrations
-- **Interfaces Layer**: API controllers and external communication
+## What You'll Find Here
 
-### Dependency Injection Best Practices
-- Constructor injection for required dependencies
-- Setter injection for optional dependencies
-- Field injection avoided in favor of constructor injection
-- Clear component boundaries and responsibilities
+This guide covers Spring Boot architecture patterns. You'll learn how to organize code and connect components.
 
-### Component Management
-- Proper use of Spring stereotypes (`@Component`, `@Service`, `@Repository`, `@Controller`)
-- Configuration management with `@Configuration` classes
-- Bean lifecycle management and scoping
-- Conditional bean creation and profile-specific configurations
+## Core Topics
 
-## Quick Reference
+### Main Guide
 
-### Constructor Injection Pattern
+- **[Dependency Injection and Component Management](dependency-injection-and-component-management.md)**: Learn how Spring connects your code. This guide shows you how to use DI, scan components, and manage configs.
+
+## Key Principles
+
+### How to Organize Layers
+
+Spring apps use layers like a building:
+
+- **Domain Layer**: Your business rules live here. No outside code allowed.
+- **Application Layer**: Runs your business logic. Calls domain code.
+- **Infrastructure Layer**: Connects to databases and APIs. Handles technical stuff.
+- **Interfaces Layer**: Takes requests from users. Sends responses back.
+
+Each layer talks only to the one below it. This keeps code clean.
+
+### Dependency Injection Tips
+
+Spring gives your code what it needs. Follow these rules:
+
+- **Required parts**: Use constructor injection. Spring passes them when creating your class.
+- **Optional parts**: Use setter injection. Spring adds them later if available.
+- **Never use field injection**: Always use constructors instead. Tests work better.
+- **Keep boundaries clear**: Each component does one job.
+
+### Managing Components
+
+Spring uses labels to organize your code:
+
+- `@Component`: General-purpose code blocks
+- `@Service`: Business logic blocks
+- `@Repository`: Database access blocks
+- `@Controller`: Request handling blocks
+- `@Configuration`: Setup and config blocks
+
+Spring creates and manages these components for you.
+
+## Quick Examples
+
+### Constructor Injection
+
+Spring passes what you need through the constructor:
+
 ```java
 @Service
 public class OrderService {
@@ -46,7 +86,10 @@ public class OrderService {
 }
 ```
 
-### Configuration Management
+### Configuration Setup
+
+Store your settings in config classes:
+
 ```java
 @Configuration
 @ConfigurationProperties(prefix = "app.payment")
@@ -59,7 +102,10 @@ public class PaymentConfig {
 }
 ```
 
-### Conditional Bean Creation
+### Environment-Based Setup
+
+Create different configs for test and production:
+
 ```java
 @Configuration
 public class DatabaseConfig {
