@@ -1,70 +1,130 @@
 # API Deprecation Policies Reference
 
-This document shows how to deprecate APIs properly. It covers timelines, HTTP headers, and implementation.
+> **Reading Guide:** Grade Level 14.3 • Fairly Difficult (34.6 Flesch) • 12 min read  
+> **Prerequisites:** Basic HTTP knowledge, API versioning concepts  
+> **Purpose:** Step-by-step policies for retiring API versions safely
 
-## Deprecation Timeline Policies
+## Quick Start
 
-### Support Times
+**What is API deprecation?** You mark an old API version as outdated. You give clients time to switch to the new version. Then you remove the old version.
 
-#### Minimum Support Duration
-- **Public APIs**: 12 months after deprecation notice
-- **Partner APIs**: 6 months after deprecation notice  
-- **Internal APIs**: 3 months after deprecation notice
+**Why deprecation matters:**
+- Protects your clients from sudden API changes
+- Reduces maintenance costs over time
+- Ensures smooth transitions to better designs
+- Maintains trust with API consumers
 
-#### Extended Support
-- **High-traffic endpoints**: 18-24 months for endpoints with over 10,000 daily requests
-- **Critical integrations**: Negotiate with important customers case by case
-- **Security vulnerabilities**: Deprecate immediately, remove in 30 days for critical issues
+**Basic deprecation flow:**
+1. Announce the deprecation. Add headers and notify clients.
+2. Support both versions. This is the dual support phase.
+3. Help clients migrate. Provide guides and tools.
+4. Remove the old version. Wait until after the sunset date.
 
-### Support Based on Usage
+**Key policy elements:**
+- **Timeline**: How long you support the old version
+- **HTTP headers**: How you mark deprecated endpoints
+- **Migration support**: How you help clients switch
+- **Final removal**: How you handle the sunset date
 
-#### Traffic Levels
-- **Low traffic** (<100 requests/day): Standard minimum support
-- **Medium traffic** (100-1000 requests/day): Extended support consideration
-- **High traffic** (>1000 requests/day): Mandatory extended support
+## Timeline Policies
 
-#### What to Monitor
-- Count daily requests to each deprecated endpoint
-- Track which clients use deprecated endpoints
-- Measure error rates and response times for deprecated endpoints
+### How Long to Support Old Versions
 
-## HTTP Deprecation Headers
+You must support old API versions for minimum periods. These minimums protect your clients.
 
-### RFC 8594 Compliance
+**Minimum support by API type:**
+- **Public APIs**: 12 months
+- **Partner APIs**: 6 months  
+- **Internal APIs**: 3 months
 
-#### Deprecation Header
+**Example:** You deprecate a public endpoint on January 1, 2025. Support continues until January 1, 2026 minimum.
+
+### When to Extend Support
+
+Some situations require longer support periods.
+
+**High traffic endpoints:**
+- Endpoints with over 10,000 requests per day
+- Extend support to 18-24 months
+- More clients depend on these endpoints
+
+**Critical integrations:**
+- Major customers with complex dependencies
+- Negotiate custom timelines case by case
+- Document agreements in writing
+
+**Security issues:**
+- Deprecate immediately when you find critical vulnerabilities
+- Remove the endpoint within 30 days
+- Security takes priority over standard timelines
+
+### Traffic-Based Support Levels
+
+You adjust timelines based on usage patterns.
+
+**Low traffic** (under 100 requests per day):
+- Use standard minimum support periods
+- Use standard migration communication
+
+**Medium traffic** (100 to 1000 requests per day):
+- Consider extended support
+- Evaluate client dependencies
+
+**High traffic** (over 1000 requests per day):
+- Extend support automatically
+- Provide premium migration assistance
+
+### Metrics to Track
+
+You monitor these metrics for deprecated endpoints:
+- Daily request counts per endpoint
+- Client identities using each endpoint
+- Error rates for deprecated versions
+- Response times compared to new versions
+
+## HTTP Headers for Deprecation
+
+You use specific HTTP headers to mark deprecated endpoints. These headers follow RFC 8594 standards.
+
+### Required Headers
+
+**Deprecation header** tells machines the endpoint is deprecated:
 ```http
 Deprecation: true
 ```
-- **Required**: Add to all deprecated endpoint responses
-- **Format**: Boolean value (true/false)
-- **Purpose**: Shows machines the endpoint is deprecated
+- Add this to every deprecated endpoint response
+- Use the boolean value `true`
+- Machines can detect this automatically
 
-#### Sunset Header
+**Sunset header** specifies when you will remove the endpoint:
 ```http
 Sunset: Sat, 31 Dec 2025 23:59:59 GMT
 ```
-- **Required**: Must specify exact sunset date/time
-- **Format**: HTTP date format
-- **Purpose**: Shows when the endpoint will be removed
+- Include the exact removal date and time
+- Use HTTP date format
+- Clients can plan migration deadlines
 
-#### Link Header for Successor
+### Recommended Headers
+
+**Link header** points to the replacement endpoint:
 ```http
 Link: </v2/customers>; rel="successor-version"
 ```
-- **Recommended**: Should point to replacement endpoint
-- **Format**: URI reference with rel="successor-version"
-- **Purpose**: Guides clients to the new version
+- Shows clients where to migrate
+- Use the `successor-version` relation type
+- Include the full replacement path
 
-#### Warning Header
+**Warning header** provides human-readable messages:
 ```http
 Warning: 299 - "This API version is deprecated and will be removed on 2025-12-31"
 ```
-- **Optional**: Human-readable deprecation message
-- **Format**: Warning code 299 with descriptive text
-- **Purpose**: Provides context for developers
+- Use warning code 299
+- Write clear, direct messages
+- Include the sunset date
 
-### Complete Header Example
+### Complete Example
+
+Here is a full deprecated endpoint response:
 ```http
 HTTP/1.1 200 OK
 Deprecation: true
@@ -85,52 +145,77 @@ Content-Type: application/json
 }
 ```
 
-## Strangulation Pattern Implementation
+**Why include deprecation info in the body:**
+- Headers might be ignored by some clients
+- Body data is easier to log and track
+- Migration guides need URLs
 
-### Phase 1: Dual Support Phase
+## Three-Phase Deprecation Process
 
-#### Deployment Strategy
-1. **Deploy new version** (v2) alongside existing version (v1)
-2. **Add deprecation headers** to v1 responses
-3. **Update documentation** to mark v1 as deprecated
-4. **Configure monitoring** for both versions
-5. **Test both versions** to ensure compatibility
+You retire old versions through three phases. Each phase has specific tasks.
 
-#### Load Balancing Considerations
-- Route traffic based on version header or URI path
-- Maintain separate health checks for each version
-- Consider capacity planning for running both versions
+### Phase 1: Dual Support
 
-### Phase 2: Client Migration Phase
+You run both old and new versions together.
 
-#### Communication Strategy
-1. **Email notifications** to registered API consumers
-2. **Dashboard announcements** in developer portal
-3. **Slack/Teams notifications** for internal teams
-4. **Blog posts** for public API changes
-5. **Support ticket updates** for active issues
+**Deployment steps:**
+1. Deploy v2 alongside v1
+2. Add deprecation headers to v1
+3. Update docs to mark v1 as deprecated
+4. Set up monitoring for both versions
+5. Test both versions work correctly
 
-#### Migration Support
-- Provide detailed migration guides with code examples
-- Offer office hours or support sessions for complex migrations
-- Create automated migration tools where possible
-- Maintain FAQ document for common migration questions
+**Load balancing setup:**
+- Route requests by version header or URL path
+- Create separate health checks for each version
+- Plan server capacity for running two versions
 
-#### Progress Tracking
-- Weekly reports on v1 usage decline
-- Client-specific migration status dashboards
-- Automated alerts for clients approaching sunset date
-- Success metrics for migration completion
+**Example routing:**
+```
+/v1/customers → Route to v1 service
+/v2/customers → Route to v2 service
+```
 
-### Phase 3: Sunsetting Phase
+### Phase 2: Client Migration
 
-#### Graceful Degradation
-1. **Warning period**: 30 days before sunset with increased warning frequency
-2. **Soft sunset**: Return 410 Gone for new clients, maintain service for existing clients
-3. **Hard sunset**: Return 410 Gone for all requests
-4. **Removal**: Remove v1 implementation after monitoring period
+You help clients switch to the new version.
 
-#### 410 Gone Response Format
+**How to notify clients:**
+1. Send emails to registered API users
+2. Post announcements in your developer portal
+3. Message internal teams via Slack or Teams
+4. Write blog posts for public API changes
+5. Update open support tickets
+
+**Migration assistance you provide:**
+- Write detailed guides with code examples
+- Host office hours for complex cases
+- Build automated migration tools when possible
+- Maintain an FAQ for common questions
+
+**Track migration progress:**
+- Generate weekly reports on v1 usage
+- Create dashboards showing client status
+- Send alerts to clients near sunset date
+- Measure migration completion rates
+
+**Example migration dashboard:**
+- Total clients using v1: 150
+- Migrated to v2: 120 clients
+- Not started: 30 clients
+- Days until sunset: 45
+
+### Phase 3: Sunset and Removal
+
+You stop supporting the old version.
+
+**Graceful shutdown steps:**
+1. **30 days before**: Increase warning frequency
+2. **Soft sunset**: Return 410 for new clients. Support existing clients.
+3. **Hard sunset**: Return 410 for all requests
+4. **Final removal**: Delete v1 code. Wait for monitoring period to end.
+
+**410 Gone response format:**
 ```http
 HTTP/1.1 410 Gone
 Content-Type: application/problem+json
@@ -151,9 +236,18 @@ Cache-Control: no-cache
 }
 ```
 
-## Field-Level Deprecation
+**Why use 410 instead of 404:**
+- 410 means "gone permanently"
+- 404 means "not found" (might be temporary)
+- Clients should stop retrying 410 responses
 
-### OpenAPI Specification
+## Deprecating Individual Fields
+
+You can deprecate specific fields without changing the whole API version.
+
+### Mark Fields in OpenAPI
+
+Show deprecated fields in your API specification:
 ```yaml
 components:
   schemas:
@@ -173,7 +267,9 @@ components:
           description: "Replacement for oldField"
 ```
 
-### Response Field Deprecation
+### Include Deprecation Metadata
+
+Add deprecation info to your responses:
 ```json
 {
   "id": "12345",
@@ -191,7 +287,14 @@ components:
 }
 ```
 
-### Response Shaping Support
+**Why include metadata:**
+- Clients can detect deprecated fields automatically
+- Migration tools can parse this info
+- Logs show which clients use old fields
+
+### Let Clients Hide Deprecated Fields
+
+Support query parameters to exclude old fields:
 ```http
 GET /v1/customers/123?exclude_deprecated=true
 ```
@@ -203,48 +306,92 @@ GET /v1/customers/123?exclude_deprecated=true
 }
 ```
 
-## Backward Compatibility Rules
+**Benefits of this approach:**
+- Clients can test migrations incrementally
+- Reduces response payload size
+- Helps identify field dependencies
 
-### Breaking Changes (Require New Version)
+## Breaking vs Non-Breaking Changes
 
-#### Request Changes
-- Removing request parameters
-- Changing parameter types
-- Making optional parameters required
-- Changing parameter validation rules
-- Modifying authentication requirements
+You need to know which changes require a new version.
 
-#### Response Changes
-- Removing response fields
-- Changing field types
-- Changing field semantics
-- Modifying error response formats
-- Changing HTTP status codes
+### Breaking Changes (New Version Required)
 
-#### Behavior Changes
-- Modifying side effects
-- Changing idempotency behavior
-- Altering rate limiting rules
-- Changing caching behavior
+These changes break existing clients. You must create a new API version.
+
+**Request breaking changes:**
+- You remove request parameters
+- You change parameter data types
+- You make optional parameters required
+- You change validation rules
+- You modify authentication requirements
+
+**Example of breaking request change:**
+```json
+// v1: email is optional
+{"name": "John"}
+
+// v2: email is required (BREAKING)
+{"name": "John", "email": "john@example.com"}
+```
+
+**Response breaking changes:**
+- You remove response fields
+- You change field data types
+- You change what fields mean
+- You modify error formats
+- You change HTTP status codes
+
+**Example of breaking response change:**
+```json
+// v1: id is a string
+{"id": "12345"}
+
+// v2: id is a number (BREAKING)
+{"id": 12345}
+```
+
+**Behavior breaking changes:**
+- You modify side effects
+- You change idempotency guarantees
+- You alter rate limiting rules
+- You change caching behavior
 
 ### Non-Breaking Changes (Same Version)
 
-#### Additions
+These changes keep existing clients working. You can add them without a new version.
+
+**Safe additions:**
 - New optional request parameters
 - New response fields
-- New HTTP methods on existing resources
-- New query parameters with default values
+- New HTTP methods on resources
+- New query parameters with defaults
 - New error codes for new scenarios
 
-#### Enhancements
-- Improved validation messages
-- Better error descriptions
+**Example of non-breaking addition:**
+```json
+// v1 response
+{"id": "12345", "name": "John"}
+
+// v1 enhanced (non-breaking)
+{"id": "12345", "name": "John", "email": "john@example.com"}
+```
+
+**Safe improvements:**
+- Better validation messages
+- Clearer error descriptions
 - Performance optimizations
-- Security improvements (non-breaking)
+- Security fixes that don't change behavior
 
-## Version-Specific Error Handling
+**Key principle:** If existing client code still works, the change is non-breaking.
 
-### Error Code Versioning
+## Version-Specific Errors
+
+You include version info in error responses. This helps clients understand which version failed.
+
+### Include Version in Error Codes
+
+Add the version to error identifiers:
 ```json
 {
   "error": {
@@ -261,7 +408,14 @@ GET /v1/customers/123?exclude_deprecated=true
 }
 ```
 
-### RFC 7807 Problem Details
+**Why prefix error codes with version:**
+- Different versions might have different validation rules
+- Error logs show which version caused the problem
+- Clients can handle version-specific errors
+
+### Use RFC 7807 Problem Details
+
+Include the API version in standard problem responses:
 ```json
 {
   "type": "https://example.com/problems/validation-error",
@@ -279,16 +433,32 @@ GET /v1/customers/123?exclude_deprecated=true
 }
 ```
 
+**Benefits of including version:**
+- Support teams know which API version failed
+- Analytics track errors by version
+- Clients can provide better error context
+
 ## Content Negotiation for Minor Versions
 
-### Accept Header Versioning
+You can version through HTTP headers instead of URLs. This works well for minor version changes.
+
+### Request a Specific Minor Version
+
+Clients specify the version in the Accept header:
 ```http
 GET /api/customers HTTP/1.1
 Accept: application/vnd.api+json;version=1.2
 Host: api.example.com
 ```
 
-### Response Header Versioning
+**When to use Accept header versioning:**
+- Minor version updates (1.0 → 1.1)
+- Non-breaking changes
+- Backward-compatible enhancements
+
+### Return Version in Response
+
+Tell clients which version you returned:
 ```http
 HTTP/1.1 200 OK
 API-Version: 1.2
@@ -296,72 +466,227 @@ API-Supported-Versions: 1.0, 1.1, 1.2, 2.0
 Content-Type: application/vnd.api+json;version=1.2
 ```
 
+**Why include supported versions:**
+- Clients discover available versions automatically
+- Migration planning becomes easier
+- Version negotiation is transparent
+
 ## Monitoring and Metrics
 
-### Key Metrics to Track
+You track specific metrics during deprecation. These metrics guide your decisions.
 
-#### Usage Metrics
+### Usage Metrics
+
+Track how clients use each version:
 - Request count per API version
 - Unique client count per version
-- Geographic distribution of version usage
-- Request success rate by version
+- Geographic distribution by version
+- Success rate by version
 
-#### Performance Metrics
+**Example usage dashboard:**
+- v1: 10,000 requests per day (declining)
+- v2: 25,000 requests per day (growing)
+- v1 clients: 50 total (down from 150)
+- v2 clients: 200 total (up from 100)
+
+### Performance Metrics
+
+Monitor version health separately:
 - Response time by version
 - Error rate by version
 - Throughput by version
-- Resource utilization by version
+- Resource usage by version
 
-#### Migration Metrics
+**Why track separately:**
+- Old versions might perform worse
+- Resource allocation decisions need data
+- Performance degradation signals problems
+
+### Migration Progress Metrics
+
+Measure migration success:
 - Client migration completion rate
-- Time to migrate per client
-- Support ticket volume related to deprecation
-- Documentation usage patterns
+- Average migration time per client
+- Support tickets about deprecation
+- Migration guide page views
 
-### Alerting Thresholds
-- **High usage alert**: >1000 requests/day to deprecated endpoint 30 days before sunset
-- **Client alert**: Individual client making >100 requests/day to deprecated endpoint
-- **Error rate alert**: >5% error rate on deprecated endpoints
-- **Sunset reminder**: Automated alerts at 90, 60, 30, and 7 days before sunset
+**Example migration tracking:**
+- Week 1: 10% migrated
+- Week 4: 40% migrated
+- Week 8: 75% migrated
+- Week 12: 95% migrated
+
+### Alert Thresholds
+
+Set automatic alerts for these conditions:
+
+**High usage alert:**
+- Trigger when >1000 requests/day to deprecated endpoint
+- Send 30 days before sunset
+- Contact heavy users directly
+
+**Individual client alert:**
+- Trigger when single client makes >100 requests/day
+- Send personalized migration assistance
+- Escalate if no response
+
+**Error rate alert:**
+- Trigger when error rate >5% on deprecated endpoints
+- Investigate immediately
+- May indicate breaking changes
+
+**Sunset reminders:**
+- Send at 90 days before sunset
+- Send at 60 days before sunset
+- Send at 30 days before sunset
+- Send at 7 days before sunset
 
 ## Documentation Requirements
 
-### API Documentation Updates
-- Mark deprecated endpoints with clear indicators
-- Provide migration timeline in endpoint documentation
-- Include code examples for both old and new versions
-- Maintain change log with deprecation announcements
+You maintain specific documentation during deprecation.
 
-### Migration Documentation
-- Step-by-step migration guides
-- Code comparison examples (before/after)
-- Testing recommendations
-- Rollback procedures
+### Update API Documentation
 
-### Communication Templates
-- Email notification templates for different phases
-- Developer portal announcement templates
-- Support ticket response templates
-- Blog post templates for public API changes
+Mark deprecated endpoints clearly:
+- Add deprecation badges to endpoint docs
+- Include the sunset date prominently
+- Show migration timeline
+- Provide before/after code examples
 
-## Legal and Compliance Considerations
+**Example deprecation notice:**
+```
+⚠️ DEPRECATED: This endpoint will be removed on 2025-12-31
+Migration guide: https://docs.example.com/migrate-v1-to-v2
+Replacement: GET /v2/customers
+```
 
-### Terms of Service Updates
-- Update API terms to reflect deprecation policies
-- Define support obligations for deprecated versions
-- Specify client responsibilities during migration
-- Include liability limitations for deprecated endpoints
+### Create Migration Guides
 
-### SLA Adjustments
-- Reduced SLA commitments for deprecated endpoints
-- Performance guarantees during migration periods
-- Support level agreements for deprecated versions
-- Incident response procedures for deprecated endpoints
+Write step-by-step instructions:
+- List all breaking changes
+- Show code comparisons (old vs new)
+- Explain testing strategies
+- Document rollback procedures
 
-### Data Retention
-- Specify data retention policies for deprecated endpoints
-- Define data migration procedures
-- Document data export capabilities
+**Migration guide sections:**
+1. What changed
+2. Why we changed it
+3. Step-by-step migration steps
+4. Before and after code examples
+5. Testing checklist
+6. Common problems and solutions
+7. Rollback instructions
+
+### Prepare Communication Templates
+
+Create templates for each deprecation phase:
+
+**Email template (initial announcement):**
+```
+Subject: [Action Required] API v1 Deprecation - Migrate by Dec 31, 2025
+
+We are deprecating API v1 on Dec 31, 2025.
+
+Action required:
+- Migrate to v2 before the sunset date
+- Review the migration guide: [link]
+- Test your integration with v2
+
+Timeline:
+- Now: v1 marked as deprecated
+- Dec 31, 2025: v1 will stop working
+
+Need help? Reply to this email or visit [support link]
+```
+
+**Developer portal announcement:**
+```
+API v1 Deprecation Notice
+Sunset Date: December 31, 2025
+Migration Guide: [link]
+Support: [contact info]
+```
+
+**Support ticket template:**
+```
+Thank you for contacting support.
+
+API v1 is deprecated and will be removed on Dec 31, 2025.
+Please migrate to v2 using our guide: [link]
+
+We can help with:
+- Migration questions
+- Testing assistance
+- Custom timeline discussions
+```
+
+## Legal and Compliance
+
+You update legal agreements during deprecation.
+
+### Update Terms of Service
+
+Revise your API terms to cover deprecation:
+- State your deprecation timeline policies
+- Define support obligations for old versions
+- Specify client migration responsibilities
+- Limit liability for deprecated endpoints
+
+**Example ToS clause:**
+```
+We may deprecate API versions with 12 months notice.
+Deprecated versions receive limited support.
+You must migrate before the sunset date.
+We are not liable for issues with deprecated versions after sunset.
+```
+
+### Adjust Service Level Agreements
+
+Change SLA commitments for deprecated versions:
+- Reduce uptime guarantees (from 99.9% to 99%)
+- Lower performance commitments
+- Limit support response times
+- Define incident response priorities
+
+**Example SLA adjustment:**
+```
+Current version v2:
+- 99.9% uptime
+- Under 200ms p95 latency
+
+Deprecated version v1:
+- 99% uptime
+- Under 500ms p95 latency
+```
+
+### Document Data Retention
+
+Clarify data handling during deprecation:
+- State how long you keep data from deprecated endpoints
+- Explain data migration procedures
+- Provide data export capabilities
 - Maintain audit logs for compliance
 
-This comprehensive deprecation policy ensures consistent, predictable API evolution while maintaining positive relationships with API consumers and meeting legal obligations.
+**Example data policy:**
+```
+We retain request logs for deprecated endpoints for 90 days after sunset.
+You can export your data before the sunset date using [export tool].
+After sunset, data may not be recoverable.
+```
+
+## Summary
+
+Good deprecation policies balance several goals:
+- Protect clients from breaking changes
+- Reduce your maintenance burden
+- Maintain client trust and relationships
+- Meet legal obligations
+
+**Key success factors:**
+- Clear timelines with adequate notice periods
+- Standard HTTP headers for machine detection
+- Comprehensive migration support
+- Proactive client communication
+- Careful monitoring and metrics
+
+Follow these policies to ensure smooth API evolution.

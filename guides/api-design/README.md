@@ -2,101 +2,125 @@
 
 > **📖 Reading Guide**
 > 
-> **⏱️ Reading Time:** 2 minutes | **🟢 Level:** Beginner
+> **⏱️ Reading Time:** 3 minutes | **🟢 Level:** Beginner
 > 
 > **📋 Prerequisites:** Basic HTTP knowledge  
-> **🎯 Key Topics:** REST, HTTP, API Design
+> **🎯 Key Topics:** Authentication, Security, Data
 > 
-> **📊 Complexity:** 8.5 grade level • 2.1% technical density • easy
+> **📊 Complexity:** 9.7 grade level • 2.5% technical density • fairly difficult
 
-## Overview
+## Who Should Use This Guide?
 
-This directory contains comprehensive, language-agnostic standards for designing well-structured REST APIs. These guides establish patterns, conventions, and best practices that apply to any technology stack.
+Do you build REST APIs? This guide is for you.
 
-All documentation uses only HTTP, JSON, and YAML examples—no programming language code. For language-specific implementations, see the [Spring implementation guides](../../languages/spring/).
+**You will learn:**
+- How to build APIs for any language
+- HTTP and JSON standards
+- How to make APIs work the same way each time
+- How to handle errors
+- How to add security
 
-## Quick Start
+## What You'll Find Here
 
-**New to API design?** Start with [Foundations](foundations/README.md) to learn HTTP fundamentals and resource naming conventions.
+These guides teach REST API design. 
 
-**Assessing an existing API?** Use the [Richardson Maturity Model](maturity-model/README.md) to evaluate your API's maturity level.
+We show you:
+- HTTP examples
+- JSON examples  
+- YAML examples
 
-## Documentation Sections
+We don't show code. This works for all languages.
+
+**Want code?** Go to our [Spring guides](../../languages/spring/). See Java examples there.
+
+## Start Here
+
+**New to APIs?** 
+
+Start with [Foundations](foundations/README.md). You will learn:
+- HTTP basics
+- How to name resources
+
+**Have an API?** 
+
+Use the [Maturity Model](maturity-model/README.md) to check its quality.
+
+## Learn by Topic
 
 ### [Foundations](foundations/README.md)
-Core HTTP concepts and REST principles that form the basis of all API design.
+Start here. Learn HTTP and REST basics.
 
 - **[HTTP Fundamentals](foundations/http-fundamentals.md)** - Methods, status codes, headers
-- **[Resource Naming](foundations/resource-naming-and-url-structure.md)** - URL patterns and conventions
-- **[Versioning Strategy](foundations/api-version-strategy.md)** - URI-based versioning patterns
-- **[API Lifecycle](foundations/api-lifecycle.md)** - Deprecation and sunset policies
-- **[Idempotency & Safety](foundations/idempotency-and-safety.md)** - Safe operations and retry patterns
-- **[Governance](foundations/api-governance.md)** - Design review and enforcement
+- **[Resource Naming](foundations/resource-naming-and-url-structure.md)** - Design clean URLs
+- **[Versioning Strategy](foundations/api-version-strategy.md)** - Plan for changes
+- **[API Lifecycle](foundations/api-lifecycle.md)** - Manage deprecation
+- **[Idempotency & Safety](foundations/idempotency-and-safety.md)** - Build safe retries
+- **[Governance](foundations/api-governance.md)** - Review and enforce rules
 
 ### [Request-Response](request-response/README.md)
-Standards for request and response formatting, error handling, and data pagination.
+Format data and errors.
 
-- **[Content Types](request-response/content-types-and-structure.md)** - JSON structure standards
-- **[Content Negotiation](request-response/content-negotiation.md)** - Accept headers and media types
-- **[Error Standards](request-response/error-response-standards.md)** - RFC 7807 Problem Details
-- **[Pagination & Filtering](request-response/pagination-and-filtering.md)** - Collection response patterns
-- **[Schema Conventions](request-response/schema-conventions.md)** - Naming and format standards
-- **[Streaming APIs](request-response/streaming-apis.md)** - SSE and NDJSON patterns
+- **[Content Types](request-response/content-types-and-structure.md)** - Structure JSON data
+- **[Content Negotiation](request-response/content-negotiation.md)** - Support many formats
+- **[Error Standards](request-response/error-response-standards.md)** - Use RFC 7807
+- **[Pagination & Filtering](request-response/pagination-and-filtering.md)** - Handle large data
+- **[Schema Conventions](request-response/schema-conventions.md)** - Name fields well
+- **[Streaming APIs](request-response/streaming-apis.md)** - Stream with SSE and NDJSON
 
 ### [Security](security/README.md)
-Authentication, authorization, and security header standards.
+Protect your APIs.
 
-- **[Security Standards](security/security-standards.md)** - OAuth 2.1, JWT, CORS, rate limiting
+- **[Security Standards](security/security-standards.md)** - Use OAuth 2.1, JWT, CORS, rate limiting
 
 ### [Advanced Patterns](advanced-patterns/README.md)
-Patterns for complex API scenarios beyond basic CRUD operations.
+Go beyond basic operations.
 
-- **[Async Operations](advanced-patterns/async-operations.md)** - Long-running tasks and polling
-- **[Batch Operations](advanced-patterns/batch-operations.md)** - Bulk create, update, delete
-- **[HTTP Caching](advanced-patterns/http-caching.md)** - Cache-Control, ETags
-- **[Rate Limiting](advanced-patterns/rate-limiting.md)** - Throttling and quota headers
-- **[Streaming Patterns](advanced-patterns/http-streaming-patterns.md)** - Real-time data streaming
-- **[Hypermedia Controls](advanced-patterns/hypermedia-controls.md)** - HATEOAS implementation
+- **[Async Operations](advanced-patterns/async-operations.md)** - Run long tasks in the background
+- **[Batch Operations](advanced-patterns/batch-operations.md)** - Process many items at once
+- **[HTTP Caching](advanced-patterns/http-caching.md)** - Speed up responses
+- **[Rate Limiting](advanced-patterns/rate-limiting.md)** - Prevent abuse
+- **[Streaming Patterns](advanced-patterns/http-streaming-patterns.md)** - Send real-time updates
+- **[Hypermedia Controls](advanced-patterns/hypermedia-controls.md)** - Build self-describing APIs
 
 ### [Documentation](documentation/README.md)
-API documentation and OpenAPI specification standards.
+Write and test your docs.
 
-- **[OpenAPI Standards](documentation/openapi-standards.md)** - OpenAPI 3.1 structure
-- **[Documentation Testing](documentation/documentation-testing.md)** - Validating API docs
-- **[Tools & Integration](documentation/documentation-tools-and-integration.md)** - Swagger UI, Redoc
+- **[OpenAPI Standards](documentation/openapi-standards.md)** - Write OpenAPI 3.1 specs
+- **[Documentation Testing](documentation/documentation-testing.md)** - Validate docs
+- **[Tools & Integration](documentation/documentation-tools-and-integration.md)** - Use Swagger UI, Redoc
 
 ### [Maturity Model](maturity-model/README.md)
-Richardson Maturity Model assessment framework for evaluating API design quality.
+Check and improve API quality.
 
-- **[Assessment Guide](maturity-model/assessment-guide.md)** - 5-minute maturity assessment
-- **[Level 0](maturity-model/level-0/)** - Single endpoint, RPC-style APIs
-- **[Level 1](maturity-model/level-1/)** - Resource-based URIs
-- **[Level 2](maturity-model/level-2/)** - HTTP verbs (industry standard)
-- **[Level 3](maturity-model/level-3/)** - Hypermedia controls (HATEOAS)
+- **[Assessment Guide](maturity-model/assessment-guide.md)** - Take a 5-minute test
+- **[Level 0](maturity-model/level-0/)** - Single endpoint
+- **[Level 1](maturity-model/level-1/)** - Many resources
+- **[Level 2](maturity-model/level-2/)** - HTTP verbs (standard)
+- **[Level 3](maturity-model/level-3/)** - Full hypermedia
 
-## Supporting Materials
+## More Resources
 
 ### Examples
-- [Streaming Examples](examples/streaming/) - SSE, NDJSON, bulk processing
-- [Versioning Examples](examples/versioning/) - Migration patterns
+- [Streaming Examples](examples/streaming/) - See SSE, NDJSON, bulk processing
+- [Versioning Examples](examples/versioning/) - See migration patterns
 
 ### Reference
 - [Streaming Reference](reference/streaming/) - SSE spec, NDJSON spec, flow control
 - [Versioning Reference](reference/versioning/) - Deprecation policies
 
 ### Troubleshooting
-- [Streaming Issues](troubleshooting/streaming/) - Common problems and solutions
-- [Versioning Issues](troubleshooting/versioning/) - Migration challenges
+- [Streaming Issues](troubleshooting/streaming/) - Fix common issues
+- [Versioning Issues](troubleshooting/versioning/) - Fix migration problems
 
 ## Key Standards
 
-| Topic | Standard | Reference |
-|-------|----------|-----------|
-| Error Format | RFC 7807 Problem Details | [Error Standards](request-response/error-response-standards.md) |
-| Deprecation | RFC 8594 Sunset Header | [API Lifecycle](foundations/api-lifecycle.md) |
-| Caching | RFC 7234 HTTP Caching | [HTTP Caching](advanced-patterns/http-caching.md) |
-| Authentication | OAuth 2.1, JWT | [Security Standards](security/security-standards.md) |
-| Streaming | SSE (W3C), NDJSON | [Streaming APIs](request-response/streaming-apis.md) |
+We follow these standards:
+
+- **Errors:** RFC 7807 - [Error Standards](request-response/error-response-standards.md)
+- **Deprecation:** RFC 8594 - [API Lifecycle](foundations/api-lifecycle.md)
+- **Caching:** RFC 7234 - [HTTP Caching](advanced-patterns/http-caching.md)
+- **Security:** OAuth 2.1, JWT - [Security Standards](security/security-standards.md)
+- **Streaming:** SSE, NDJSON - [Streaming APIs](request-response/streaming-apis.md)
 
 ## Navigation
 

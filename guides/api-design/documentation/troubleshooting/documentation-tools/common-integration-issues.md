@@ -1,16 +1,35 @@
 # Common Integration Issues and Solutions
 
-This guide covers common problems with documentation tools and how to fix them.
+This guide helps you fix common documentation tool problems.
+
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 9 minutes | **🟢 Level:** Intermediate
+> 
+> **📋 Prerequisites:** HTTP fundamentals, basic API experience  
+> **🎯 Key Topics:** Troubleshooting, Documentation Tools, Integration
+> 
+> **📊 Complexity:** 7.2 grade level • 1.1% technical density • easy
 
 ## Swagger UI Issues
 
 ### Swagger UI Won't Load
-**What you see:**
-- Blank page or loading spinner
-- Browser shows missing file errors
-- CORS errors
 
-**How to fix:**
+**Problem:** You see a blank page, endless loading spinner, or CORS errors.
+
+**What causes this:**
+- Your OpenAPI spec has validation errors
+- CORS headers are missing or incorrect
+- File permissions block access
+- CDN files fail to load
+
+**Quick Fix:**
+1. Validate your OpenAPI file first
+2. Check CORS headers on your server
+3. Verify file permissions allow reading
+4. Test CDN file URLs in your browser
+
+**Validation commands:**
 ```bash
 # Check if OpenAPI spec is valid
 swagger-codegen validate -i openapi.yaml
@@ -22,21 +41,24 @@ curl -I -H "Origin: http://localhost:3000" http://api.example.com/openapi.yaml
 ls -la openapi.yaml
 ```
 
-**Quick fixes:**
-- Check OpenAPI file is valid
-- Fix CORS headers
-- Check file paths and permissions
-- Check CDN files work
+### Authentication Not Working
 
-### Problem: Authentication Not Working
-**What you see:**
-- API calls fail with 401/403 errors
-- Authorization header not sent
-- OAuth flow redirects fail
+**Problem:** API calls fail with 401 or 403 errors. Authorization headers don't get sent.
 
-**How to fix:**
+**What causes this:**
+- OAuth URLs are wrong or unreachable
+- Security schemes don't match your API
+- Scopes are missing or incorrect
+- Redirect URLs are misconfigured
+
+**Quick Fix:**
+1. Open your browser's network tab
+2. Watch for authentication requests
+3. Check if OAuth URLs respond
+4. Verify scopes match API needs
+
+**Correct OAuth2 setup:**
 ```yaml
-# Correct OAuth2 configuration
 securitySchemes:
   oauth2:
     type: oauth2
@@ -49,21 +71,24 @@ securitySchemes:
           write:orders: Create and update orders
 ```
 
-**Debugging Steps:**
-1. Check browser network tab for auth requests
-2. Verify OAuth URLs are accessible
-3. Confirm scopes match API requirements
-4. Test auth flow manually
+### Large API Spec Performance
 
-### Problem: Large API Spec Performance
-**What you see:**
-- Slow loading times
-- Browser freezing
-- Memory issues
+**Problem:** The page loads slowly. Your browser freezes or runs out of memory.
 
-**How to fix:**
+**What causes this:**
+- Your OpenAPI spec is too large
+- All endpoints load at once
+- Schemas expand recursively
+- No lazy loading is enabled
+
+**Quick Fix:**
+1. Split your spec into multiple files
+2. Use `$ref` to link files together
+3. Enable lazy loading in Swagger UI
+4. Consider switching to Redoc
+
+**Split large specs:**
 ```yaml
-# Split large specs into multiple files
 # main.yaml
 openapi: 3.0.0
 info:
@@ -79,21 +104,25 @@ components:
     $ref: './schemas/index.yaml'
 ```
 
-**Performance Optimizations:**
-- Use `$ref` to split large specifications
-- Implement lazy loading for large schemas
-- Consider using Redoc for better performance
-- Paginate or group API endpoints
-
 ## Redoc Issues
 
-### Problem: Styling Conflicts
-**What you see:**
-- Broken layout
-- Missing styles
-- Overlapping elements
+### Styling Conflicts
 
-**How to fix:**
+**Problem:** The layout breaks. Styles go missing. Elements overlap each other.
+
+**What causes this:**
+- Your site's CSS conflicts with Redoc
+- Global styles override Redoc styles
+- Multiple stylesheets clash
+- No CSS isolation exists
+
+**Quick Fix:**
+1. Wrap Redoc in its own container
+2. Use CSS namespacing
+3. Test Redoc on a blank page first
+4. Check for conflicting stylesheets
+
+**Isolate Redoc styles:**
 ```html
 <!-- Isolate Redoc styles -->
 <div class="redoc-container">
@@ -114,21 +143,24 @@ components:
 </style>
 ```
 
-**Prevention:**
-- Use CSS namespacing
-- Test in isolation
-- Check for conflicting stylesheets
-- Use CSS-in-JS if needed
+### Custom Themes Not Applied
 
-### Problem: Custom Themes Not Applied
-**What you see:**
-- Default theme still showing
-- Custom colors not applied
-- Font changes ignored
+**Problem:** Redoc shows the default theme. Your custom colors and fonts don't appear.
 
-**How to fix:**
+**What causes this:**
+- Invalid JSON in theme config
+- Browser cache shows old version
+- Theme file doesn't load
+- Config path is wrong
+
+**Quick Fix:**
+1. Validate your JSON syntax
+2. Clear your browser cache
+3. Check the network tab for theme file
+4. Test with a simple theme first
+
+**Custom theme config:**
 ```json
-// Custom theme configuration
 {
   "theme": {
     "colors": {
@@ -154,21 +186,25 @@ components:
 }
 ```
 
-**Troubleshooting:**
-- Verify theme JSON is valid
-- Check browser cache
-- Ensure theme file is loaded
-- Test with minimal theme first
-
 ## GitHub Pages Deployment Issues
 
-### Problem: 404 Errors After Deployment
-**What you see:**
-- Main page loads but assets return 404
-- Relative links broken
-- Images not displaying
+### 404 Errors After Deployment
 
-**How to fix:**
+**Problem:** The main page loads but assets return 404. Links and images break.
+
+**What causes this:**
+- Relative paths don't work on GitHub Pages
+- Base URL is not configured
+- Assets are in wrong directory
+- Branch protection blocks deployment
+
+**Quick Fix:**
+1. Use absolute paths for all assets
+2. Set the correct base URL
+3. Check repository settings
+4. Verify branch protection rules
+
+**Fix base URL:**
 ```yaml
 # Fix base URL in GitHub Actions
 - name: Deploy to GitHub Pages
@@ -180,21 +216,24 @@ components:
     destination_dir: docs
 ```
 
-**Quick fixes:**
-- Use absolute paths for assets
-- Configure base URL correctly
-- Check repository settings
-- Verify branch protection rules
+### Build Fails in Actions
 
-### Problem: Build Fails in Actions
-**What you see:**
-- GitHub Actions workflow fails
-- Build step errors
-- Permission denied errors
+**Problem:** GitHub Actions workflow fails. You see permission or build errors.
 
-**How to fix:**
+**What causes this:**
+- Workflow lacks proper permissions
+- Node or tool versions mismatch
+- Dependencies are missing
+- Local build works but CI fails
+
+**Quick Fix:**
+1. Add required permissions to workflow
+2. Match tool versions with local setup
+3. Test your build locally first
+4. Check for missing dependencies
+
+**Add proper permissions:**
 ```yaml
-# Add proper permissions
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -211,23 +250,26 @@ jobs:
           cache: 'npm'
 ```
 
-**Debugging:**
-- Check workflow permissions
-- Verify tooling version compatibility
-- Test build locally first
-- Check for missing dependencies
-
 ## Backstage Integration Issues
 
-### Problem: API Not Appearing in Catalog
-**What you see:**
-- API registered but not visible
-- Catalog shows empty results
-- Discovery errors in logs
+### API Not Appearing in Catalog
 
-**How to fix:**
+**Problem:** You register your API but it doesn't show up. The catalog looks empty.
+
+**What causes this:**
+- YAML syntax errors in catalog file
+- File paths point to wrong locations
+- Required fields are missing
+- Discovery process failed
+
+**Quick Fix:**
+1. Validate your YAML syntax
+2. Check all file paths are correct
+3. Look at Backstage logs for errors
+4. Test with a minimal catalog entry first
+
+**Correct catalog structure:**
 ```yaml
-# Correct catalog-info.yaml structure
 apiVersion: backstage.io/v1alpha1
 kind: API
 metadata:
@@ -245,21 +287,24 @@ spec:
     $text: ./openapi.yaml
 ```
 
-**Troubleshooting:**
-- Check YAML syntax
-- Verify file paths are correct
-- Review Backstage logs
-- Test with minimal catalog entry
+### TechDocs Not Building
 
-### Problem: TechDocs Not Building
-**What you see:**
-- Documentation pages show 404
-- Build fails with MkDocs errors
-- Missing documentation in portal
+**Problem:** Documentation pages return 404. MkDocs build fails.
 
-**How to fix:**
+**What causes this:**
+- mkdocs.yml file is missing
+- Plugin config is wrong
+- Markdown links are broken
+- index.md file doesn't exist
+
+**Quick Fix:**
+1. Add mkdocs.yml to your repo
+2. Include techdocs-core plugin
+3. Fix broken Markdown links
+4. Create an index.md file
+
+**mkdocs.yml config:**
 ```yaml
-# mkdocs.yml configuration
 site_name: My API Documentation
 plugins:
   - techdocs-core
@@ -270,23 +315,26 @@ nav:
   - API Reference: reference.md
 ```
 
-**Common Issues:**
-- Missing mkdocs.yml file
-- Incorrect plugin configuration
-- Broken Markdown links
-- Missing index.md file
-
 ## CI/CD Pipeline Issues
 
-### Problem: OpenAPI Validation Fails
-**What you see:**
-- Pipeline fails at validation step
-- Spec lint errors
-- Invalid OpenAPI format
+### OpenAPI Validation Fails
 
-**How to fix:**
+**Problem:** Your pipeline fails at the validation step. You see lint errors.
+
+**What causes this:**
+- Required fields are missing
+- Schema references are invalid
+- HTTP status codes are wrong
+- Examples are malformed
+
+**Quick Fix:**
+1. Run validators locally first
+2. Fix one error type at a time
+3. Check schema references carefully
+4. Validate all examples
+
+**Run multiple validators:**
 ```bash
-# Use multiple validators
 # Spectral for advanced linting
 spectral lint openapi.yaml
 
@@ -297,21 +345,25 @@ swagger-codegen validate -i openapi.yaml
 redocly lint openapi.yaml
 ```
 
-**Common Validation Errors:**
-- Missing required fields
-- Invalid schema references
-- Incorrect HTTP status codes
-- Malformed examples
+### Documentation Not Updating
 
-### Problem: Documentation Not Updating
-**What you see:**
-- Changes not reflected in docs
-- Caching issues
-- Stale content
+**Problem:** You make changes but the docs stay the same. Content looks stale.
 
-**How to fix:**
+**What causes this:**
+- CDN cache holds old version
+- Build didn't actually run
+- Deployment failed silently
+- Browser cache is active
+
+**Quick Fix:**
+1. Check if the build ran
+2. Verify deployment succeeded
+3. Clear your browser cache
+4. Test in incognito mode
+5. Purge CDN cache if needed
+
+**Force cache clear:**
 ```yaml
-# Force cache invalidation
 - name: Deploy documentation
   run: |
     # Clear CDN cache
@@ -321,23 +373,26 @@ redocly lint openapi.yaml
       --data '{"purge_everything":true}'
 ```
 
-**Debugging Steps:**
-1. Check if build actually ran
-2. Verify deployment succeeded
-3. Clear browser cache
-4. Test in incognito mode
-
 ## Authentication and Authorization Issues
 
-### Problem: OAuth Flow Broken
-**What you see:**
-- Redirect loops
-- Token not persisting
-- PKCE errors
+### OAuth Flow Broken
 
-**How to fix:**
+**Problem:** OAuth creates redirect loops. Tokens don't persist. PKCE fails.
+
+**What causes this:**
+- Redirect URL doesn't match config
+- PKCE is not enabled
+- Scope separator is wrong
+- CORS blocks the auth flow
+
+**Quick Fix:**
+1. Check redirect URL matches exactly
+2. Enable PKCE in your config
+3. Use space as scope separator
+4. Fix CORS to allow auth domain
+
+**Correct OAuth setup:**
 ```javascript
-// Correct OAuth configuration
 const swaggerUIBundle = SwaggerUIBundle({
   url: '/openapi.yaml',
   dom_id: '#swagger-ui',
@@ -352,21 +407,24 @@ const swaggerUIBundle = SwaggerUIBundle({
 });
 ```
 
-**Common Issues:**
-- Incorrect redirect URL
-- Missing PKCE configuration
-- Scope format problems
-- CORS configuration errors
+### API Keys Not Working
 
-### Problem: API Keys Not Working
-**What you see:**
-- Authentication header missing
-- API key format incorrect
-- Security scheme not applied
+**Problem:** Headers don't include your API key. Auth fails for all requests.
 
-**How to fix:**
+**What causes this:**
+- Header name doesn't match API
+- Key format is wrong (Bearer vs plain)
+- Security scheme isn't applied
+- API key has expired
+
+**Quick Fix:**
+1. Check header name matches your API
+2. Verify key format (Bearer, Basic, plain)
+3. Apply security to operations
+4. Test with a valid, non-expired key
+
+**Correct API key setup:**
 ```yaml
-# Correct API key security scheme
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -383,23 +441,26 @@ paths:
         - ApiKeyAuth: []
 ```
 
-**Verification:**
-- Check header name matches API expectations
-- Verify key format (Bearer, Basic, etc.)
-- Test with actual API key
-- Check for key expiration
-
 ## Performance and Scalability Issues
 
-### Problem: Slow Documentation Loading
-**What you see:**
-- Long page load times
-- High bandwidth usage
-- Poor user experience
+### Slow Documentation Loading
 
-**How to fix:**
+**Problem:** Pages take too long to load. Users experience poor performance.
+
+**What causes this:**
+- No compression is enabled
+- Cache headers are missing
+- Assets are not on a CDN
+- Images are too large
+
+**Quick Fix:**
+1. Enable gzip compression
+2. Add cache headers
+3. Use a CDN for static files
+4. Optimize or lazy-load images
+
+**Nginx config:**
 ```nginx
-# Nginx configuration for documentation
 server {
     location /docs {
         # Enable compression
@@ -416,21 +477,24 @@ server {
 }
 ```
 
-**Optimizations:**
-- Implement CDN caching
-- Compress static assets
-- Use lazy loading
-- Optimize images
+### High Memory Usage
 
-### Problem: High Memory Usage
-**What you see:**
-- Browser crashes
-- Slow rendering
-- Memory leaks
+**Problem:** The browser crashes or slows down. Memory usage keeps growing.
 
-**How to fix:**
+**What causes this:**
+- All models expand at once
+- DOM grows too large
+- Event listeners never clean up
+- No virtual scrolling exists
+
+**Quick Fix:**
+1. Collapse models by default
+2. Disable auto-expansion
+3. Use virtual scrolling
+4. Clean up event listeners
+
+**Limit memory usage:**
 ```javascript
-// Implement pagination for large APIs
 const swaggerUIBundle = SwaggerUIBundle({
   url: '/openapi.yaml',
   dom_id: '#swagger-ui',
@@ -441,15 +505,18 @@ const swaggerUIBundle = SwaggerUIBundle({
 });
 ```
 
-**Memory Management:**
-- Use virtual scrolling
-- Implement progressive loading
-- Optimize DOM structure
-- Clean up event listeners
-
 ## Monitoring and Debugging
 
 ### Essential Monitoring
+
+**Check these regularly:**
+
+1. **Documentation availability** - Test if docs load
+2. **Spec validity** - Run validators daily
+3. **SSL certificates** - Check expiration dates
+4. **Error logs** - Watch for 404s and errors
+
+**Monitoring commands:**
 ```bash
 # Check documentation availability
 curl -I https://api-docs.example.com/
@@ -462,25 +529,41 @@ openssl s_client -connect api-docs.example.com:443 -servername api-docs.example.
 ```
 
 ### Debugging Tools
-- Browser Developer Tools
-- Network tab for API calls
-- Console for script errors
-- Lighthouse for performance
-- OpenAPI validators
+
+**Use these tools to debug issues:**
+- Browser Developer Tools (F12)
+- Network tab for request inspection
+- Console for JavaScript errors
+- Lighthouse for performance audits
+- OpenAPI validators for spec issues
 
 ### Log Analysis
+
+**Watch for these patterns:**
 ```bash
-# Common log patterns to monitor
+# Find 404 errors
 grep "404" /var/log/nginx/access.log | head -10
+
+# Find OpenAPI issues
 grep "OpenAPI" /var/log/application.log
+
+# Find general errors
 grep "ERROR" /var/log/documentation.log
 ```
 
 ## Prevention Strategies
 
 ### Automated Testing
+
+**Test your docs in CI/CD:**
+
+1. Validate OpenAPI spec
+2. Test example requests
+3. Check for broken links
+4. Verify authentication flows
+
+**CI/CD test example:**
 ```yaml
-# Test documentation in CI/CD
 - name: Test documentation
   run: |
     # Validate OpenAPI spec
@@ -494,8 +577,13 @@ grep "ERROR" /var/log/documentation.log
 ```
 
 ### Health Checks
+
+**Monitor docs health continuously:**
+
+Add a health check endpoint that tests key components. Return 200 if healthy, 503 if not.
+
+**Health check endpoint:**
 ```javascript
-// Documentation health check endpoint
 app.get('/health/docs', (req, res) => {
   const checks = {
     openapi_spec: checkOpenAPISpec(),
@@ -510,9 +598,11 @@ app.get('/health/docs', (req, res) => {
 ```
 
 ### Regular Maintenance
-- Monthly link validation
-- Quarterly tool updates
-- Annual security reviews
-- Continuous performance monitoring
 
-By following these troubleshooting guides and prevention strategies, you can maintain reliable and performant API documentation throughout your development lifecycle.
+**Keep your docs healthy:**
+- **Monthly:** Validate all links
+- **Quarterly:** Update tools and dependencies
+- **Annually:** Review security settings
+- **Continuously:** Monitor performance metrics
+
+These strategies help you maintain reliable docs throughout your development lifecycle.
