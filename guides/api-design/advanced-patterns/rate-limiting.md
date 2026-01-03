@@ -877,6 +877,8 @@ RateLimit-Policy: 10;w=1, 500;w=3600, 5000;w=86400
 - [Error Response Standards](../request-response/error-response-standards.md) - Error formatting
 - [API Observability Standards](./api-observability-standards.md) - Monitoring throttling
 - [Security Standards](../security/security-standards.md) - Protecting against abuse
+- [HTTP Client Best Practices](./http-client-best-practices.md) - Retry patterns for handling 429 responses
+- [Performance Standards](./performance-standards.md) - Maintaining performance under load
 
 ### Industry Examples
 - GitHub API: X-RateLimit headers with per-resource limits

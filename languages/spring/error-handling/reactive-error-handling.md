@@ -581,4 +581,5 @@ public class ReactiveOrderControllerTest {
 - [Error Response Formats](./error-response-formats.md) - RFC 7807 and response structures
 - [Imperative Error Handling](./imperative-error-handling.md) - Spring MVC global exception handlers
 - [Validation Standards](./validation-standards.md) - Bean validation and custom validators
+- [Schema Validation](../validation/schema-validation.md) - Complete validation patterns (imperative examples apply to reactive)
 - [Error Logging and Monitoring](./error-logging-and-monitoring.md) - Structured logging and metrics

@@ -130,7 +130,7 @@ Retry-After: 30
 ### Polling Best Practices
 
 1. **Use Retry-After Header**: Tell clients when to poll again
-2. **Implement Exponential Backoff**: Start with short intervals, increase gradually
+2. **Implement Exponential Backoff**: Start with short intervals, increase gradually (see [HTTP Client Best Practices](./http-client-best-practices.md#exponential-backoff) for implementation details)
 3. **Set Maximum Poll Frequency**: Prevent excessive requests
 4. **Return Progress Information**: Help clients show progress bars
 
@@ -664,6 +664,8 @@ GET /operations/op-abc123 HTTP/1.1
 - [Event-Driven Architecture](./event-driven-architecture.md): Event patterns for async systems
 - [API Observability Standards](./api-observability-standards.md): Monitoring async operations
 - [Error Response Standards](../request-response/error-response-standards.md): Error handling for async failures
+- [HTTP Client Best Practices](./http-client-best-practices.md): Retry patterns and exponential backoff for polling
+- [Performance Standards](./performance-standards.md): Response time SLAs for long-running operations
 
 ## Implementation Notes
 

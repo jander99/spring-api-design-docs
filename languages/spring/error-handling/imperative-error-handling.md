@@ -505,4 +505,5 @@ public ResponseEntity<Object> handleDataAccessException(DataAccessException ex, 
 - [Error Response Formats](./error-response-formats.md) - RFC 7807 and response structures
 - [Reactive Error Handling](./reactive-error-handling.md) - WebFlux error handling patterns
 - [Validation Standards](./validation-standards.md) - Bean validation and custom validators
+- [Schema Validation](../validation/schema-validation.md) - Complete validation patterns and error handling
 - [Error Logging and Monitoring](./error-logging-and-monitoring.md) - Structured logging and metrics

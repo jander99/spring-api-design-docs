@@ -642,3 +642,4 @@ private OrderResponse createOrderResponse() {
 - [Unit Testing Fundamentals](unit-testing-fundamentals.md) - Core testing principles and setup
 - [Reactive Testing](../specialized-testing/reactive-testing.md) - Testing reactive components in detail
 - [API Integration Testing](../integration-testing/api-integration-testing.md) - Full API integration tests
+- [Schema Validation](../../validation/schema-validation.md#testing-validation-logic) - Comprehensive validation testing patterns

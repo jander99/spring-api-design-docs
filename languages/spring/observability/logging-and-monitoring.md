@@ -1141,5 +1141,6 @@ public class OrderMetricsService {
 - [Error Logging and Monitoring](../error-handling/error-logging-and-monitoring.md) - Error handling observability
 - [Infrastructure Testing](../testing/specialized-testing/infrastructure-testing.md) - Testing observability components
 - [Security Context Propagation](../security/security-context-propagation.md) - Security context in traces
+- [HTTP Client Patterns](../http-clients/http-client-patterns.md) - HTTP client metrics and observability
 
 These logging and monitoring practices ensure comprehensive operational visibility into our microservices, enabling effective troubleshooting, performance analysis, and business intelligence.

@@ -217,3 +217,5 @@ These patterns are based on HTTP and JSON standards and work with any REST frame
 - [Error Response Standards](error-response-standards.md) - Error handling and RFC 7807 Problem Details
 - [Pagination and Filtering](pagination-and-filtering.md) - Collection response patterns
 - [Streaming APIs](streaming-apis.md) - Streaming response formats
+- [Advanced Schema Design](advanced-schema-design.md) - Schema composition and evolution strategies
+- [Performance Standards](../advanced-patterns/performance-standards.md) - Payload size optimization and compression

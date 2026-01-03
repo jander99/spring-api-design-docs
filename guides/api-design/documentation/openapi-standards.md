@@ -339,6 +339,10 @@ Implement a documentation review process as part of API design reviews:
 
 These OpenAPI standards ensure that developers have the information needed to successfully integrate with and use our APIs, with specifications that are both developer-friendly and machine-readable.
 
+## Advanced Schema Design
+
+For advanced schema patterns including polymorphism, composition, versioning, and backward compatibility strategies, see [Advanced Schema Design](../request-response/advanced-schema-design.md).
+
 ## Implementation Notes
 
 When implementing these OpenAPI standards:
@@ -349,3 +353,14 @@ When implementing these OpenAPI standards:
 - **Automation**: Integrate documentation generation and validation into CI/CD pipelines
 
 These standards work with any REST API framework and are based on OpenAPI specifications and industry-standard tooling.
+
+## Related Documentation
+
+- [Advanced Schema Design](../request-response/advanced-schema-design.md) - Schema composition, versioning, and evolution
+- [Schema Conventions](../request-response/schema-conventions.md) - Basic schema design principles
+- [API Version Strategy](../foundations/api-version-strategy.md) - API versioning approaches
+- [Schema Testing](../testing/schema-testing.md) - Testing OpenAPI schemas and examples
+- [Documentation Testing](./documentation-testing.md) - Testing API documentation
+
+### Spring Implementation
+- [Schema Validation](../../../languages/spring/validation/schema-validation.md) - Implementing schema validation in Spring Boot

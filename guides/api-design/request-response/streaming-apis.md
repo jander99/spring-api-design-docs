@@ -142,3 +142,4 @@ data: {"type":"processing-error","message":"Failed to process item"}
 - [Content Types and Structure](content-types-and-structure.md) - Basic request/response patterns
 - [Error Response Standards](error-response-standards.md) - Error handling patterns
 - [Pagination and Filtering](pagination-and-filtering.md) - Alternative patterns for large datasets
+- [Performance Standards](../advanced-patterns/performance-standards.md): Payload size optimization and NDJSON performance benefits

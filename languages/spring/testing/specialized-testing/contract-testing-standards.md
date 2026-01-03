@@ -160,3 +160,9 @@ response:
 - Establish process for contract breaking changes
 - Implement contract review in API design process
 - Train teams on contract-first development
+
+## Related Documentation
+
+- [Client-Side Testing](../../../../guides/api-design/testing/client-side-testing.md) - Contract testing from consumer perspective
+- [Schema Testing](../../../../guides/api-design/testing/schema-testing.md) - Schema validation and compatibility testing
+- [External Service Testing](../integration-testing/external-service-testing.md) - Testing external service integrations

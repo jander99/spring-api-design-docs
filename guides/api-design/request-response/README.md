@@ -57,6 +57,15 @@ Good request and response formats make APIs easy to use. These standards show ho
 - Advanced query capabilities
 - Performance optimization guidelines
 
+### 🔧 [Advanced Schema Design](advanced-schema-design.md)
+**Advanced patterns for complex schema design and evolution**
+- JSON Schema composition (allOf, anyOf, oneOf, not)
+- Reusable schema definitions with $defs and $ref
+- OpenAPI schema organization and polymorphism
+- Schema evolution and versioning strategies
+- Backward compatibility patterns
+- Schema validation best practices
+
 ### 🌊 [Streaming APIs](streaming-apis.md)
 **Streaming response formats for real-time and bulk data**
 - NDJSON streaming patterns

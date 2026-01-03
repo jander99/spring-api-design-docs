@@ -574,3 +574,9 @@ public class ValidationExceptionHandler {
 ```
 
 These mapping patterns ensure clean separation between API contracts and internal application structures while providing robust validation and error handling.
+
+## Related Documentation
+
+- [Schema Validation](../validation/schema-validation.md) - Complete validation patterns
+- [Error Response Formats](../error-handling/error-response-formats.md) - Error handling patterns
+- [Controller Fundamentals](./controller-fundamentals.md) - Basic controller concepts

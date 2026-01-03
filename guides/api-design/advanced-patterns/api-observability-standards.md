@@ -247,5 +247,6 @@ Content-Type: application/problem+json
 - [Observability Standards](../../observability/observability-standards.md) - Comprehensive observability practices
 - [Error Response Standards](../request-response/error-response-standards.md) - Error handling and RFC 7807
 - [Security Standards](../security/security-standards.md) - Authentication and authorization
+- [Performance Standards](./performance-standards.md): Server-Timing headers, percentile tracking, and performance budgets
 
 This guide provides HTTP endpoint patterns for exposing observability data. For detailed monitoring, logging, and tracing practices, refer to the comprehensive Observability Standards guide.

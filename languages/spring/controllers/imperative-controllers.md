@@ -367,3 +367,10 @@ public class OrderController {
 ```
 
 These imperative controller patterns provide a solid foundation for building robust, maintainable REST APIs using Spring MVC's blocking I/O model.
+
+## Related Documentation
+
+- [Schema Validation](../validation/schema-validation.md) - Complete validation patterns
+- [Imperative Error Handling](../error-handling/imperative-error-handling.md) - Error handling for Spring MVC
+- [Request Response Mapping](./request-response-mapping.md) - DTO mapping patterns
+- [Controller Testing](../testing/unit-testing/controller-unit-testing.md) - Testing strategies

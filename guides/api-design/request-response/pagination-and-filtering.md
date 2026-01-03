@@ -159,5 +159,6 @@ Always echo back applied filters:
 
 ### API Design Standards
 - [Content Types and Structure](content-types-and-structure.md) - Basic request/response patterns
+- [Performance Standards](../advanced-patterns/performance-standards.md) - Pagination performance patterns and optimization strategies
 - [Error Response Standards](error-response-standards.md) - Error handling patterns
 - [Streaming APIs](streaming-apis.md) - Alternative patterns for large datasets

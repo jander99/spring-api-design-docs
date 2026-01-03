@@ -354,3 +354,4 @@ public class ContentNegotiatingErrorResponseBuilder {
 - [Imperative Error Handling](./imperative-error-handling.md) - Spring MVC global exception handlers
 - [Reactive Error Handling](./reactive-error-handling.md) - WebFlux error handling patterns
 - [Validation Standards](./validation-standards.md) - Bean validation and custom validators
+- [Schema Validation](../validation/schema-validation.md) - Complete validation error handling examples
