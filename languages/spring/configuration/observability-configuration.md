@@ -1,12 +1,31 @@
 # Observability Configuration
 
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 18 minutes | **🟡 Level:** Intermediate
+> 
+> **📋 Prerequisites:** HTTP fundamentals, basic API experience  
+> **🎯 Key Topics:** Architecture
+> 
+> **📊 Complexity:** 11.8 grade level • 0.8% technical density • fairly difficult
+
 ## Overview
 
-This document outlines observability configuration patterns for Spring Boot microservices, covering metrics collection, distributed tracing, health checks, and monitoring setup using Micrometer, Spring Boot Actuator, and OpenTelemetry.
+This guide shows you how to set up monitoring for Spring Boot services.
+
+You will learn to configure four key areas:
+- Metrics: Track system performance
+- Tracing: Follow requests across services
+- Health checks: Monitor service status
+- Logging: Record system events
+
+We use three main tools: Micrometer, Spring Boot Actuator, and OpenTelemetry.
 
 ## Observability Properties
 
-### Observability Configuration Structure
+### Basic Configuration
+
+This YAML file configures your observability settings.
 
 ```yaml
 # application.yml
@@ -58,7 +77,10 @@ app:
         environment: ${ENVIRONMENT:development}
 ```
 
-### Observability Properties Class
+### Properties Class
+
+This Java class reads the YAML file.
+It checks that all settings are valid.
 
 ```java
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -97,7 +119,11 @@ public record ObservabilityProperties(
 
 ## Metrics Configuration
 
-### Micrometer Configuration
+### Configure Micrometer
+
+Micrometer collects metrics from your application.
+This config adds custom tags to all metrics.
+Tags help you filter and organize your data.
 
 ```java
 import io.micrometer.core.instrument.MeterRegistry;
@@ -135,7 +161,18 @@ public class MetricsConfig {
 }
 ```
 
-### Custom Metrics Configuration
+### Create Custom Metrics
+
+Create three types of metrics:
+
+**Counter**: Counts events.
+Use this for orders created.
+
+**Timer**: Tracks duration.
+Use this for operation time.
+
+**Gauge**: Shows current values.
+Use this for active users or queue size.
 
 ```java
 import io.micrometer.core.instrument.Counter;
@@ -182,7 +219,15 @@ public class CustomMetricsConfig {
 
 ## Distributed Tracing Configuration
 
-### OpenTelemetry Configuration
+### Configure OpenTelemetry
+
+OpenTelemetry tracks requests between services.
+It helps you find slow operations and errors.
+
+The config does three things:
+1. Names your service
+2. Sends data to Jaeger
+3. Controls sampling rate
 
 ```java
 import io.opentelemetry.api.OpenTelemetry;
@@ -243,7 +288,13 @@ public class TracingConfig {
 }
 ```
 
-### Spring Cloud Sleuth Configuration
+### Configure Spring Cloud Sleuth
+
+Sleuth is an alternative to OpenTelemetry.
+It provides tracing for Spring apps.
+
+This config sets the sampling rate.
+This controls how many requests to trace.
 
 ```java
 import brave.sampler.Sampler;
@@ -270,7 +321,14 @@ public class SleuthConfig {
 
 ## Health Check Configuration
 
-### Custom Health Indicators
+### Create Custom Health Indicators
+
+Health indicators check if your service is working properly.
+This example checks if the database is available.
+
+The indicator returns two states:
+- UP: Database is working
+- DOWN: Database has problems
 
 ```java
 import org.springframework.boot.actuate.health.Health;
@@ -311,7 +369,13 @@ public class DatabaseHealthIndicator implements HealthIndicator {
 }
 ```
 
-### Reactive Health Indicators
+### Create Reactive Health Indicators
+
+Reactive health indicators do not block threads.
+Use these with Spring WebFlux apps.
+
+This example checks a payment service.
+It uses Mono for reactive code.
 
 ```java
 import org.springframework.boot.actuate.health.Health;
@@ -345,7 +409,15 @@ public class ExternalServiceHealthIndicator implements ReactiveHealthIndicator {
 
 ## Actuator Configuration
 
-### Security Configuration for Actuator
+### Secure Actuator Endpoints
+
+Actuator endpoints expose sensitive system information.
+You must secure them to prevent unauthorized access.
+
+This config creates three security levels:
+- Public: Health and info (no login required)
+- Metrics role: Prometheus endpoint
+- Admin role: All other endpoints
 
 ```java
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
@@ -372,7 +444,13 @@ public class ActuatorSecurityConfig {
 }
 ```
 
-### Custom Actuator Endpoints
+### Create Custom Endpoints
+
+You can create custom actuator endpoints.
+These endpoints expose business metrics.
+
+This example shows order and payment statistics.
+Access it at `/actuator/business-metrics`.
 
 ```java
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
@@ -414,7 +492,16 @@ public class BusinessMetricsEndpoint {
 
 ## Logging Configuration
 
-### Structured Logging Configuration
+### Configure Logging Levels
+
+Set different log levels for different parts of your application.
+This controls how much detail you see in logs.
+
+Common log levels:
+- DEBUG: Very detailed information
+- INFO: General informational messages
+- WARN: Warning messages
+- ERROR: Error messages only
 
 ```yaml
 # application.yml
@@ -435,7 +522,16 @@ logging:
     max-history: ${LOG_FILE_MAX_HISTORY:30}
 ```
 
-### Logback Configuration
+### Configure Logback
+
+Logback is the logging framework for Spring Boot.
+Settings change based on your environment.
+
+**Development**: Logs show in the console.
+
+**Production**: Logs save to files.
+Files rotate daily and compress.
+Old files delete after 30 days.
 
 ```xml
 <!-- logback-spring.xml -->
@@ -480,7 +576,15 @@ logging:
 
 ## Monitoring Alerts Configuration
 
-### Micrometer Alert Configuration
+### Create Alert Metrics
+
+Alert metrics help monitoring systems detect problems.
+They expose values that trigger alerts when exceeded.
+
+This example creates three alert metrics:
+- Error rate: Percentage of failed requests
+- Response time: 99th percentile latency
+- Queue depth: Number of pending operations
 
 ```java
 import io.micrometer.core.instrument.Gauge;
@@ -529,9 +633,17 @@ public class AlertMetrics implements MeterBinder {
 }
 ```
 
-## Observability Configuration by Environment
+## Configuration by Environment
 
-### Development Configuration
+### Development Settings
+
+Development needs detailed info for debugging.
+
+Key differences:
+- All endpoints exposed
+- Full health details shown
+- 100% trace sampling
+- Debug logs enabled
 
 ```yaml
 # application-development.yml
@@ -564,7 +676,15 @@ logging:
     org.springframework.web: DEBUG
 ```
 
-### Production Configuration
+### Production Settings
+
+Production focuses on security and speed.
+
+Key differences:
+- Only key endpoints exposed
+- Health details hidden
+- 10% trace sampling
+- Info log level
 
 ```yaml
 # application-production.yml
@@ -599,9 +719,14 @@ logging:
     name: /var/log/order-service.log
 ```
 
-## Observability Testing
+## Testing Observability
 
-### Metrics Testing
+### Test Metrics
+
+Check that your app records metrics correctly.
+Use a test registry to avoid external tools.
+
+This test checks that orders increment the counter.
 
 ```java
 import io.micrometer.core.instrument.MeterRegistry;
@@ -638,7 +763,12 @@ class MetricsIntegrationTest {
 }
 ```
 
-### Health Check Testing
+### Test Health Checks
+
+Test that health checks return the correct status.
+Also verify that metrics endpoints are accessible.
+
+These tests use TestRestTemplate to call actuator endpoints.
 
 ```java
 import org.springframework.boot.test.context.SpringBootTest;
@@ -671,47 +801,92 @@ class ActuatorIntegrationTest {
 }
 ```
 
-## Observability Best Practices
+## Best Practices
 
-### 1. Metric Naming Conventions
+### Metric Naming
 
-- Use descriptive metric names with consistent naming patterns
-- Include units in metric names where appropriate
-- Use tags for dimensions rather than metric name variations
+Use clear and consistent metric names.
 
-### 2. Trace Sampling
+Follow these rules:
+- Use descriptive names that explain what you measure
+- Include units in the name (like `duration_seconds`)
+- Use tags for categories (not different metric names)
 
-- Use appropriate sampling rates for different environments
-- Sample more aggressively in production to reduce overhead
-- Ensure critical paths are always traced
+### Trace Sampling
 
-### 3. Health Check Design
+Adjust sampling rates based on your environment.
 
-- Implement meaningful health checks that reflect actual service health
-- Use appropriate timeouts for health check dependencies
-- Provide detailed information in non-production environments
+**Development**: Sample 100% of requests.
+You need full visibility for debugging.
 
-### 4. Alert Configuration
+**Production**: Sample 10% or less.
+This reduces performance overhead.
+Always trace critical operations regardless of sampling.
 
-- Set up alerts based on business metrics, not just technical metrics
-- Use appropriate thresholds and time windows
-- Implement escalation policies for critical alerts
+### Health Check Design
 
-## Common Observability Anti-patterns
+Create meaningful health checks.
 
-| Anti-pattern | Problem | Solution |
-|--------------|---------|----------|
-| Too many metrics | Performance impact | Use selective metric collection |
-| No trace sampling | High overhead | Implement appropriate sampling |
-| Generic health checks | Poor diagnostic value | Create specific, meaningful checks |
-| No alert thresholds | Alert fatigue | Set appropriate thresholds |
-| Logging everything | Storage costs | Use appropriate log levels |
+Good health checks:
+- Test real dependencies (databases, external services)
+- Use short timeouts to avoid hanging
+- Return detailed info in development
+- Hide details in production for security
+
+### Alert Configuration
+
+Base alerts on business impact.
+
+Good alerts:
+- Track business metrics (orders processed, revenue)
+- Set realistic thresholds to avoid false alarms
+- Define clear escalation steps
+- Include context for troubleshooting
+
+## Common Mistakes
+
+### Avoid These Problems
+
+**Too Many Metrics**
+- Problem: Slows down your application
+- Solution: Only track important metrics
+
+**No Trace Sampling**
+- Problem: High performance cost
+- Solution: Sample 10% or less in production
+
+**Generic Health Checks**
+- Problem: Provides no useful information
+- Solution: Check actual dependencies
+
+**No Alert Thresholds**
+- Problem: Too many false alarms
+- Solution: Set realistic limits
+
+**Logging Everything**
+- Problem: High storage costs
+- Solution: Use appropriate log levels (INFO or WARN)
 
 ## Related Documentation
 
-- [Configuration Principles](configuration-principles.md) - Core configuration concepts
-- [Environment Profiles](environment-profiles.md) - Environment-specific observability setup
-- [External Services](external-services.md) - Service monitoring and health checks
+**Configuration Basics**
+- [Configuration Principles](configuration-principles.md) - Learn core configuration concepts
+- [Environment Profiles](environment-profiles.md) - Set up environment-specific configs
+
+**Service Integration**
+- [External Services](external-services.md) - Monitor external service health
 - [Logging and Monitoring](../observability/logging-and-monitoring.md) - Detailed logging patterns
 
-This observability configuration ensures comprehensive monitoring, tracing, and health checking for Spring Boot microservices across all environments while maintaining performance and security standards.
+## Summary
+
+This guide covered observability configuration for Spring Boot services.
+
+You learned how to:
+- Configure metrics with Micrometer
+- Set up distributed tracing
+- Create health checks
+- Secure actuator endpoints
+- Configure logging
+- Test your observability setup
+
+Apply these patterns to monitor your services effectively.

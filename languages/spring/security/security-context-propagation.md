@@ -1,14 +1,30 @@
 # Security Context Propagation
 
+## Reading Guide
+
+**⏱️ Reading Time:** 10 minutes | **Level:** Advanced (Grade 12.6)
+**Flesch Score:** 34.2 (Fairly Difficult)
+**Key Topics:** Authentication, Microservices, Headers
+
 ## Overview
 
-This document covers security context propagation patterns for service-to-service communication in microservices architectures. It includes OAuth 2.0 client configuration, context propagation interceptors, and secure header management for both imperative and reactive implementations.
+When services call each other, they must share security information. This document shows how to do that in Spring Boot.
+
+Topics covered:
+- OAuth 2.0 setup for service-to-service calls
+- Passing user info between services
+- Token management
+- Traditional and reactive examples
 
 ## OAuth 2.0 Client Configuration
 
+### What is OAuth 2.0?
+
+OAuth 2.0 is a standard for services to request access tokens. A token proves one service's identity to another.
+
 ### Imperative Services
 
-Set up security context propagation for service-to-service communication:
+This setup lets one service talk to another safely:
 
 ```java
 @Configuration
@@ -89,7 +105,11 @@ public class ReactiveSecurityClientConfig {
 
 ## Security Context Propagation Interceptor
 
+An interceptor is code that runs before each request. It adds user information to the request headers.
+
 ### Imperative Implementation
+
+In traditional Spring code:
 
 ```java
 @Component
@@ -124,6 +144,8 @@ public class SecurityContextPropagationInterceptor implements ClientHttpRequestI
 
 ### Reactive Implementation
 
+In non-blocking reactive code:
+
 ```java
 @Component
 public class ReactiveSecurityContextPropagationFilter implements ExchangeFilterFunction {
@@ -154,7 +176,11 @@ public class ReactiveSecurityContextPropagationFilter implements ExchangeFilterF
 
 ## Token Relay Configuration
 
+Token relay means passing along the token you received to the next service. It keeps the same authentication chain.
+
 ### OAuth 2.0 Token Relay for Imperative Services
+
+Here's how to pass tokens in traditional code:
 
 ```java
 @Configuration
@@ -207,6 +233,8 @@ public class OAuth2TokenRelayInterceptor implements ClientHttpRequestInterceptor
 
 ### OAuth 2.0 Token Relay for Reactive Services
 
+Here's how to pass tokens in reactive code:
+
 ```java
 @Configuration
 public class ReactiveTokenRelayConfig {
@@ -239,7 +267,9 @@ public class ReactiveTokenRelayConfig {
 
 ### Client Credentials Flow
 
-Configure client credentials for service authentication:
+Client credentials is a way for services to prove their identity. Use this when service A needs to call service B.
+
+Configuration:
 
 ```yaml
 # application.yml
@@ -291,7 +321,11 @@ public class ServiceAccountProperties {
 
 ## Correlation ID and Tracing
 
+A correlation ID is a unique ID that tracks a request across all services. It helps you find where problems happen.
+
 ### Correlation ID Propagation
+
+Add the correlation ID to outgoing requests:
 
 ```java
 @Component
@@ -319,6 +353,8 @@ public class CorrelationIdInterceptor implements ClientHttpRequestInterceptor {
 ```
 
 ### Request Tracing Filter
+
+This filter checks each incoming request for a correlation ID. If none exists, it creates one:
 
 ```java
 @Component
@@ -357,7 +393,11 @@ public class RequestTracingFilter implements Filter {
 
 ## Security Headers Propagation
 
+Security headers carry important information like user ID or tenant ID. Your code can forward these headers to downstream services.
+
 ### Custom Security Headers
+
+This code extracts headers from the incoming request and adds them to outgoing requests:
 
 ```java
 @Component
@@ -401,31 +441,31 @@ public class SecurityHeadersPropagationInterceptor implements ClientHttpRequestI
 
 ### Token Management
 
-- Use short-lived access tokens with automatic refresh
-- Implement proper token caching to avoid unnecessary requests
-- Handle token expiration gracefully with retry logic
-- Never log or expose tokens in error messages
+- Use tokens that expire quickly
+- Refresh tokens automatically
+- Cache tokens to reduce requests
+- Never print tokens in logs
 
 ### Security Context
 
-- Always propagate user context for audit trails
-- Include correlation IDs for request tracing
-- Validate propagated context at service boundaries
-- Implement circuit breaker patterns for external service calls
+- Always send user information for audit trails
+- Use correlation IDs to track requests
+- Check that forwarded context is valid
+- Use circuit breakers for outside service calls
 
-### Performance Considerations
+### Performance
 
-- Cache OAuth 2.0 tokens appropriately
+- Cache tokens to avoid repeated token requests
 - Use connection pooling for HTTP clients
-- Implement timeout and retry policies
-- Monitor token refresh rates and service latency
+- Set timeouts for requests
+- Track token refresh speed and response times
 
 ### Error Handling
 
-- Implement proper fallback mechanisms
-- Log security-related errors appropriately
-- Return generic error messages to clients
-- Implement proper circuit breaker patterns
+- Plan for failures when getting tokens
+- Log errors safely without exposing tokens
+- Send simple error messages to clients
+- Use circuit breakers to prevent cascading failures
 
 ## Related Documentation
 

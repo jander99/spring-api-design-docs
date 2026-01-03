@@ -2,11 +2,11 @@
 
 ## Overview
 
-A well-structured exception hierarchy is fundamental to consistent error handling in Spring Boot applications. This document outlines the standard exception hierarchy and implementation patterns used across all microservices.
+Create a clear exception structure. This ensures consistent error handling. This document shows how to organize and use exceptions across microservices.
 
 ## Exception Hierarchy Structure
 
-Implement a clear exception hierarchy to differentiate between different types of errors:
+Separate errors into different exception types:
 
 ```
 ApplicationException (abstract)
@@ -19,7 +19,7 @@ ApplicationException (abstract)
 
 ## Base Exception Class
 
-All custom exceptions should extend this base class:
+Create a base class that all exceptions extend. This provides standard features:
 
 ```java
 package com.example.common.exception;
@@ -51,7 +51,11 @@ public abstract class ApplicationException extends RuntimeException {
 
 ## Specific Exception Classes
 
+Each exception type handles a specific error scenario. Here are the main types:
+
 ### Resource Not Found Exception
+
+Use this when a resource cannot be found:
 
 ```java
 package com.example.common.exception;
@@ -73,6 +77,8 @@ public class ResourceNotFoundException extends ApplicationException {
 ```
 
 ### Validation Exception
+
+Use this when input validation fails:
 
 ```java
 package com.example.common.exception;
@@ -116,6 +122,8 @@ public class ValidationException extends ApplicationException {
 
 ### Business Exception
 
+Use this for business logic errors:
+
 ```java
 package com.example.common.exception;
 
@@ -132,6 +140,8 @@ public class BusinessException extends ApplicationException {
 ```
 
 ### Security Exception
+
+Use this for security-related errors:
 
 ```java
 package com.example.common.exception;
@@ -150,6 +160,8 @@ public class SecurityException extends ApplicationException {
 
 ### Technical Exception
 
+Use this for system and infrastructure errors:
+
 ```java
 package com.example.common.exception;
 
@@ -166,6 +178,8 @@ public class TechnicalException extends ApplicationException {
 ```
 
 ## Domain-Specific Exception Examples
+
+Create exceptions for your business domains. Use them to handle specific errors.
 
 ### Order Domain Exception
 
@@ -189,7 +203,7 @@ public class InvalidOrderStatusException extends BusinessException {
 
 ## Error Code Registry
 
-Maintain an error code registry for consistency:
+Create a registry of error codes. Use it to keep codes consistent:
 
 ```java
 package com.example.common.error;
@@ -226,7 +240,7 @@ public final class ErrorCodes {
 
 ## Error Code Structure
 
-Implement domain-specific error codes with a consistent format:
+Use this format for error codes:
 
 ```
 {DOMAIN}_{ERROR_TYPE}_{DETAIL}
@@ -234,21 +248,21 @@ Implement domain-specific error codes with a consistent format:
 
 Examples:
 - `ORD_NOT_FOUND_ORDER`: Order not found
-- `ORD_INVALID_STATUS`: Invalid order status
-- `PAY_DECLINED_INSUFFICIENT_FUNDS`: Payment declined due to insufficient funds
+- `ORD_INVALID_STATUS`: Bad order status
+- `PAY_DECLINED_INSUFFICIENT_FUNDS`: No payment funds
 
 ## Best Practices
 
-1. **Extend ApplicationException**: All custom exceptions should extend the base `ApplicationException` class
-2. **Use Specific Types**: Create specific exception types for different error scenarios
-3. **Include Context**: Pass relevant context information as constructor parameters
-4. **Consistent Error Codes**: Use the error code registry for consistent error identification
-5. **Meaningful Messages**: Provide clear, actionable error messages
-6. **Avoid Generic Exceptions**: Don't use generic `RuntimeException` for business logic errors
+1. **Extend ApplicationException**: All exceptions must extend `ApplicationException`
+2. **Use Specific Types**: Create an exception for each error scenario
+3. **Include Context**: Pass context as constructor parameters
+4. **Consistent Error Codes**: Use the error code registry
+5. **Meaningful Messages**: Write clear error messages
+6. **Avoid Generic Exceptions**: Don't use `RuntimeException` for business errors
 
 ## Related Documentation
 
-- [Error Response Formats](./error-response-formats.md) - RFC 7807 and response structures
-- [Imperative Error Handling](./imperative-error-handling.md) - Spring MVC global exception handlers
-- [Reactive Error Handling](./reactive-error-handling.md) - WebFlux error handling patterns
-- [Validation Standards](./validation-standards.md) - Bean validation and custom validators
+- [Error Response Formats](./error-response-formats.md) - How to format error responses
+- [Imperative Error Handling](./imperative-error-handling.md) - Exception handlers for Spring MVC
+- [Reactive Error Handling](./reactive-error-handling.md) - Exception handlers for WebFlux
+- [Validation Standards](./validation-standards.md) - Input validation techniques

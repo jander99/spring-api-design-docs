@@ -2,16 +2,36 @@
 
 > **📖 Reading Guide**
 > 
-> **⏱️ Reading Time:** 13 minutes | **🔴 Level:** Advanced
+> **⏱️ Reading Time:** 13 minutes | **🟡 Level:** Intermediate-Advanced
 > 
-> **📋 Prerequisites:** Strong API background, experience with complex systems  
+> **📋 Prerequisites:** API background, system experience  
 > **🎯 Key Topics:** REST, Documentation
 > 
-> **📊 Complexity:** 15.1 grade level • 0.8% technical density • difficult
+> **📊 Complexity:** 13.7 grade level • 0.7% technical density • fairly difficult
 
 ## Overview
 
-APIs change over time. Good lifecycle management helps APIs evolve smoothly. It also keeps trust with users. This guide covers the full lifecycle. It starts at design and ends at deprecation. It focuses on communication and migration.
+APIs change over time. Teams add features. They fix bugs. They improve performance. Good lifecycle management helps your API evolve without breaking client apps. This guide shows you how to manage this process from start to finish.
+
+### API Lifecycle Timeline
+
+Here's what happens during an API's life:
+
+1. **Design** → Review contract before release
+2. **Development** → Build and test internally
+3. **Beta** → Get early feedback
+4. **Stable** → Support production use
+5. **Deprecated** → Announce replacement
+6. **Sunset** → Turn off old version
+
+Example timeline:
+```
+Month 0: Launch v1 (Stable)
+Month 12: Release v2 (Stable) + Deprecate v1
+Month 18: Sunset v1 (v2 becomes primary)
+```
+
+This guide focuses on the later stages: deprecation and sunset.
 
 ## Core Principles
 
@@ -25,13 +45,13 @@ APIs change over time. Good lifecycle management helps APIs evolve smoothly. It 
 
 ### Pre-Release Review
 
-Before publishing any API endpoint, complete these review steps:
+Before you publish any API endpoint, complete these review steps:
 
-1. **Contract Review**: Validate request and response formats
-2. **Breaking Change Assessment**: Identify potential compatibility issues
-3. **Versioning Decision**: Determine if new version is required
-4. **Documentation Check**: Ensure complete API documentation
-5. **Security Review**: Verify authentication and authorization patterns
+1. **Contract Review**: Check request and response formats
+2. **Breaking Change Assessment**: Find compatibility issues
+3. **Versioning Decision**: Decide if you need a new version
+4. **Documentation Check**: Make sure docs are complete
+5. **Security Review**: Verify auth patterns work
 
 ### Review Checklist
 
@@ -88,16 +108,16 @@ These changes maintain backward compatibility:
 
 Use automation to find breaking changes:
 
-1. **Schema Comparison**: Compare OpenAPI specs between versions
-2. **Contract Testing**: Run client tests against the new version
-3. **Type Analysis**: Check type compatibility in requests and responses
-4. **Response Validation**: Ensure fields stay the same
+1. **Schema Comparison**: Compare OpenAPI specs
+2. **Contract Testing**: Run tests against new version
+3. **Type Analysis**: Check type compatibility
+4. **Response Validation**: Make sure fields stay the same
 
 ## Deprecation Communication
 
 ### The Sunset Header (RFC 8594)
 
-Use the `Sunset` header to tell when a resource will stop working:
+The `Sunset` header tells clients when a resource stops working:
 
 ```http
 HTTP/1.1 200 OK
@@ -128,7 +148,7 @@ Content-Type: application/json
 
 ### Warning Header
 
-Give clear deprecation messages:
+Give clients clear deprecation messages:
 
 ```http
 Warning: 299 - "This endpoint will be removed on 2025-12-31. Use /v2/orders instead"
@@ -139,7 +159,7 @@ Warning: 299 - "This endpoint will be removed on 2025-12-31. Use /v2/orders inst
 Warning: 299 - "<message text>"
 ```
 
-Use code 299 for general warnings that stay relevant.
+The code 299 means a general warning.
 
 ### Successor Version Link
 
@@ -174,18 +194,18 @@ Content-Type: application/json
 
 ## Sunset Link Relation
 
-Give detailed sunset info using the `sunset` link:
+The `sunset` link provides detailed retirement info:
 
 ```http
 Link: <https://api.example.com/sunset-policy>; rel="sunset"; type="text/html"
 ```
 
-The linked resource can provide:
+The linked resource provides:
 
-1. **Sunset Policy**: Service-wide retirement policies
-2. **Migration Information**: Step-by-step upgrade guides
-3. **Timeline Details**: Extended deprecation schedules
-4. **Support Resources**: Contact information and help
+1. **Sunset Policy**: Service-wide retirement rules
+2. **Migration Information**: Step-by-step guides
+3. **Timeline Details**: Deprecation schedules
+4. **Support Resources**: Contact info and help
 
 ### Sunset Policy Document
 
@@ -256,7 +276,7 @@ Content-Type: application/json
 
 ### Strategy 1: Parallel Versions
 
-Run old and new versions at the same time:
+**What happens**: You run old and new versions at the same time.
 
 ```http
 # Old version continues working
@@ -287,7 +307,7 @@ HTTP/1.1 200 OK
 
 ### Strategy 2: Field-Level Deprecation
 
-Mark specific fields as deprecated. Keep the endpoint working:
+**What happens**: You mark specific fields as deprecated. The endpoint keeps working.
 
 ```http
 GET /v1/customers/12345 HTTP/1.1
@@ -322,7 +342,7 @@ Content-Type: application/json
 
 ### Strategy 3: Redirect-Based Migration
 
-Use HTTP redirects to guide clients:
+**What happens**: You use HTTP redirects to guide clients to the new version.
 
 ```http
 GET /v1/orders HTTP/1.1
@@ -346,7 +366,7 @@ Sunset: Sat, 31 Dec 2025 23:59:59 GMT
 
 ### Strategy 4: Gateway-Level Transformation
 
-Change old requests to new format at the gateway:
+**What happens**: Your gateway changes old requests to the new format.
 
 ```http
 # Client sends old format
@@ -389,15 +409,15 @@ Sunset: Sat, 31 Dec 2025 23:59:59 GMT
 
 ### State 1: Development
 
-API is still being built. Not released yet.
+**What happens**: Your API is still being built. It's not released yet.
 
-- No promises of stability
-- Breaking changes OK
+- No stability promises
+- Breaking changes are OK
 - Internal use only
 
 ### State 2: Beta
 
-API is ready for testing. Not for production:
+**What happens**: Your API is ready for testing. It's not ready for production:
 
 ```http
 HTTP/1.1 200 OK
@@ -406,12 +426,12 @@ Content-Type: application/json
 ```
 
 - Breaking changes may happen
-- Want early feedback
+- You want early feedback
 - No SLA promises
 
 ### State 3: Stable
 
-API is ready for production. Full support:
+**What happens**: Your API is ready for production. You provide full support:
 
 ```http
 HTTP/1.1 200 OK
@@ -424,7 +444,7 @@ Content-Type: application/json
 
 ### State 4: Deprecated
 
-API is marked to be retired:
+**What happens**: You mark the API for retirement:
 
 ```http
 HTTP/1.1 200 OK
@@ -441,7 +461,7 @@ Content-Type: application/json
 
 ### State 5: Sunset
 
-API is shut down:
+**What happens**: You shut down the API:
 
 ```http
 HTTP/1.1 410 Gone
@@ -485,7 +505,7 @@ Content-Type: application/problem+json
 
 ### Monitoring Implementation
 
-Include version information in logs:
+Include version info in your logs:
 
 ```http
 GET /v1/orders HTTP/1.1
@@ -733,16 +753,16 @@ Action required:
 ### Approval Process
 
 **Minor Changes** (non-breaking):
-- Tech lead approves
-- Update docs
-- Deploy normally
+- Your tech lead approves
+- You update docs
+- You deploy normally
 
 **Major Changes** (breaking):
-- Architecture board approves
-- Need deprecation plan
-- Need communication plan
-- Need migration docs
-- Approve sunset timeline
+- Your architecture board approves
+- You need a deprecation plan
+- You need a communication plan
+- You need migration docs
+- You need to approve the sunset timeline
 
 ### Version Support Policy
 
@@ -758,7 +778,7 @@ Action required:
 
 ## Implementation Notes
 
-These principles work for any REST API. The headers and formats follow HTTP standards and RFCs. This ensures they work across all frameworks and platforms.
+These principles work for any REST API. The headers and formats follow HTTP standards. They work across all frameworks and platforms.
 
 ## Related Documentation
 

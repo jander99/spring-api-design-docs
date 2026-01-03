@@ -1,6 +1,6 @@
 # Testing Structure
 
-This document outlines the testing structure and patterns that mirror the main [package organization](./package-organization.md) for both [imperative](./imperative-examples.md) and [reactive](./reactive-examples.md) implementations.
+This document shows how to organize tests. Use the same structure as your main [package organization](./package-organization.md). This applies to both [imperative](./imperative-examples.md) and [reactive](./reactive-examples.md) code.
 
 ## Test Package Structure
 
@@ -572,12 +572,12 @@ class OrderServiceIntegrationTest {
 
 ## Testing Best Practices
 
-1. **Layer Isolation**: Test each layer independently with appropriate mocking
-2. **Reactive Testing**: Use `StepVerifier` for reactive components
-3. **Test Data Builders**: Use builder pattern for test data creation
-4. **Container Testing**: Use Testcontainers for integration tests
-5. **Mock Management**: Keep mocks focused and verify interactions appropriately
-6. **Assertion Quality**: Use meaningful assertions that verify business logic
+1. **Layer Isolation**: Test each layer alone. Mock other layers.
+2. **Reactive Testing**: Use `StepVerifier` for reactive code.
+3. **Test Data Builders**: Use the builder pattern to create test data.
+4. **Container Testing**: Use Testcontainers for integration tests.
+5. **Mock Management**: Keep mocks simple. Verify what they do.
+6. **Assertion Quality**: Write assertions that check real business logic.
 
 ## Testing Dependencies
 
@@ -622,6 +622,6 @@ class OrderServiceIntegrationTest {
 
 ## See Also
 
-- [Package Organization](./package-organization.md) - Core structure principles
-- [Imperative Examples](./imperative-examples.md) - Spring MVC implementation examples
-- [Reactive Examples](./reactive-examples.md) - WebFlux implementation examples
+- [Package Organization](./package-organization.md) - How to structure packages
+- [Imperative Examples](./imperative-examples.md) - Spring MVC code examples
+- [Reactive Examples](./reactive-examples.md) - WebFlux code examples

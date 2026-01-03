@@ -2,11 +2,28 @@
 
 ## Overview
 
-This document covers comprehensive testing strategies for both imperative (Spring MVC) and reactive (WebFlux) controllers, including unit tests, integration tests, and specialized testing scenarios.
+This guide shows how to test Spring controllers.
+
+It covers two approaches:
+- Traditional MVC with Spring WebMvc
+- Reactive WebFlux for async streams
+
+Testing strategies include unit tests, integration tests, and specialized scenarios.
 
 ## Testing Imperative Controllers
 
+This section covers tests for traditional Spring MVC controllers.
+
+These tests verify:
+- HTTP requests are processed correctly
+- HTTP responses are formatted properly
+- Business logic integrates with controllers
+
 ### Basic Unit Test Setup
+
+Unit tests isolate the controller. They ignore other components.
+
+Use `@WebMvcTest` to test only the web layer. Mock the services. Verify the controller calls the right methods with the right data.
 
 ```java
 @WebMvcTest(OrderController.class)
@@ -142,6 +159,15 @@ public class OrderControllerTest {
 
 ### Testing with Security
 
+Security testing verifies who can access endpoints.
+
+Test these scenarios:
+- Unauthenticated requests are rejected
+- Requests without proper scopes fail
+- Valid tokens grant access
+
+You can simulate JWT tokens. Check that scope validation works correctly.
+
 ```java
 @WebMvcTest(OrderController.class)
 @Import(TestSecurityConfig.class)
@@ -239,7 +265,18 @@ public class WithMockJwtUserSecurityContextFactory implements WithSecurityContex
 
 ## Testing Reactive Controllers
 
+This section covers tests for WebFlux controllers.
+
+These tests verify:
+- Non-blocking operations complete correctly
+- Async streams produce expected data
+- Error handling works in reactive flows
+
 ### Basic Reactive Controller Tests
+
+Reactive tests use `@WebFluxTest`. This annotation tests the web layer only.
+
+Use `WebTestClient` for testing. It handles async streams naturally. It works with Mono and Flux types.
 
 ```java
 @WebFluxTest(ReactiveOrderController.class)
@@ -373,6 +410,10 @@ public class ReactiveOrderControllerTest {
 
 ### Testing Reactive Validation
 
+Validation tests check that bad requests fail. They verify error responses are correct.
+
+The reactive approach handles validation in async flows. Test that validation errors are reported in the response body.
+
 ```java
 @WebFluxTest(ReactiveOrderController.class)
 public class ReactiveOrderControllerValidationTest {
@@ -444,7 +485,18 @@ public class ReactiveOrderControllerValidationTest {
 
 ## Integration Testing
 
+Integration tests run the full application.
+
+They verify:
+- Controllers work with real databases
+- Services integrate correctly
+- End-to-end flows succeed
+
 ### Controller Integration Tests
+
+These tests start the entire Spring Boot application. Use `@SpringBootTest`.
+
+Use Testcontainers to run a real database. No mocks. No isolated testing. Full integration.
 
 ```java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -535,6 +587,13 @@ public class OrderControllerIntegrationTest {
 
 ### Reactive Integration Tests
 
+Reactive integration tests combine WebFlux with real data sources.
+
+They test:
+- Async endpoints with real databases
+- Streaming responses work correctly
+- Non-blocking operations complete as expected
+
 ```java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -608,7 +667,18 @@ public class ReactiveOrderControllerIntegrationTest {
 
 ## Testing Best Practices
 
+Best practices make tests cleaner. They are easier to maintain.
+
+They reduce repetition. They improve clarity. They make intent obvious.
+
 ### 1. Test Data Builders
+
+Test data builders create test objects. Use them instead of creating objects repeatedly.
+
+Benefits:
+- Less code in each test
+- Changes to object structure need only one update
+- Tests focus on what they test, not object creation
 
 ```java
 public class OrderTestDataBuilder {
@@ -658,6 +728,13 @@ void shouldCreateOrder() {
 ```
 
 ### 2. Custom Test Assertions
+
+Custom assertions express intent clearly. Tests read like plain English.
+
+Benefits:
+- Assertions are self-documenting
+- Failure messages are specific and helpful
+- Complex validation logic is reusable
 
 ```java
 public class OrderAssertions {
@@ -710,6 +787,13 @@ OrderAssertions.assertThat(response)
 
 ### 3. Test Configuration
 
+Test configuration provides consistent test setup.
+
+Use fixed clocks. Use fake implementations. This ensures:
+- Tests always produce the same results
+- Tests are not flaky due to timing
+- External dependencies are controlled
+
 ```java
 @TestConfiguration
 public class ControllerTestConfig {
@@ -744,4 +828,8 @@ public class OrderControllerTest {
 }
 ```
 
-These comprehensive testing strategies ensure that controllers are thoroughly tested across different scenarios, providing confidence in API reliability and maintainability.
+## Summary
+
+These testing strategies ensure controllers work reliably. Test different scenarios. Test edge cases.
+
+This approach builds confidence. Your API behaves correctly. You catch bugs early. Users get a good experience.

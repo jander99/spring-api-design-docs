@@ -1,14 +1,24 @@
-# OAuth 2.0/OIDC Resource Server Configuration
+# OAuth 2.0 Resource Server Setup
+
+> **📖 Reading Guide**
+>
+> **⏱️ Reading Time:** 4 minutes | **🟢 Level:** Intermediate
+>
+> **📋 Prerequisites:** HTTP fundamentals, basic API experience
+>
+> **🎯 Key Topics:** Authentication
+>
+> **📊 Complexity:** 11.1 grade level • Fairly difficult
 
 ## Overview
 
-This document covers the implementation of OAuth 2.0/OIDC resource server configuration in Spring Boot applications. It provides patterns for both imperative (Spring MVC) and reactive (WebFlux) implementations.
+This guide shows how to set up OAuth 2.0 authentication in Spring Boot. We cover both traditional (MVC) and modern (WebFlux) approaches.
 
-## OAuth 2.0 Resource Server Configuration
+## Setting Up OAuth 2.0 in Spring
 
-### Imperative Services (Spring MVC)
+### Traditional Services (Spring MVC)
 
-Configure Spring Security as an OAuth 2.0 resource server:
+Here's how to set up OAuth 2.0 security checks in your app:
 
 ```java
 @Configuration
@@ -34,30 +44,30 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(jwt -> {
-            // Custom logic to extract resource permissions from JWT
-            // Instead of using roles/scopes, extract resource permissions
+            // Extract what this user can do from the token
             return extractResourcePermissions(jwt);
         });
         return converter;
     }
     
     private Collection<GrantedAuthority> extractResourcePermissions(Jwt jwt) {
+        // Get permissions from the token
         Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
         if (resourceAccess == null) {
             return Collections.emptyList();
         }
         
-        // Extract resource permissions based on our custom binary 
-        // resource-based authorization model
         List<String> permissions = new ArrayList<>();
         
-        // Extract permissions based on claims structure
-        Map<String, Object> resources = (Map<String, Object>) resourceAccess.get("order-service");
+        // Look for permissions under "order-service"
+        Map<String, Object> resources = 
+            (Map<String, Object>) resourceAccess.get("order-service");
         if (resources != null && resources.containsKey("resources")) {
             List<String> resourceList = (List<String>) resources.get("resources");
             permissions.addAll(resourceList);
         }
         
+        // Add prefix and return
         return permissions.stream()
             .map(p -> new SimpleGrantedAuthority("RESOURCE_" + p))
             .collect(Collectors.toList());
@@ -65,7 +75,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ```
 
-### Reactive Services (WebFlux)
+### Modern Services (WebFlux)
 
 ```java
 @Configuration
@@ -92,14 +102,15 @@ public class ReactiveSecurityConfig {
     @Bean
     public Converter<Jwt, Mono<AbstractAuthenticationToken>> jwtAuthenticationConverter() {
         return jwt -> {
-            // Custom logic to extract resource permissions from JWT
-            Collection<GrantedAuthority> authorities = extractResourcePermissions(jwt);
+            // Extract user permissions from the token
+            Collection<GrantedAuthority> authorities = 
+                extractResourcePermissions(jwt);
             return Mono.just(new JwtAuthenticationToken(jwt, authorities));
         };
     }
     
     private Collection<GrantedAuthority> extractResourcePermissions(Jwt jwt) {
-        // Same extraction logic as in imperative example
+        // Get permissions from the token
         Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
         if (resourceAccess == null) {
             return Collections.emptyList();
@@ -107,12 +118,15 @@ public class ReactiveSecurityConfig {
         
         List<String> permissions = new ArrayList<>();
         
-        Map<String, Object> resources = (Map<String, Object>) resourceAccess.get("order-service");
+        // Look for permissions under "order-service"
+        Map<String, Object> resources = 
+            (Map<String, Object>) resourceAccess.get("order-service");
         if (resources != null && resources.containsKey("resources")) {
             List<String> resourceList = (List<String>) resources.get("resources");
             permissions.addAll(resourceList);
         }
         
+        // Add prefix and return
         return permissions.stream()
             .map(p -> new SimpleGrantedAuthority("RESOURCE_" + p))
             .collect(Collectors.toList());
@@ -120,9 +134,9 @@ public class ReactiveSecurityConfig {
 }
 ```
 
-## JWT Configuration Properties
+## Setting Up JWT Validation
 
-Configure JWT validation properties:
+Add these properties to check tokens:
 
 ```yaml
 # application.yml
@@ -135,37 +149,37 @@ spring:
           jwk-set-uri: https://auth.example.com/realms/services/protocol/openid-connect/certs
 ```
 
-## Security Principles
+## Core Security Rules
 
-1. **Defense in Depth**: Implement multiple layers of security controls
-2. **Least Privilege**: Grant only the minimum access necessary
-3. **Secure by Default**: Apply security by default, not as an afterthought
-4. **No Security by Obscurity**: Don't rely on secrecy of implementation
-5. **Fail Securely**: Security controls should fail in a secure manner
+1. **Multiple Layers**: Use many security checks, not just one
+2. **Minimum Access**: Only give users what they need
+3. **Secure First**: Build security in from the start
+4. **Visible Security**: Don't hide how security works
+5. **Safe Failures**: When security fails, fail safely
 
 ## Best Practices
 
-### JWT Token Validation
+### Checking JWT Tokens
 
-- Always validate JWT signatures using the issuer's public keys
-- Verify the issuer (`iss`) claim matches your expected authorization server
-- Check the audience (`aud`) claim to ensure the token is intended for your service
-- Validate token expiration (`exp`) and not-before (`nbf`) claims
-- Consider implementing additional custom claim validation based on your business requirements
+- Check the token signature using public keys
+- Verify the issuer (`iss`) matches your auth server
+- Check the audience (`aud`) to confirm the token is for your service
+- Verify the token hasn't expired (`exp`)
+- Add custom checks based on your needs
 
-### Error Handling
+### Handling Errors
 
-- Never expose internal security details in error responses
-- Log security events for audit purposes
-- Return generic error messages for authentication failures
-- Implement proper rate limiting to prevent brute force attacks
+- Don't show security details in error messages
+- Log security events for records
+- Give generic error messages to users
+- Limit login attempts to prevent attacks
 
-### Configuration Security
+### Keeping Configuration Safe
 
-- Store sensitive configuration values (client secrets, JWK URIs) securely
-- Use environment variables or secure configuration services
-- Never commit sensitive values to version control
-- Regularly rotate client credentials and secrets
+- Store secrets securely, not in code
+- Use environment variables
+- Don't commit secrets to version control
+- Change credentials regularly
 
 ## Related Documentation
 

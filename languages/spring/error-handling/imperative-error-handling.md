@@ -2,11 +2,11 @@
 
 ## Overview
 
-This document covers error handling patterns for Spring MVC (imperative) applications using `@ControllerAdvice` and global exception handlers. These patterns provide centralized error handling for traditional servlet-based Spring Boot applications.
+This document covers error handling for Spring MVC applications. We show how to use `@ControllerAdvice` and global exception handlers. These approaches handle all errors in one place for servlet-based Spring Boot.
 
 ## Global Exception Handler
 
-Create a global `@ControllerAdvice` for handling exceptions:
+Use `@ControllerAdvice` to handle all exceptions globally:
 
 ```java
 package com.example.common.api;
@@ -214,7 +214,7 @@ public class GlobalExceptionHandler {
 
 ### Common Interface
 
-Define a common interface for request ID providers:
+Create an interface for request ID providers:
 
 ```java
 package com.example.common.api;
@@ -226,7 +226,7 @@ public interface RequestIdProvider {
 
 ### Servlet Implementation
 
-Implement a servlet-specific request ID provider:
+Add a servlet request ID provider:
 
 ```java
 package com.example.common.api;
@@ -259,7 +259,7 @@ public class ServletRequestIdProvider implements RequestIdProvider {
 
 ## Error Metrics Collection
 
-Register error metrics with Micrometer:
+Track errors with Micrometer:
 
 ```java
 @ControllerAdvice
@@ -305,7 +305,7 @@ public class GlobalExceptionHandler {
 
 ## Controller-Level Error Handling
 
-While global exception handlers are preferred, you can also handle specific exceptions at the controller level:
+Global handlers are better. But you can handle specific errors at the controller level:
 
 ```java
 @RestController
@@ -349,7 +349,7 @@ public class OrderController {
 
 ## Testing Error Responses
 
-### Unit Testing Exception Handlers
+### Unit Tests
 
 ```java
 @ExtendWith(MockitoExtension.class)
@@ -389,7 +389,7 @@ public class GlobalExceptionHandlerTest {
 }
 ```
 
-### Integration Testing Error Responses
+### Integration Tests
 
 ```java
 @WebMvcTest(OrderController.class)
@@ -442,16 +442,16 @@ public class OrderControllerTest {
 
 ## Best Practices
 
-1. **Centralized Handling**: Use `@ControllerAdvice` for global exception handling
-2. **Specific Exception Types**: Handle specific exception types rather than generic exceptions
-3. **Appropriate Logging**: Log at appropriate levels (INFO for client errors, ERROR for server errors)
-4. **Request Correlation**: Always include request IDs for tracing
-5. **Security**: Sanitize error messages to avoid information disclosure
-6. **Metrics**: Collect error metrics for monitoring and alerting
+1. **Centralized Handling**: Use `@ControllerAdvice` for all errors
+2. **Specific Exceptions**: Handle specific errors. Avoid generic catches
+3. **Log Levels**: Use INFO for client errors. Use ERROR for server errors
+4. **Request IDs**: Add request IDs to trace each error
+5. **Security**: Hide sensitive details from error messages
+6. **Metrics**: Track error counts for monitoring
 
 ## Common Patterns
 
-### Pattern: Exception Mapping
+### Exception Mapping
 
 ```java
 @ExceptionHandler({
@@ -475,7 +475,7 @@ public ResponseEntity<Object> handleValidationExceptions(Exception ex, WebReques
 }
 ```
 
-### Pattern: Conditional Error Handling
+### Conditional Error Handling
 
 ```java
 @ExceptionHandler(DataAccessException.class)

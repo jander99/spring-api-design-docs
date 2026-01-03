@@ -2,14 +2,14 @@
 
 ## Overview
 
-A consistent project structure facilitates code navigation, promotes separation of concerns, and enables teams to quickly understand new services. This document outlines our standard approach to organizing Spring Boot microservices following Domain-Driven Design principles.
+A consistent project structure makes it easier to find code. It separates different concerns. It helps teams understand new services quickly. This guide shows how to organize Spring Boot microservices using Domain-Driven Design principles.
 
 ## Core Structure Principles
 
-1. **Domain-Centric Organization**: Structure packages around business domains rather than technical layers
-2. **Bounded Contexts**: Align microservice boundaries with DDD bounded contexts
-3. **Hexagonal Architecture**: Separate domain logic from external concerns through ports and adapters
-4. **Consistent Conventions**: Apply the same organizational patterns across all microservices
+1. **Domain-Centric Organization**: Organize packages by business domain, not by technical type
+2. **Bounded Contexts**: Match microservice boundaries to business domains
+3. **Hexagonal Architecture**: Keep domain logic separate from external tools through ports and adapters
+4. **Consistent Conventions**: Use the same patterns across all microservices
 
 ## Standard Project Structure
 
@@ -40,91 +40,91 @@ com.example.{service-name}
 
 ## Domain Package
 
-The domain package contains core business logic and entities, independent of technical concerns:
+The domain package holds your core business logic. It has no framework dependencies.
 
 ```
 domain
-├── model           # Domain entities and value objects
+├── model           # Business entities and value objects
 ├── repository      # Repository interfaces (ports)
 ├── service         # Domain services
 ├── event           # Domain events
-└── exception       # Domain-specific exceptions
+└── exception       # Business-specific exceptions
 ```
 
 ## Application Package
 
-The application package contains use cases that orchestrate domain operations:
+The application package contains use cases. It coordinates domain operations.
 
 ```
 application
-├── service        # Application services implementing use cases
-├── dto            # Data Transfer Objects for internal communication
-├── mapper         # Mappers between domain and DTOs
+├── service        # Application services that run use cases
+├── dto            # Data objects for internal communication
+├── mapper         # Convert between domain and DTOs
 └── exception      # Application-specific exceptions
 ```
 
 ## Infrastructure Package
 
-The infrastructure package contains technical implementations of domain ports:
+The infrastructure package implements your technical tools. It adapts to what your domain needs.
 
 ```
 infrastructure
-├── repository             # Repository implementations (adapters)
+├── repository             # Repository implementations
 ├── client                 # External service clients
-├── messaging              # Message queue producers/consumers
-├── persistence            # JPA entities and repositories
-│   ├── entity             # JPA entities 
+├── messaging              # Message queue tools
+├── persistence            # Database entities and repositories
+│   ├── entity             # Database entities 
 │   ├── repository         # Spring Data repositories
-│   └── mapper             # Mappers between domain and JPA entities
-└── security               # Security implementations
+│   └── mapper             # Convert between domain and database entities
+└── security               # Security tools
 ```
 
 ## Interfaces Package
 
-The interfaces package contains controllers and external interfaces:
+The interfaces package exposes your API to the outside world.
 
 ```
 interfaces
-├── rest                   # REST controllers
+├── rest                   # REST API
 │   ├── controller         # Controller classes
-│   ├── request            # Request DTOs
-│   ├── response           # Response DTOs
-│   ├── mapper             # Mappers between application DTOs and API DTOs
-│   └── advice             # Controller advice for exception handling
-├── graphql                # GraphQL resolvers (if applicable)
-└── grpc                   # gRPC service implementations (if applicable)
+│   ├── request            # Request data objects
+│   ├── response           # Response data objects
+│   ├── mapper             # Convert between application and API data
+│   └── advice             # Handle exceptions in controllers
+├── graphql                # GraphQL resolvers (optional)
+└── grpc                   # gRPC services (optional)
 ```
 
 ## Config Package
 
-The config package contains application configuration:
+The config package sets up your application.
 
 ```
 config
-├── security              # Security configuration
-├── cache                 # Cache configuration
-├── database              # Database configuration
-├── messaging             # Messaging configuration
-└── web                   # Web configuration
+├── security              # Security setup
+├── cache                 # Cache setup
+├── database              # Database setup
+├── messaging             # Messaging setup
+└── web                   # Web setup
 ```
 
 ## Implementation Guidelines
 
-1. **Keep the Domain Pure**: Domain models should not have framework dependencies
-2. **Rich Domain Models**: Use encapsulation and behavior-rich domain objects over anemic models
-3. **Immutable Where Possible**: Prefer immutable objects for value objects and where appropriate
-4. **Clear Boundaries**: Maintain clear separation between layers with appropriate mappers
-5. **Package Private Scope**: Use package-private visibility to enforce layer boundaries where appropriate
+1. **Keep the Domain Pure**: Domain models should not depend on frameworks
+2. **Rich Domain Models**: Use objects with behavior and encapsulation, not just data holders
+3. **Immutable When Possible**: Make value objects unchangeable when you can
+4. **Clear Boundaries**: Separate layers clearly with mappers between them
+5. **Package Private Access**: Restrict visibility to enforce boundaries between layers
 
 ## Anti-patterns to Avoid
 
-| Anti-pattern | Example | Preferred Approach |
-|--------------|---------|-------------------|
-| Anemic Domain Models | Entities with only getters/setters | Rich domain models with behavior |
-| Technical Layer Packaging | Packages by type (controllers, services) | Domain-centric packaging |
-| Leaky Abstractions | JPA annotations on domain models | Keep domain models pure |
-| Service Orchestration in Controllers | Business logic in controllers | Use application services |
-| Repository Method Explosion | Many specific finder methods | Consider query objects pattern |
+| Anti-pattern | Problem | Better Way |
+|--------------|---------|-----------|
+| Anemic Domain Models | Only getters and setters | Add behavior to your models |
+| Technical Layer Packaging | Organize by type (controllers, services) | Organize by business domain |
+| Leaky Abstractions | JPA annotations in domain models | Keep domain models framework-free |
+| Business Logic in Controllers | Controllers do too much | Move logic to application services |
+| Too Many Finder Methods | Repository has many specific methods | Use query objects instead |
 
 ## See Also
 

@@ -11,21 +11,21 @@
 
 ## Overview
 
-Spring provides two primary HTTP client implementations for making requests to external services:
+Spring provides two HTTP client options:
 
-- **RestTemplate**: Traditional blocking (imperative) HTTP client for Spring MVC applications
-- **WebClient**: Non-blocking (reactive) HTTP client for Spring WebFlux and modern applications
+- **RestTemplate**: Blocking HTTP client for Spring MVC
+- **WebClient**: Non-blocking HTTP client for Spring WebFlux
 
-This guide covers both approaches with production-ready patterns for resilience, error handling, timeouts, connection pooling, and observability.
+This guide shows both approaches. You'll learn about resilience, error handling, timeouts, and connection pooling.
 
 ### When to Use Each Client
 
 | Client | Use When | Advantages | Disadvantages |
 |--------|----------|------------|---------------|
-| **RestTemplate** | Spring MVC applications, synchronous workflows | Simple API, familiar patterns | Blocking I/O, deprecated in favor of WebClient |
-| **WebClient** | Spring WebFlux applications, high concurrency needs | Non-blocking, composable, modern | Steeper learning curve, reactive paradigm |
+| **RestTemplate** | Spring MVC apps | Simple, familiar | Blocking, deprecated |
+| **WebClient** | Spring WebFlux apps | Non-blocking, modern | Steeper learning curve |
 
-**Note**: While RestTemplate is in maintenance mode, it remains widely used in existing Spring MVC applications. For new projects, prefer WebClient even in non-reactive applications.
+**Note**: RestTemplate still works in Spring MVC. For new projects, choose WebClient.
 
 ## RestTemplate Configuration
 
@@ -54,7 +54,7 @@ public class RestTemplateConfig {
 
 ### Advanced RestTemplate with Apache HttpClient
 
-For production environments, use Apache HttpClient for connection pooling:
+Use Apache HttpClient in production for connection pooling:
 
 ```java
 import org.apache.hc.client5.http.classic.HttpClient;
@@ -117,7 +117,7 @@ public class AdvancedRestTemplateConfig {
 
 ### Per-Service RestTemplate Configuration
 
-Create dedicated RestTemplate beans for different services:
+Create a RestTemplate bean for each service:
 
 ```java
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -488,28 +488,27 @@ public class ReactivePaymentServiceClient {
 
 ### Blocking Usage of WebClient
 
-WebClient can be used in imperative code when needed:
+You can block WebClient when needed:
 
 ```java
 @Service
 @RequiredArgsConstructor
 public class BlockingWebClientExample {
+     private final WebClient webClient;
 
-    private final WebClient webClient;
-
-    public PaymentResponse processPaymentBlocking(PaymentRequest request) {
-        return webClient
-            .post()
-            .uri("/v1/payments")
-            .bodyValue(request)
-            .retrieve()
-            .bodyToMono(PaymentResponse.class)
-            .block(Duration.ofSeconds(30)); // Blocks for up to 30 seconds
-    }
+     public PaymentResponse processPaymentBlocking(PaymentRequest request) {
+         return webClient
+             .post()
+             .uri("/v1/payments")
+             .bodyValue(request)
+             .retrieve()
+             .bodyToMono(PaymentResponse.class)
+             .block(Duration.ofSeconds(30));
+     }
 }
 ```
 
-**Warning**: Blocking WebClient defeats its non-blocking benefits. Use only when necessary.
+**Warning**: Blocking reduces WebClient's benefits. Use only when necessary.
 
 ## Error Handling Patterns
 
@@ -525,39 +524,29 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @RequiredArgsConstructor
 public class ResilientPaymentClient {
+     private final RestTemplate restTemplate;
 
-    private final RestTemplate restTemplate;
-
-    public PaymentResponse processPayment(PaymentRequest request) {
-        try {
-            ResponseEntity<PaymentResponse> response = restTemplate.postForEntity(
-                "/v1/payments",
-                request,
-                PaymentResponse.class
-            );
-            
-            return response.getBody();
-            
-        } catch (HttpClientErrorException ex) {
-            // 4xx errors
-            if (ex.getStatusCode() == HttpStatus.BAD_REQUEST) {
-                throw new PaymentValidationException("Invalid payment request", ex);
-            } else if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
-                throw new PaymentNotFoundException("Payment resource not found", ex);
-            }
-            throw new PaymentException("Client error: " + ex.getStatusText(), ex);
-            
-        } catch (HttpServerErrorException ex) {
-            // 5xx errors
-            log.error("Payment service error: {}", ex.getStatusText());
-            throw new PaymentServiceException("Payment service unavailable", ex);
-            
-        } catch (ResourceAccessException ex) {
-            // Network errors, timeouts
-            log.error("Network error accessing payment service", ex);
-            throw new PaymentServiceException("Cannot reach payment service", ex);
-        }
-    }
+     public PaymentResponse processPayment(PaymentRequest request) {
+         try {
+             ResponseEntity<PaymentResponse> response = restTemplate.postForEntity(
+                 "/v1/payments", request, PaymentResponse.class);
+             return response.getBody();
+             
+         } catch (HttpClientErrorException ex) {
+             if (ex.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                 throw new PaymentValidationException("Invalid request", ex);
+             }
+             throw new PaymentException("Client error", ex);
+             
+         } catch (HttpServerErrorException ex) {
+             log.error("Service error: {}", ex.getStatusText());
+             throw new PaymentServiceException("Service unavailable", ex);
+             
+         } catch (ResourceAccessException ex) {
+             log.error("Network error", ex);
+             throw new PaymentServiceException("Cannot reach service", ex);
+         }
+     }
 }
 ```
 
@@ -572,57 +561,43 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class ReactiveResilientPaymentClient {
+     private final WebClient webClient;
 
-    private final WebClient webClient;
+     public Mono<PaymentResponse> processPayment(PaymentRequest request) {
+         return webClient
+             .post()
+             .uri("/v1/payments")
+             .bodyValue(request)
+             .retrieve()
+             .onStatus(HttpStatus.BAD_REQUEST::equals,
+                 response -> Mono.error(
+                     new PaymentValidationException("Invalid payment")))
+             .onStatus(HttpStatus.NOT_FOUND::equals,
+                 response -> Mono.error(
+                     new PaymentNotFoundException("Not found")))
+             .onStatus(HttpStatus::is5xxServerError,
+                 response -> Mono.error(
+                     new PaymentServiceException("Service error")))
+             .bodyToMono(PaymentResponse.class)
+             .onErrorMap(WebClientResponseException.class,
+                 this::mapWebClientException);
+     }
 
-    public Mono<PaymentResponse> processPayment(PaymentRequest request) {
-        return webClient
-            .post()
-            .uri("/v1/payments")
-            .bodyValue(request)
-            .retrieve()
-            .onStatus(
-                HttpStatus.BAD_REQUEST::equals,
-                response -> response.bodyToMono(String.class)
-                    .flatMap(body -> Mono.error(
-                        new PaymentValidationException("Invalid payment: " + body)
-                    ))
-            )
-            .onStatus(
-                HttpStatus.NOT_FOUND::equals,
-                response -> Mono.error(
-                    new PaymentNotFoundException("Payment not found")
-                )
-            )
-            .onStatus(
-                HttpStatus::is5xxServerError,
-                response -> response.bodyToMono(String.class)
-                    .flatMap(body -> Mono.error(
-                        new PaymentServiceException("Service error: " + body)
-                    ))
-            )
-            .bodyToMono(PaymentResponse.class)
-            .onErrorMap(
-                WebClientResponseException.class,
-                this::mapWebClientException
-            );
-    }
-
-    private Exception mapWebClientException(WebClientResponseException ex) {
-        return switch (ex.getStatusCode().value()) {
-            case 400 -> new PaymentValidationException("Invalid payment request");
-            case 404 -> new PaymentNotFoundException("Payment not found");
-            case 409 -> new PaymentConflictException("Payment conflict");
-            case 500, 502, 503, 504 -> new PaymentServiceException("Service unavailable");
-            default -> new PaymentException("Unexpected error: " + ex.getStatusText());
-        };
-    }
+     private Exception mapWebClientException(WebClientResponseException ex) {
+         return switch (ex.getStatusCode().value()) {
+             case 400 -> new PaymentValidationException("Invalid");
+             case 404 -> new PaymentNotFoundException("Not found");
+             case 409 -> new PaymentConflictException("Conflict");
+             case 500, 502, 503, 504 -> new PaymentServiceException("Unavailable");
+             default -> new PaymentException("Error");
+         };
+     }
 }
 ```
 
 ## Resilience4j Integration
 
-### Dependencies
+Add Resilience4j dependencies:
 
 ```xml
 <dependency>
@@ -673,22 +648,18 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CircuitBreakerPaymentClient {
+     private final RestTemplate restTemplate;
 
-    private final RestTemplate restTemplate;
+     @CircuitBreaker(name = "paymentService", fallbackMethod = "paymentFallback")
+     public PaymentResponse processPayment(PaymentRequest request) {
+         return restTemplate.postForObject("/v1/payments", request, 
+             PaymentResponse.class);
+     }
 
-    @CircuitBreaker(name = "paymentService", fallbackMethod = "paymentFallback")
-    public PaymentResponse processPayment(PaymentRequest request) {
-        return restTemplate.postForObject(
-            "/v1/payments",
-            request,
-            PaymentResponse.class
-        );
-    }
-
-    private PaymentResponse paymentFallback(PaymentRequest request, Exception ex) {
-        log.warn("Payment circuit breaker activated, using fallback", ex);
-        return PaymentResponse.failed("Service temporarily unavailable");
-    }
+     private PaymentResponse paymentFallback(PaymentRequest request, Exception ex) {
+         log.warn("Circuit breaker activated", ex);
+         return PaymentResponse.failed("Service unavailable");
+     }
 }
 ```
 
@@ -703,28 +674,25 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class ReactiveCircuitBreakerClient {
+     private final WebClient webClient;
+     private final CircuitBreakerRegistry registry;
 
-    private final WebClient webClient;
-    private final CircuitBreakerRegistry circuitBreakerRegistry;
+     public Mono<PaymentResponse> processPayment(PaymentRequest request) {
+         CircuitBreaker breaker = registry.circuitBreaker("paymentService");
+         
+         return webClient.post()
+             .uri("/v1/payments")
+             .bodyValue(request)
+             .retrieve()
+             .bodyToMono(PaymentResponse.class)
+             .transformDeferred(CircuitBreakerOperator.of(breaker))
+             .onErrorResume(this::handleError);
+     }
 
-    public Mono<PaymentResponse> processPayment(PaymentRequest request) {
-        CircuitBreaker circuitBreaker = 
-            circuitBreakerRegistry.circuitBreaker("paymentService");
-        
-        return webClient
-            .post()
-            .uri("/v1/payments")
-            .bodyValue(request)
-            .retrieve()
-            .bodyToMono(PaymentResponse.class)
-            .transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
-            .onErrorResume(this::handleCircuitBreakerError);
-    }
-
-    private Mono<PaymentResponse> handleCircuitBreakerError(Throwable ex) {
-        log.error("Payment service circuit breaker error", ex);
-        return Mono.just(PaymentResponse.failed("Service temporarily unavailable"));
-    }
+     private Mono<PaymentResponse> handleError(Throwable ex) {
+         log.error("Circuit breaker error", ex);
+         return Mono.just(PaymentResponse.failed("Service unavailable"));
+     }
 }
 ```
 
@@ -735,25 +703,18 @@ public class ReactiveCircuitBreakerClient {
 ```yaml
 # application.yml
 resilience4j:
-  retry:
-    configs:
-      default:
-        max-attempts: 3
-        wait-duration: 1s
-        enable-exponential-backoff: true
-        exponential-backoff-multiplier: 2
-        retry-exceptions:
-          - org.springframework.web.client.ResourceAccessException
-          - java.net.ConnectException
-          - java.net.SocketTimeoutException
-        ignore-exceptions:
-          - com.example.exception.PaymentValidationException
-    
-    instances:
-      paymentService:
-        base-config: default
-        max-attempts: 5
-        wait-duration: 2s
+   retry:
+     configs:
+       default:
+         max-attempts: 3
+         wait-duration: 1s
+         retry-exceptions:
+           - org.springframework.web.client.ResourceAccessException
+           - java.net.ConnectException
+     instances:
+       paymentService:
+         base-config: default
+         max-attempts: 5
 ```
 
 ### Retry with RestTemplate
@@ -764,24 +725,20 @@ import io.github.resilience4j.retry.annotation.Retry;
 @Service
 @RequiredArgsConstructor
 public class RetryablePaymentClient {
+     private final RestTemplate restTemplate;
 
-    private final RestTemplate restTemplate;
+     @Retry(name = "paymentService", fallbackMethod = "paymentFallback")
+     @CircuitBreaker(name = "paymentService")
+     public PaymentResponse processPayment(PaymentRequest request) {
+         log.info("Processing payment");
+         return restTemplate.postForObject("/v1/payments", request, 
+             PaymentResponse.class);
+     }
 
-    @Retry(name = "paymentService", fallbackMethod = "paymentFallback")
-    @CircuitBreaker(name = "paymentService")
-    public PaymentResponse processPayment(PaymentRequest request) {
-        log.info("Attempting payment processing");
-        return restTemplate.postForObject(
-            "/v1/payments",
-            request,
-            PaymentResponse.class
-        );
-    }
-
-    private PaymentResponse paymentFallback(PaymentRequest request, Exception ex) {
-        log.error("All retry attempts failed for payment", ex);
-        return PaymentResponse.failed("Payment processing failed after retries");
-    }
+     private PaymentResponse paymentFallback(PaymentRequest request, Exception ex) {
+         log.error("Retries failed", ex);
+         return PaymentResponse.failed("Payment failed after retries");
+     }
 }
 ```
 
@@ -796,39 +753,31 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class ReactiveRetryableClient {
+     private final WebClient webClient;
+     private final RetryRegistry retryRegistry;
 
-    private final WebClient webClient;
-    private final RetryRegistry retryRegistry;
-
-    public Mono<PaymentResponse> processPayment(PaymentRequest request) {
-        Retry retry = retryRegistry.retry("paymentService");
-        
-        return webClient
-            .post()
-            .uri("/v1/payments")
-            .bodyValue(request)
-            .retrieve()
-            .bodyToMono(PaymentResponse.class)
-            .transformDeferred(RetryOperator.of(retry))
-            .doOnError(ex -> 
-                log.error("Payment failed after retries", ex)
-            );
-    }
+     public Mono<PaymentResponse> processPayment(PaymentRequest request) {
+         Retry retry = retryRegistry.retry("paymentService");
+         
+         return webClient.post()
+             .uri("/v1/payments")
+             .bodyValue(request)
+             .retrieve()
+             .bodyToMono(PaymentResponse.class)
+             .transformDeferred(RetryOperator.of(retry))
+             .doOnError(ex -> log.error("Retries failed", ex));
+     }
 }
 ```
 
 ### Spring Retry Alternative
 
-For projects not using Resilience4j:
+Use Spring Retry if not using Resilience4j:
 
 ```xml
 <dependency>
     <groupId>org.springframework.retry</groupId>
     <artifactId>spring-retry</artifactId>
-</dependency>
-<dependency>
-    <groupId>org.springframework</groupId>
-    <artifactId>spring-aspects</artifactId>
 </dependency>
 ```
 
@@ -839,27 +788,23 @@ import org.springframework.retry.annotation.Retryable;
 
 @Service
 public class SpringRetryPaymentClient {
+     private final RestTemplate restTemplate;
 
-    private final RestTemplate restTemplate;
+     @Retryable(
+         retryFor = {ResourceAccessException.class},
+         maxAttempts = 3,
+         backoff = @Backoff(delay = 1000, multiplier = 2)
+     )
+     public PaymentResponse processPayment(PaymentRequest request) {
+         return restTemplate.postForObject("/v1/payments", request, 
+             PaymentResponse.class);
+     }
 
-    @Retryable(
-        retryFor = {ResourceAccessException.class, HttpServerErrorException.class},
-        maxAttempts = 3,
-        backoff = @Backoff(delay = 1000, multiplier = 2)
-    )
-    public PaymentResponse processPayment(PaymentRequest request) {
-        return restTemplate.postForObject(
-            "/v1/payments",
-            request,
-            PaymentResponse.class
-        );
-    }
-
-    @Recover
-    public PaymentResponse recover(ResourceAccessException ex, PaymentRequest request) {
-        log.error("Payment failed after all retries", ex);
-        return PaymentResponse.failed("Service unavailable");
-    }
+     @Recover
+     public PaymentResponse recover(Exception ex, PaymentRequest request) {
+         log.error("Retries failed", ex);
+         return PaymentResponse.failed("Service unavailable");
+     }
 }
 ```
 
@@ -892,22 +837,18 @@ import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 @Service
 @RequiredArgsConstructor
 public class RateLimitedClient {
+     private final RestTemplate restTemplate;
 
-    private final RestTemplate restTemplate;
+     @RateLimiter(name = "paymentService", fallbackMethod = "rateLimitFallback")
+     public PaymentResponse processPayment(PaymentRequest request) {
+         return restTemplate.postForObject("/v1/payments", request, 
+             PaymentResponse.class);
+     }
 
-    @RateLimiter(name = "paymentService", fallbackMethod = "rateLimitFallback")
-    public PaymentResponse processPayment(PaymentRequest request) {
-        return restTemplate.postForObject(
-            "/v1/payments",
-            request,
-            PaymentResponse.class
-        );
-    }
-
-    private PaymentResponse rateLimitFallback(PaymentRequest request, Exception ex) {
-        log.warn("Rate limit exceeded for payment service");
-        throw new RateLimitExceededException("Too many payment requests");
-    }
+     private PaymentResponse rateLimitFallback(PaymentRequest request, Exception ex) {
+         log.warn("Rate limit exceeded");
+         throw new RateLimitExceededException("Too many requests");
+     }
 }
 ```
 
@@ -922,22 +863,19 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class ReactiveRateLimitedClient {
+     private final WebClient webClient;
+     private final RateLimiterRegistry registry;
 
-    private final WebClient webClient;
-    private final RateLimiterRegistry rateLimiterRegistry;
-
-    public Mono<PaymentResponse> processPayment(PaymentRequest request) {
-        RateLimiter rateLimiter = 
-            rateLimiterRegistry.rateLimiter("paymentService");
-        
-        return webClient
-            .post()
-            .uri("/v1/payments")
-            .bodyValue(request)
-            .retrieve()
-            .bodyToMono(PaymentResponse.class)
-            .transformDeferred(RateLimiterOperator.of(rateLimiter));
-    }
+     public Mono<PaymentResponse> processPayment(PaymentRequest request) {
+         RateLimiter limiter = registry.rateLimiter("paymentService");
+         
+         return webClient.post()
+             .uri("/v1/payments")
+             .bodyValue(request)
+             .retrieve()
+             .bodyToMono(PaymentResponse.class)
+             .transformDeferred(RateLimiterOperator.of(limiter));
+     }
 }
 ```
 
@@ -968,23 +906,19 @@ import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 @Service
 @RequiredArgsConstructor
 public class BulkheadProtectedClient {
+     private final RestTemplate restTemplate;
 
-    private final RestTemplate restTemplate;
+     @Bulkhead(name = "paymentService", fallbackMethod = "bulkheadFallback")
+     @CircuitBreaker(name = "paymentService")
+     public PaymentResponse processPayment(PaymentRequest request) {
+         return restTemplate.postForObject("/v1/payments", request, 
+             PaymentResponse.class);
+     }
 
-    @Bulkhead(name = "paymentService", fallbackMethod = "bulkheadFallback")
-    @CircuitBreaker(name = "paymentService")
-    public PaymentResponse processPayment(PaymentRequest request) {
-        return restTemplate.postForObject(
-            "/v1/payments",
-            request,
-            PaymentResponse.class
-        );
-    }
-
-    private PaymentResponse bulkheadFallback(PaymentRequest request, Exception ex) {
-        log.warn("Bulkhead full for payment service");
-        throw new ServiceUnavailableException("Payment service at capacity");
-    }
+     private PaymentResponse bulkheadFallback(PaymentRequest request, Exception ex) {
+         log.warn("Bulkhead full");
+         throw new ServiceUnavailableException("Service at capacity");
+     }
 }
 ```
 
@@ -1026,32 +960,27 @@ public class TimeoutConfig {
 
 ```java
 import reactor.core.publisher.Mono;
-import reactor.netty.http.client.HttpClient;
-
 import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
 public class TimeoutControlledClient {
+     private final WebClient webClient;
 
-    private final WebClient webClient;
-
-    public Mono<PaymentResponse> processPaymentWithTimeout(
-            PaymentRequest request, 
-            Duration timeout) {
-        
-        return webClient
-            .post()
-            .uri("/v1/payments")
-            .bodyValue(request)
-            .retrieve()
-            .bodyToMono(PaymentResponse.class)
-            .timeout(timeout)
-            .onErrorResume(TimeoutException.class, ex -> {
-                log.error("Payment request timed out after {}", timeout);
-                return Mono.error(new PaymentTimeoutException("Request timed out"));
-            });
-    }
+     public Mono<PaymentResponse> processPaymentWithTimeout(
+             PaymentRequest request, Duration timeout) {
+         
+         return webClient.post()
+             .uri("/v1/payments")
+             .bodyValue(request)
+             .retrieve()
+             .bodyToMono(PaymentResponse.class)
+             .timeout(timeout)
+             .onErrorResume(TimeoutException.class, ex -> {
+                 log.error("Request timed out");
+                 return Mono.error(new PaymentTimeoutException("Timed out"));
+             });
+     }
 }
 ```
 
@@ -1073,45 +1002,33 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @RequiredArgsConstructor
 public class FullyResilientPaymentClient {
+     private final RestTemplate restTemplate;
 
-    private final RestTemplate restTemplate;
+     @CircuitBreaker(name = "paymentService", fallbackMethod = "paymentFallback")
+     @Retry(name = "paymentService")
+     @RateLimiter(name = "paymentService")
+     @Bulkhead(name = "paymentService")
+     public PaymentResponse processPayment(PaymentRequest request) {
+         log.info("Processing payment");
+         
+         return restTemplate.postForObject("/v1/payments", request, 
+             PaymentResponse.class);
+     }
 
-    @CircuitBreaker(name = "paymentService", fallbackMethod = "paymentFallback")
-    @Retry(name = "paymentService")
-    @RateLimiter(name = "paymentService")
-    @Bulkhead(name = "paymentService")
-    public PaymentResponse processPayment(PaymentRequest request) {
-        log.info("Processing payment with full resilience patterns");
-        
-        return restTemplate.postForObject(
-            "/v1/payments",
-            request,
-            PaymentResponse.class
-        );
-    }
+     private PaymentResponse paymentFallback(PaymentRequest request, Exception ex) {
+         log.error("Payment failed", ex);
+         
+         PaymentResponse cached = checkCache(request);
+         if (cached != null) {
+             return cached;
+         }
+         
+         return PaymentResponse.failed("Service unavailable. Try later.");
+     }
 
-    private PaymentResponse paymentFallback(
-            PaymentRequest request, 
-            Exception ex) {
-        
-        log.error("Payment failed with all resilience patterns applied", ex);
-        
-        // Return cached result if available
-        PaymentResponse cached = checkCache(request);
-        if (cached != null) {
-            return cached;
-        }
-        
-        // Return graceful degradation
-        return PaymentResponse.failed(
-            "Payment service temporarily unavailable. Please try again later."
-        );
-    }
-
-    private PaymentResponse checkCache(PaymentRequest request) {
-        // Implementation for cache check
-        return null;
-    }
+     private PaymentResponse checkCache(PaymentRequest request) {
+         return null;
+     }
 }
 ```
 
@@ -1128,42 +1045,37 @@ import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryRegistry;
 import io.github.resilience4j.reactor.retry.RetryOperator;
 import reactor.core.publisher.Mono;
-
 import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
 public class FullyReactiveResilientClient {
+     private final WebClient webClient;
+     private final CircuitBreakerRegistry cbRegistry;
+     private final RetryRegistry retryRegistry;
+     private final RateLimiterRegistry rlRegistry;
 
-    private final WebClient webClient;
-    private final CircuitBreakerRegistry circuitBreakerRegistry;
-    private final RetryRegistry retryRegistry;
-    private final RateLimiterRegistry rateLimiterRegistry;
+     public Mono<PaymentResponse> processPayment(PaymentRequest request) {
+         CircuitBreaker cb = cbRegistry.circuitBreaker("paymentService");
+         Retry retry = retryRegistry.retry("paymentService");
+         RateLimiter rl = rlRegistry.rateLimiter("paymentService");
+         
+         return webClient.post()
+             .uri("/v1/payments")
+             .bodyValue(request)
+             .retrieve()
+             .bodyToMono(PaymentResponse.class)
+             .transformDeferred(CircuitBreakerOperator.of(cb))
+             .transformDeferred(RetryOperator.of(retry))
+             .transformDeferred(RateLimiterOperator.of(rl))
+             .timeout(Duration.ofSeconds(30))
+             .onErrorResume(this::handleError);
+     }
 
-    public Mono<PaymentResponse> processPayment(PaymentRequest request) {
-        CircuitBreaker circuitBreaker = 
-            circuitBreakerRegistry.circuitBreaker("paymentService");
-        Retry retry = retryRegistry.retry("paymentService");
-        RateLimiter rateLimiter = 
-            rateLimiterRegistry.rateLimiter("paymentService");
-        
-        return webClient
-            .post()
-            .uri("/v1/payments")
-            .bodyValue(request)
-            .retrieve()
-            .bodyToMono(PaymentResponse.class)
-            .transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
-            .transformDeferred(RetryOperator.of(retry))
-            .transformDeferred(RateLimiterOperator.of(rateLimiter))
-            .timeout(Duration.ofSeconds(30))
-            .onErrorResume(this::handleError);
-    }
-
-    private Mono<PaymentResponse> handleError(Throwable ex) {
-        log.error("Payment processing failed with resilience patterns", ex);
-        return Mono.just(PaymentResponse.failed("Service unavailable"));
-    }
+     private Mono<PaymentResponse> handleError(Throwable ex) {
+         log.error("Payment failed", ex);
+         return Mono.just(PaymentResponse.failed("Service unavailable"));
+     }
 }
 ```
 
@@ -1324,43 +1236,43 @@ class ReactivePaymentServiceClientTest {
 
 ### RestTemplate Best Practices
 
-1. **Always configure timeouts**: Connection and read timeouts prevent hanging requests
-2. **Use connection pooling**: Configure Apache HttpClient for production environments
-3. **Create per-service beans**: Separate RestTemplate beans for different services
-4. **Implement error handling**: Handle all HTTP status codes and network errors
-5. **Add resilience patterns**: Circuit breakers, retries, and rate limiting
-6. **Configure appropriate pool sizes**: Based on expected load and service capacity
-7. **Monitor and log**: Track request metrics and failures
+1. **Configure timeouts**: Prevent hanging requests
+2. **Use connection pooling**: Use Apache HttpClient in production
+3. **Create per-service beans**: Separate beans for each service
+4. **Handle errors**: Deal with all HTTP errors and network failures
+5. **Add resilience**: Use circuit breakers and retries
+6. **Monitor**: Track metrics and failures
+7. **Log requests**: Record important events
 
 ### WebClient Best Practices
 
-1. **Configure connection providers**: Custom connection pools for high-concurrency scenarios
-2. **Set appropriate timeouts**: Response timeout, connection timeout, and read/write timeouts
-3. **Use reactive error handling**: Handle errors reactively with proper operators
-4. **Avoid blocking**: Only use `.block()` when absolutely necessary
-5. **Implement backpressure**: Handle slow consumers appropriately
-6. **Chain resilience operators**: Apply circuit breakers, retries, and rate limiters
-7. **Test reactively**: Use StepVerifier for testing reactive streams
+1. **Configure connections**: Set up custom pools for high concurrency
+2. **Set timeouts**: Response and connection timeouts
+3. **Handle errors reactively**: Use proper operators
+4. **Avoid blocking**: Use `.block()` only when necessary
+5. **Handle backpressure**: Manage slow consumers
+6. **Chain operators**: Apply circuit breakers and retries
+7. **Test reactively**: Use StepVerifier
 
-### General HTTP Client Best Practices
+### General Best Practices
 
-1. **Externalize configuration**: Use application properties for URLs, timeouts, and pool sizes
-2. **Implement fallbacks**: Provide graceful degradation when services fail
-3. **Use correlation IDs**: Track requests across service boundaries
-4. **Monitor circuit breaker states**: Alert on open circuits
-5. **Log retry attempts**: Track retry behavior for troubleshooting
-6. **Handle idempotency**: Use idempotency keys for non-idempotent operations
-7. **Test failure scenarios**: Test timeouts, errors, and circuit breaker behavior
+1. **Externalize config**: Use properties for URLs and timeouts
+2. **Implement fallbacks**: Handle service failures gracefully
+3. **Use correlation IDs**: Track across services
+4. **Monitor circuits**: Alert on failures
+5. **Log retries**: Track retry behavior
+6. **Handle idempotency**: Use idempotency keys
+7. **Test failures**: Test timeouts and errors
 
 ## Common Anti-patterns
 
 ### Anti-pattern: No Timeout Configuration
 
 ```java
-// Bad: No timeouts configured
+// Bad - no timeouts
 RestTemplate restTemplate = new RestTemplate();
 
-// Good: Timeouts configured
+// Good - with timeouts
 RestTemplate restTemplate = new RestTemplateBuilder()
     .setConnectTimeout(Duration.ofSeconds(5))
     .setReadTimeout(Duration.ofSeconds(30))
@@ -1370,64 +1282,53 @@ RestTemplate restTemplate = new RestTemplateBuilder()
 ### Anti-pattern: Single RestTemplate for All Services
 
 ```java
-// Bad: One RestTemplate for everything
+// Bad - one for everything
 @Bean
 public RestTemplate restTemplate() {
     return new RestTemplate();
 }
 
-// Good: Per-service RestTemplate beans
+// Good - one per service
 @Bean
-public RestTemplate paymentServiceRestTemplate() {
+public RestTemplate paymentRestTemplate() {
     return builder.rootUri("http://payment-service").build();
-}
-
-@Bean
-public RestTemplate customerServiceRestTemplate() {
-    return builder.rootUri("http://customer-service").build();
 }
 ```
 
 ### Anti-pattern: Ignoring Errors
 
 ```java
-// Bad: Swallowing exceptions
+// Bad - swallows exceptions
 try {
     return restTemplate.getForObject(url, Response.class);
 } catch (Exception e) {
     return null; // Don't do this
 }
 
-// Good: Proper error handling
+// Good - handles errors properly
 try {
     return restTemplate.getForObject(url, Response.class);
 } catch (HttpClientErrorException ex) {
     throw new ClientException("Client error", ex);
-} catch (HttpServerErrorException ex) {
-    throw new ServiceException("Service error", ex);
 }
 ```
 
 ### Anti-pattern: Blocking in Reactive Code
 
 ```java
-// Bad: Blocking defeats reactive benefits
+// Bad - blocking defeats benefits
 public Mono<PaymentResponse> processPayment(PaymentRequest request) {
-    PaymentResponse response = webClient
-        .post()
+    return webClient.post()
         .uri("/v1/payments")
         .bodyValue(request)
         .retrieve()
         .bodyToMono(PaymentResponse.class)
-        .block(); // Don't block in reactive pipelines
-    
-    return Mono.just(response);
+        .block(); // Don't block
 }
 
-// Good: Stay reactive
+// Good - stays reactive
 public Mono<PaymentResponse> processPayment(PaymentRequest request) {
-    return webClient
-        .post()
+    return webClient.post()
         .uri("/v1/payments")
         .bodyValue(request)
         .retrieve()
@@ -1437,13 +1338,13 @@ public Mono<PaymentResponse> processPayment(PaymentRequest request) {
 
 ## Related Documentation
 
-- [HTTP Client Best Practices](../../../guides/api-design/advanced-patterns/http-client-best-practices.md) - Language-agnostic HTTP client patterns
-- [External Services Configuration](../configuration/external-services.md) - Service integration configuration
-- [Reactive Error Handling](../error-handling/reactive-error-handling.md) - WebFlux error handling patterns
-- [Imperative Error Handling](../error-handling/imperative-error-handling.md) - Spring MVC error handling
-- [Reactive Testing](../testing/specialized-testing/reactive-testing.md) - Testing reactive HTTP clients
-- [External Service Testing](../testing/integration-testing/external-service-testing.md) - Integration testing patterns
+- [HTTP Client Best Practices](../../../guides/api-design/advanced-patterns/http-client-best-practices.md) - HTTP patterns
+- [External Services Configuration](../configuration/external-services.md) - Service config
+- [Reactive Error Handling](../error-handling/reactive-error-handling.md) - WebFlux errors
+- [Imperative Error Handling](../error-handling/imperative-error-handling.md) - Spring MVC errors
+- [Reactive Testing](../testing/specialized-testing/reactive-testing.md) - Testing clients
+- [External Service Testing](../testing/integration-testing/external-service-testing.md) - Integration tests
 
 ---
 
-**Next Steps**: Review the [language-agnostic HTTP client patterns](../../../guides/api-design/advanced-patterns/http-client-best-practices.md) for universal principles, then apply Spring-specific implementations from this guide.
+**Next Steps**: Read [HTTP client patterns](../../../guides/api-design/advanced-patterns/http-client-best-practices.md) for universal principles. Then apply Spring implementations from this guide.
