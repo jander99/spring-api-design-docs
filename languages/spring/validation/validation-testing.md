@@ -11,13 +11,17 @@
 
 ## Overview
 
-This guide covers testing strategies for validation logic in Spring Boot applications. Learn how to unit test custom validators, integration test controller validation, and verify JSON Schema validation.
+This guide shows how to test validation logic in Spring Boot. You will learn three testing types: unit tests for custom validators, integration tests for controller validation, and schema validation tests.
 
-**Prerequisites**: Review [Validation Fundamentals](validation-fundamentals.md), [Custom Validators](custom-validators.md), and [Advanced Validation](advanced-validation.md).
+**Prerequisite**: First read [Validation Fundamentals](validation-fundamentals.md), [Custom Validators](custom-validators.md), and [Advanced Validation](advanced-validation.md).
 
 ## Unit Testing Custom Validators
 
+Custom validators need thorough testing. Test each validator alone before testing it in controllers.
+
 ### Testing Field-Level Validators
+
+Test validators that check single fields.
 
 ```java
 package com.example.common.validation;
@@ -129,6 +133,8 @@ class OrderDateValidatorTest {
 
 ### Testing Cross-Field Validators
 
+Test validators that compare two or more fields.
+
 ```java
 package com.example.common.validation;
 
@@ -237,7 +243,11 @@ class DateRangeValidatorTest {
 
 ## Integration Testing Controller Validation
 
+Controllers validate requests before processing them. Test that invalid requests return the right error responses.
+
 ### Testing Request Validation
+
+Use MockMvc to send HTTP requests to your controller.
 
 ```java
 package com.example.orders.api;
@@ -356,6 +366,8 @@ class OrderControllerValidationTest {
 
 ### Testing Validation Groups
 
+Different rules apply for create and update operations. Test that each operation enforces its own rules.
+
 ```java
 @WebMvcTest(CustomerController.class)
 class CustomerControllerValidationTest {
@@ -410,7 +422,11 @@ class CustomerControllerValidationTest {
 
 ## Testing JSON Schema Validation
 
+JSON schemas define the shape and constraints of data. Test that your schema validator works correctly.
+
 ### Unit Testing JSON Schema Validator
+
+Test the validator with valid and invalid data.
 
 ```java
 package com.example.common.validation;
@@ -532,7 +548,13 @@ class JsonSchemaValidatorTest {
 
 ### 1. Test All Validation Paths
 
-Cover all validation scenarios:
+Test these cases for each rule:
+- Valid input
+- Null values
+- Empty values
+- Boundary conditions
+- Nested objects
+- Pattern matches
 
 ```java
 @Test
@@ -548,7 +570,7 @@ void shouldValidateAllConstraints() {
 
 ### 2. Use Descriptive Test Names
 
-Make test intent clear:
+Write names that explain what the test checks:
 
 ```java
 @Test
@@ -563,7 +585,7 @@ void shouldReturnBadRequest_WhenZipCodeFormatIsInvalid() { }
 
 ### 3. Test Error Response Format
 
-Verify RFC 7807 compliance:
+Check that errors follow RFC 7807 format:
 
 ```java
 @Test
@@ -579,9 +601,9 @@ void shouldReturnRfc7807ErrorResponse_WhenValidationFails() throws Exception {
 }
 ```
 
-### 4. Test Nested Validation
+### 4. Test Nested Objects
 
-Ensure nested objects are validated:
+Make sure validation works on nested fields:
 
 ```java
 @Test
@@ -606,7 +628,7 @@ void shouldValidateNestedObjects() throws Exception {
 
 ### 5. Separate Unit and Integration Tests
 
-Unit test validators in isolation:
+Unit tests run fast and test validators alone:
 
 ```java
 // Unit test - fast, focused
@@ -617,7 +639,7 @@ void validatorShouldRejectInvalidDate() {
 }
 ```
 
-Integration test full validation flow:
+Integration tests verify the full flow:
 
 ```java
 // Integration test - comprehensive
@@ -632,13 +654,13 @@ void controllerShouldRejectInvalidRequest() throws Exception {
 
 ## Related Documentation
 
-### Spring Implementation
-- [Validation Fundamentals](validation-fundamentals.md) - Jakarta Bean Validation basics
-- [Custom Validators](custom-validators.md) - Custom validation logic
-- [Advanced Validation](advanced-validation.md) - JSON Schema and method-level validation
-- [Controller Testing](../testing/integration-testing/controller-testing.md) - Integration testing patterns
-- [Unit Testing Best Practices](../testing/unit-testing/unit-testing-best-practices.md) - Unit testing strategies
+**Spring guides:**
+- [Validation Fundamentals](validation-fundamentals.md) — Learn Bean Validation basics
+- [Custom Validators](custom-validators.md) — Build your own rules
+- [Advanced Validation](advanced-validation.md) — Use JSON Schema
+- [Controller Testing](../testing/integration-testing/controller-testing.md) — Test HTTP endpoints
+- [Unit Testing Best Practices](../testing/unit-testing/unit-testing-best-practices.md) — Write good tests
 
-### Language-Agnostic Theory
-- [Schema Testing](../../../guides/api-design/testing/schema-testing.md) - Schema validation testing patterns
-- [Advanced Schema Design](../../../guides/api-design/request-response/advanced-schema-design.md) - Schema patterns
+**Design theory:**
+- [Schema Testing](../../../guides/api-design/testing/schema-testing.md) — Test schemas
+- [Advanced Schema Design](../../../guides/api-design/request-response/advanced-schema-design.md) — Schema patterns

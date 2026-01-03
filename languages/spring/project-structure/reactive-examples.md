@@ -1,12 +1,12 @@
 # Reactive Examples (WebFlux)
 
-This document provides concrete examples of implementing the [package organization structure](./package-organization.md) using Spring WebFlux with non-blocking I/O operations.
+This document shows how to build the [package organization](./package-organization.md) using Spring WebFlux. WebFlux handles multiple requests without blocking.
 
 ## Domain Layer Examples
 
 ### Reactive Repository Interface (Port)
 
-For **Reactive** services (WebFlux), return reactive types in repository and service interfaces:
+In reactive services, methods return `Mono` for a single async result or `Flux` for multiple results.
 
 ```java
 package com.example.orderservice.domain.repository;
@@ -15,7 +15,6 @@ import com.example.orderservice.domain.model.Order;
 import reactor.core.publisher.Mono;
 import java.util.UUID;
 
-// Reactive port that will be implemented in the infrastructure layer
 public interface OrderRepository {
     Mono<Order> findById(UUID id);
     Mono<Order> save(Order order);
@@ -40,6 +39,8 @@ public interface InventoryService {
 
 ## Application Layer Examples
 
+This layer defines your business logic. It uses domain objects and orchestrates operations.
+
 ### Reactive Application Service
 
 ```java
@@ -58,7 +59,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
-
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -71,22 +71,21 @@ public class OrderApplicationService {
     private final OrderMapper orderMapper;
     private final ApplicationEventPublisher eventPublisher;
 
-    @Transactional
-    public Mono<OrderResponse> createOrder(OrderCreationRequest request) {
-        // Convert request to domain objects
-        Set<OrderItem> orderItems = request.getItems().stream()
-            .map(item -> new OrderItem(
-                item.getProductId(),
-                item.getQuantity(),
-                item.getUnitPrice()))
-            .collect(Collectors.toSet());
+     @Transactional
+     public Mono<OrderResponse> createOrder(OrderCreationRequest request) {
+         Set<OrderItem> orderItems = request.getItems().stream()
+             .map(item -> new OrderItem(
+                 item.getProductId(),
+                 item.getQuantity(),
+                 item.getUnitPrice()))
+             .collect(Collectors.toSet());
 
-        return inventoryService.validateInventory(orderItems)
-            .then(Mono.fromSupplier(() -> Order.create(request.getCustomerId(), orderItems)))
-            .flatMap(orderRepository::save)
-            .doOnNext(savedOrder -> eventPublisher.publishEvent(new OrderCreatedEvent(savedOrder)))
-            .map(orderMapper::toResponse);
-    }
+         return inventoryService.validateInventory(orderItems)
+             .then(Mono.fromSupplier(() -> Order.create(request.getCustomerId(), orderItems)))
+             .flatMap(orderRepository::save)
+             .doOnNext(savedOrder -> eventPublisher.publishEvent(new OrderCreatedEvent(savedOrder)))
+             .map(orderMapper::toResponse);
+     }
 
     public Mono<OrderResponse> getOrder(UUID orderId) {
         return orderRepository.findById(orderId)
@@ -107,6 +106,8 @@ public class OrderApplicationService {
 
 ## Infrastructure Layer Examples
 
+This layer implements the domain interfaces. It handles databases and external services.
+
 ### Reactive Repository Implementation
 
 ```java
@@ -119,7 +120,6 @@ import com.example.orderservice.infrastructure.persistence.mapper.OrderEntityMap
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
-
 import java.util.UUID;
 
 @Repository
@@ -157,7 +157,6 @@ import com.example.orderservice.infrastructure.persistence.entity.OrderEntity;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.util.UUID;
 
 public interface R2dbcOrderRepository extends R2dbcRepository<OrderEntity, UUID> {
@@ -178,7 +177,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.util.Set;
 import java.util.UUID;
 
@@ -213,6 +211,8 @@ public class InventoryServiceClient implements InventoryService {
 
 ## Interface Layer Examples
 
+This layer handles HTTP requests. It converts data to and from JSON.
+
 ### Reactive REST Controller
 
 ```java
@@ -228,7 +228,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-
 import javax.validation.Valid;
 import java.util.UUID;
 
@@ -243,7 +242,6 @@ public class OrderController {
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<OrderResponseDto> createOrder(
             @Valid @RequestBody OrderCreationRequestDto requestDto) {
-        
         return Mono.fromSupplier(() -> orderApiMapper.toApplicationRequest(requestDto))
             .flatMap(orderService::createOrder)
             .map(orderApiMapper::toApiResponse);
@@ -279,7 +277,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
-
 import static org.springframework.web.reactive.function.server.RequestPredicates.*;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
@@ -314,7 +311,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-
 import java.util.UUID;
 
 @Component
@@ -348,6 +344,8 @@ public class OrderHandler {
 
 ## Configuration Examples
 
+These configurations enable reactive features in your app.
+
 ### WebFlux Configuration
 
 ```java
@@ -360,7 +358,6 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
 @Configuration
 @EnableWebFlux
 public class WebFluxConfig implements WebFluxConfigurer {
-    // WebFlux configuration
 }
 ```
 
@@ -377,33 +374,31 @@ import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 @Configuration
 @EnableR2dbcRepositories
 public class R2dbcConfig extends AbstractR2dbcConfiguration {
-    
     @Override
     public ConnectionFactory connectionFactory() {
-        // R2DBC connection factory configuration
-        return null; // Implementation specific
+        return null;
     }
 }
 ```
 
-## Key Characteristics of Reactive Implementation
+## Key Characteristics
 
-1. **Non-blocking Operations**: Methods return `Mono<T>`, `Flux<T>` for reactive streams
-2. **Asynchronous Processing**: Operations are composed in reactive chains
-3. **WebFlux Framework**: Uses reactive annotations and functional routing
-4. **R2DBC Integration**: Reactive database access instead of JPA
-5. **Backpressure Handling**: Built-in support for reactive streams backpressure
-6. **Error Handling**: Uses reactive operators like `onErrorReturn`, `onErrorResume`
+1. **Non-blocking**: Methods return `Mono<T>` or `Flux<T>`
+2. **Chained**: Operations link in pipelines
+3. **WebFlux**: Reactive web layer
+4. **R2DBC**: Non-blocking database
+5. **Flow Control**: Handles mismatched speeds
+6. **Errors**: Built-in recovery operators
 
-## Performance Considerations
+## Performance Benefits
 
-1. **Memory Efficiency**: Lower memory footprint due to non-blocking operations
-2. **Scalability**: Better handling of concurrent requests
-3. **Resource Utilization**: More efficient use of threads
-4. **Latency**: Reduced latency for I/O bound operations
+1. **Memory**: Lower footprint from non-blocking work
+2. **Requests**: More requests with fewer threads
+3. **Threads**: Better thread efficiency
+4. **Speed**: Faster I/O responses
 
 ## See Also
 
-- [Package Organization](./package-organization.md) - Core structure principles
-- [Imperative Examples](./imperative-examples.md) - Spring MVC implementation examples
-- [Testing Structure](./testing-structure.md) - Test organization patterns
+- [Package Organization](./package-organization.md) - Structure principles
+- [Imperative Examples](./imperative-examples.md) - Spring MVC examples
+- [Testing Structure](./testing-structure.md) - Test patterns

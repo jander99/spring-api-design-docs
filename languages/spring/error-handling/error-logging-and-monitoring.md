@@ -2,13 +2,13 @@
 
 ## Overview
 
-This document outlines best practices for logging and monitoring errors in Spring Boot applications. Proper error logging and monitoring are essential for maintaining application health and diagnosing issues in production environments.
+This guide outlines best practices for logging and monitoring errors in Spring Boot applications. Proper error logging and monitoring help you maintain application health. They also enable rapid diagnosis of production issues.
 
 ## Logging Best Practices
 
 ### Structured Logging
 
-Use structured logging for better searchability and analysis:
+Structured logging formats error data consistently. Tools can parse and analyze logs automatically. Use structured logging to correlate error details with request context.
 
 ```java
 @ExceptionHandler(ResourceNotFoundException.class)
@@ -38,19 +38,19 @@ public ResponseEntity<Object> handleValidationException(
 
 ### Log Levels
 
-Use appropriate log levels for different types of errors:
+Use appropriate log levels for different errors. This enables you to filter logs by severity and locate important messages efficiently.
 
-| Level | Usage | Examples |
-|-------|-------|----------|
-| **ERROR** | Errors that need immediate attention | Unhandled exceptions, database connection failures, external service failures |
-| **WARN** | Potential issues that don't prevent operation | Business rule violations, deprecated API usage, configuration warnings |
-| **INFO** | Significant events in normal operation | User not found, validation failures, successful operations |
-| **DEBUG** | Detailed information for troubleshooting | Request/response details, intermediate processing steps |
-| **TRACE** | Most detailed information (rarely used) | Fine-grained execution flow, variable values |
+| Level | Purpose | When to Use |
+|-------|---------|------------|
+| **ERROR** | Critical system failures | Unhandled exceptions, connection failures |
+| **WARN** | Non-critical problems | Business logic violations, deprecated code |
+| **INFO** | Significant application events | Validation failures, successful operations |
+| **DEBUG** | Detailed diagnostic information | Request/response details, processing steps |
+| **TRACE** | Very granular diagnostic data | Method execution flow, variable values |
 
 ### Logging Configuration
 
-Configure logging levels and patterns:
+Configure where logs are written and what they contain. Specify different log levels for each package in your application.
 
 ```yaml
 logging:
@@ -70,9 +70,9 @@ logging:
 
 ## Mapped Diagnostic Context (MDC)
 
-Use MDC to include request information in logs:
+MDC enables you to attach request context to all log messages. This helps you trace a single request through your entire system.
 
-### MDC Filter for Servlet Applications
+### MDC Filter for Servlet Applications (Spring MVC)
 
 ```java
 @Component
@@ -107,7 +107,7 @@ public class RequestLoggingFilter implements Filter {
 }
 ```
 
-### MDC WebFilter for Reactive Applications
+### MDC WebFilter for Reactive Applications (Spring WebFlux)
 
 ```java
 @Component
@@ -156,9 +156,11 @@ public class ReactiveRequestLoggingFilter implements WebFilter {
 
 ## Error Metrics with Micrometer
 
+Micrometer collects quantitative measurements from your application. Use counters to measure error frequency. Use timers to track error resolution time.
+
 ### Basic Error Metrics
 
-Register error metrics with Micrometer:
+Register error counters in your exception handler to measure error occurrence:
 
 ```java
 @ControllerAdvice
@@ -225,7 +227,7 @@ public class GlobalExceptionHandler {
 
 ### Custom Error Metrics
 
-Create custom metrics for business-specific errors:
+Build custom counters for business-specific errors. Track validation errors separately from business rule violations.
 
 ```java
 @Component
@@ -276,7 +278,7 @@ public class ErrorMetricsCollector {
 
 ### Reactive Error Metrics
 
-For reactive applications, use reactive metrics:
+In Spring WebFlux applications, record metrics in reactive operator chains using doOnError and doOnSuccess callbacks:
 
 ```java
 @Component
@@ -324,7 +326,7 @@ public class ReactiveErrorMetrics {
 
 ### Custom Health Indicators
 
-Create custom health indicators for error monitoring:
+Build custom health indicators that monitor application error rates. Report unhealthy status when error percentages exceed a configured threshold.
 
 ```java
 @Component
@@ -377,7 +379,7 @@ public class ErrorRateHealthIndicator implements HealthIndicator {
 
 ### Error Alerting Configuration
 
-Configure alerting based on error metrics:
+Expose metrics through an HTTP endpoint. Configure Prometheus to scrape your metrics endpoint regularly.
 
 ```yaml
 management:
@@ -402,7 +404,7 @@ management:
 
 ### Structured Log Format
 
-Use JSON logging for better log aggregation:
+Output logs in JSON format so that aggregation tools can parse logs automatically. This capability enables efficient searching and analysis of error patterns.
 
 ```xml
 <!-- logback-spring.xml -->
@@ -447,7 +449,7 @@ Use JSON logging for better log aggregation:
 
 ### Log Correlation
 
-Create correlation IDs for tracing errors across services:
+Attach correlation IDs to all log messages in your system. These IDs enable you to trace a single request through multiple services.
 
 ```java
 @Component
@@ -484,7 +486,7 @@ public class CorrelationIdFilter implements Filter {
 
 ### Grafana Dashboard Configuration
 
-Example Grafana dashboard queries for error monitoring:
+Grafana visualizes time-series metrics from Prometheus. Create panels to display error rates, distribution by type, and historical trends.
 
 ```yaml
 # Error Rate Panel
@@ -511,7 +513,7 @@ Example Grafana dashboard queries for error monitoring:
 
 ### Custom Error Dashboard
 
-Create a custom error dashboard using Spring Boot Actuator:
+Create a custom error dashboard with a REST endpoint. Use Actuator to retrieve metrics data and compute summaries.
 
 ```java
 @RestController
@@ -559,20 +561,20 @@ public class ErrorDashboardController {
 
 ## Best Practices
 
-1. **Structured Logging**: Use structured logging formats (JSON) for better analysis
-2. **Appropriate Log Levels**: Use correct log levels for different types of errors
-3. **Request Correlation**: Include request IDs and correlation IDs in all logs
-4. **Error Metrics**: Collect comprehensive error metrics for monitoring
-5. **Health Checks**: Implement custom health indicators for error monitoring
-6. **Alert Configuration**: Set up alerts based on error rates and patterns
-7. **Log Retention**: Configure appropriate log retention policies
-8. **Security**: Sanitize logs to avoid logging sensitive information
+1. **Use structured logging**: Output logs in JSON for automated parsing and searching
+2. **Use appropriate log levels**: Select ERROR, WARN, and INFO based on severity
+3. **Include correlation IDs**: Attach unique IDs to all log messages for tracing
+4. **Collect error metrics**: Record error frequency by exception type and status
+5. **Monitor system health**: Use health indicators to detect problems early
+6. **Configure alerting**: Define thresholds for error spikes and send notifications
+7. **Retain logs long enough**: Keep logs for at least 30-90 days for analysis
+8. **Protect sensitive data**: Exclude passwords, tokens, and credentials from logs
 
 ## Security Considerations
 
 ### Sanitizing Logs
 
-Avoid logging sensitive information:
+Never log passwords, tokens, or API keys. Remove sensitive data before output to protect user information.
 
 ```java
 @Component
@@ -611,7 +613,7 @@ public class LogSanitizer {
 
 ### Log Access Control
 
-Implement proper access control for logs:
+Restrict log access using role-based controls. Use authorization annotations to prevent unauthorized viewing.
 
 ```java
 @RestController

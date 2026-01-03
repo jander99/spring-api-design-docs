@@ -2,24 +2,28 @@
 
 > **📖 Reading Guide**
 > 
-> **⏱️ Reading Time:** 10 minutes | **🟡 Level:** Advanced
+> **⏱️ Reading Time:** 12 minutes | **🟡 Level:** Advanced
 > 
 > **📋 Prerequisites:** Jakarta Bean Validation, Custom validators  
 > **🎯 Key Topics:** JSON Schema, Method-Level Validation, RFC 7807 Integration
 > 
-> **📊 Complexity:** Advanced technical content
+> **📊 Complexity:** Grade 13.8 • 2.1% technical density • Difficult
 
 ## Overview
 
-This guide covers advanced validation patterns including JSON Schema validation, method-level validation in services, and comprehensive error handling with RFC 7807 Problem Details.
+This guide covers three validation approaches:
 
-**Prerequisites**: Review [Validation Fundamentals](validation-fundamentals.md) and [Custom Validators](custom-validators.md).
+1. **JSON Schema** - Validate complex data
+2. **Method Validation** - Check service parameters
+3. **RFC 7807** - Standard error format
+
+Read [Validation Fundamentals](validation-fundamentals.md) first.
 
 ## JSON Schema Validation
 
-### Adding JSON Schema Dependencies
+### Add the Library
 
-Add JSON Schema validator library to your project:
+Add this dependency to your Maven project:
 
 ```xml
 <dependency>
@@ -29,9 +33,9 @@ Add JSON Schema validator library to your project:
 </dependency>
 ```
 
-### Defining JSON Schema
+### Create Your Schema
 
-Create a JSON Schema file for validation:
+Save this as `schemas/order-v1.json`:
 
 ```json
 {
@@ -101,31 +105,13 @@ Create a JSON Schema file for validation:
 }
 ```
 
-### JSON Schema Validator Service
+### Build a Validator
+
+Create this component:
 
 ```java
-package com.example.common.validation;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.schema.JsonSchema;
-import com.networknt.schema.JsonSchemaFactory;
-import com.networknt.schema.SpecVersion;
-import com.networknt.schema.ValidationMessage;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-@Slf4j
 @Component
 public class JsonSchemaValidator {
-    
     private final ObjectMapper objectMapper;
     private final JsonSchemaFactory schemaFactory;
     
@@ -137,48 +123,42 @@ public class JsonSchemaValidator {
     
     public void validate(Object payload, String schemaPath) {
         try {
-            JsonNode jsonNode = objectMapper.valueToTree(payload);
+            JsonNode node = objectMapper.valueToTree(payload);
             JsonSchema schema = loadSchema(schemaPath);
-            
-            Set<ValidationMessage> errors = schema.validate(jsonNode);
+            Set<ValidationMessage> errors = schema.validate(node);
             
             if (!errors.isEmpty()) {
-                List<String> errorMessages = errors.stream()
-                    .map(ValidationMessage::getMessage)
-                    .collect(Collectors.toList());
-                
                 throw new JsonSchemaValidationException(
-                    "JSON Schema validation failed", errorMessages);
+                    "Validation failed", getMessages(errors));
             }
-            
         } catch (IOException e) {
-            log.error("Failed to load JSON schema: {}", schemaPath, e);
-            throw new IllegalStateException(
-                "Schema validation configuration error", e);
+            throw new IllegalStateException("Load failed", e);
         }
     }
     
-    private JsonSchema loadSchema(String schemaPath) throws IOException {
-        ClassPathResource resource = new ClassPathResource(schemaPath);
-        try (InputStream inputStream = resource.getInputStream()) {
-            JsonNode schemaNode = objectMapper.readTree(inputStream);
+    private JsonSchema loadSchema(String path) throws IOException {
+        ClassPathResource resource = new ClassPathResource(path);
+        try (InputStream in = resource.getInputStream()) {
+            JsonNode schemaNode = objectMapper.readTree(in);
             return schemaFactory.getSchema(schemaNode);
         }
+    }
+    
+    private List<String> getMessages(Set<ValidationMessage> errors) {
+        return errors.stream()
+            .map(ValidationMessage::getMessage)
+            .collect(Collectors.toList());
     }
 }
 ```
 
-### Custom JSON Schema Validation Exception
+### Create an Exception Class
+
+Define this exception:
 
 ```java
-package com.example.common.validation;
-
-import lombok.Getter;
-import java.util.List;
-
 @Getter
 public class JsonSchemaValidationException extends RuntimeException {
-    
     private final List<String> validationErrors;
     
     public JsonSchemaValidationException(String message, 
@@ -189,24 +169,22 @@ public class JsonSchemaValidationException extends RuntimeException {
 }
 ```
 
-### Using JSON Schema Validation
+### Use the Validator
+
+Call it before saving data:
 
 ```java
 @Service
 @RequiredArgsConstructor
 public class OrderService {
-    
     private final JsonSchemaValidator schemaValidator;
     private final OrderRepository orderRepository;
     
     public OrderDto createOrder(OrderCreationDto orderDto) {
-        // Validate against JSON Schema
         schemaValidator.validate(orderDto, "schemas/order-v1.json");
         
-        // Proceed with business logic
         Order order = mapToEntity(orderDto);
         order = orderRepository.save(order);
-        
         return mapToDto(order);
     }
 }
@@ -214,305 +192,178 @@ public class OrderService {
 
 ## Method-Level Validation
 
-### Validating Service Method Parameters
+### Check Method Parameters
 
-Enable method validation by adding `@Validated` at the class level:
+Add `@Validated` to your service:
 
 ```java
-package com.example.orders.application;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
-
-import java.util.List;
-import java.util.UUID;
-
 @Service
 @Validated
-@RequiredArgsConstructor
 public class OrderService {
+    private final OrderRepository orderRepo;
     
-    private final OrderRepository orderRepository;
-    
-    public OrderDto getOrder(@NotNull UUID orderId) {
-        return orderRepository.findById(orderId)
-            .map(this::mapToDto)
-            .orElseThrow(() -> new ResourceNotFoundException("Order", orderId));
+    public OrderService(OrderRepository orderRepo) {
+        this.orderRepo = orderRepo;
     }
     
-    public List<OrderDto> getOrdersByCustomer(
+    public OrderDto getOrder(@NotNull UUID orderId) {
+        return orderRepo.findById(orderId)
+            .map(this::toDto)
+            .orElseThrow();
+    }
+    
+    public List<OrderDto> getOrders(
             @NotNull UUID customerId,
             @Min(0) int page,
             @Min(1) @Max(100) int size) {
         
-        Pageable pageable = PageRequest.of(page, size);
-        return orderRepository.findByCustomerId(customerId, pageable)
+        Pageable p = PageRequest.of(page, size);
+        return orderRepo.findByCustomerId(customerId, p)
             .stream()
-            .map(this::mapToDto)
+            .map(this::toDto)
             .collect(Collectors.toList());
     }
     
-    public OrderDto createOrder(@Valid OrderCreationDto orderDto) {
-        // Business logic
-        Order order = mapToEntity(orderDto);
-        order = orderRepository.save(order);
-        return mapToDto(order);
+    public OrderDto create(@Valid OrderCreationDto dto) {
+        Order order = toEntity(dto);
+        return toDto(orderRepo.save(order));
     }
 }
 ```
 
-### Validating Return Values
+### Validate Return Values
+
+Check what methods return:
 
 ```java
 @Service
 @Validated
-@RequiredArgsConstructor
 public class CustomerService {
+    private final CustomerRepository customerRepo;
     
-    private final CustomerRepository customerRepository;
-    
-    @NotNull(message = "Customer must not be null")
-    public CustomerDto createCustomer(@Valid CustomerCreationDto dto) {
-        Customer customer = mapToEntity(dto);
-        customer = customerRepository.save(customer);
-        return mapToDto(customer);
+    public CustomerService(CustomerRepository customerRepo) {
+        this.customerRepo = customerRepo;
     }
     
-    @NotEmpty(message = "Active customers list must not be empty")
-    public List<CustomerDto> getActiveCustomers() {
-        return customerRepository.findByActiveTrue()
+    @NotNull
+    public CustomerDto create(@Valid CustomerCreationDto dto) {
+        Customer c = toEntity(dto);
+        return toDto(customerRepo.save(c));
+    }
+    
+    @NotEmpty
+    public List<CustomerDto> getActive() {
+        return customerRepo.findByActiveTrue()
             .stream()
-            .map(this::mapToDto)
+            .map(this::toDto)
             .collect(Collectors.toList());
     }
 }
 ```
 
-## Integration with RFC 7807 Error Responses
+## RFC 7807 Error Responses
 
-### Comprehensive Validation Error Handler
+### Handle All Validation Errors
+
+Create this exception handler:
 
 ```java
-package com.example.common.api;
-
-import com.example.common.validation.JsonSchemaValidationException;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindException;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
-@Slf4j
 @ControllerAdvice
-@RequiredArgsConstructor
-public class ValidationExceptionHandler {
-    
-    private final RequestIdProvider requestIdProvider;
-    
+public class ValidationHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ProblemDetail> handleMethodArgumentNotValid(
+    public ResponseEntity<ProblemDetail> handleInvalid(
             MethodArgumentNotValidException ex) {
-        
-        log.info("Request validation failed: {} errors", 
-                 ex.getBindingResult().getErrorCount());
-        
-        List<ProblemDetail.ValidationError> errors = ex.getBindingResult()
+        List<ValidationError> errors = ex.getBindingResult()
             .getFieldErrors()
             .stream()
-            .map(this::mapFieldError)
+            .map(this::toError)
             .collect(Collectors.toList());
         
-        ProblemDetail problem = buildProblemDetail(
-            "validation-error",
-            "Request Validation Failed",
-            HttpStatus.BAD_REQUEST,
-            "One or more request parameters failed validation",
-            errors
-        );
-        
-        return ResponseEntity.badRequest().body(problem);
+        return error("validation-error", "Failed", errors);
     }
     
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ProblemDetail> handleConstraintViolation(
+    public ResponseEntity<ProblemDetail> handleViolation(
             ConstraintViolationException ex) {
-        
-        log.info("Method validation failed: {} violations", 
-                 ex.getConstraintViolations().size());
-        
-        List<ProblemDetail.ValidationError> errors = ex.getConstraintViolations()
+        List<ValidationError> errors = ex.getConstraintViolations()
             .stream()
-            .map(this::mapConstraintViolation)
+            .map(this::toError)
             .collect(Collectors.toList());
         
-        ProblemDetail problem = buildProblemDetail(
-            "constraint-violation",
-            "Constraint Violation",
-            HttpStatus.BAD_REQUEST,
-            "One or more constraints were violated",
-            errors
-        );
-        
-        return ResponseEntity.badRequest().body(problem);
+        return error("constraint-violation", "Broken", errors);
     }
     
-    @ExceptionHandler(BindException.class)
-    public ResponseEntity<ProblemDetail> handleBindException(
-            BindException ex) {
-        
-        log.info("Binding error: {} errors", ex.getErrorCount());
-        
-        List<ProblemDetail.ValidationError> errors = ex.getFieldErrors()
-            .stream()
-            .map(this::mapFieldError)
-            .collect(Collectors.toList());
-        
-        ProblemDetail problem = buildProblemDetail(
-            "binding-error",
-            "Request Binding Failed",
-            HttpStatus.BAD_REQUEST,
-            "Request data could not be bound to the expected format",
-            errors
-        );
-        
-        return ResponseEntity.badRequest().body(problem);
-    }
-    
-    @ExceptionHandler(JsonSchemaValidationException.class)
-    public ResponseEntity<ProblemDetail> handleJsonSchemaValidation(
-            JsonSchemaValidationException ex) {
-        
-        log.info("JSON Schema validation failed: {} errors", 
-                 ex.getValidationErrors().size());
-        
-        List<ProblemDetail.ValidationError> errors = ex.getValidationErrors()
-            .stream()
-            .map(msg -> ProblemDetail.ValidationError.builder()
-                .message(msg)
-                .code("SCHEMA_VIOLATION")
-                .build())
-            .collect(Collectors.toList());
-        
-        ProblemDetail problem = buildProblemDetail(
-            "schema-validation-error",
-            "JSON Schema Validation Failed",
-            HttpStatus.BAD_REQUEST,
-            "Request does not conform to the expected schema",
-            errors
-        );
-        
-        return ResponseEntity.badRequest().body(problem);
-    }
-    
-    private ProblemDetail.ValidationError mapFieldError(FieldError error) {
-        return ProblemDetail.ValidationError.builder()
-            .field(error.getField())
-            .code(error.getCode())
-            .message(error.getDefaultMessage())
-            .rejectedValue(error.getRejectedValue())
+    private ValidationError toError(FieldError e) {
+        return ValidationError.builder()
+            .field(e.getField())
+            .code(e.getCode())
+            .message(e.getDefaultMessage())
+            .rejectedValue(e.getRejectedValue())
             .build();
     }
     
-    private ProblemDetail.ValidationError mapConstraintViolation(
-            ConstraintViolation<?> violation) {
-        return ProblemDetail.ValidationError.builder()
-            .field(violation.getPropertyPath().toString())
-            .code(violation.getConstraintDescriptor()
-                .getAnnotation().annotationType().getSimpleName())
-            .message(violation.getMessage())
-            .rejectedValue(violation.getInvalidValue())
-            .build();
-    }
-    
-    private ProblemDetail buildProblemDetail(String type, String title, 
-            HttpStatus status, String detail, 
-            List<ProblemDetail.ValidationError> errors) {
+    private ResponseEntity<ProblemDetail> error(
+            String type, String title,
+            List<ValidationError> errors) {
         
-        return ProblemDetail.builder()
+        ProblemDetail detail = ProblemDetail.builder()
             .type("https://api.example.com/problems/" + type)
             .title(title)
-            .status(status.value())
-            .detail(detail)
-            .instance(requestIdProvider.getCurrentRequestPath())
-            .timestamp(OffsetDateTime.now())
-            .requestId(requestIdProvider.getRequestId())
+            .status(400)
             .errors(errors)
+            .timestamp(OffsetDateTime.now())
             .build();
+        
+        return ResponseEntity.badRequest().body(detail);
     }
 }
 ```
 
-See [Imperative Error Handling](../error-handling/imperative-error-handling.md) for complete error handling patterns.
+See [Imperative Error Handling](../error-handling/imperative-error-handling.md).
 
 ## Best Practices
 
-### 1. Validation Layer Separation
+### 1. Validate at Each Layer
 
-Validate at multiple layers for defense in depth:
+Check format at the controller. Check rules at the service. Check limits in the domain.
 
 ```java
-// Layer 1: Controller validation (Jakarta Bean Validation)
+// Controller: format checks
 @PostMapping
 public ResponseEntity<OrderResponse> createOrder(
-        @Valid @RequestBody CreateOrderRequest request) {
+        @Valid @RequestBody CreateOrderRequest req) {
     // ...
 }
 
-// Layer 2: Service validation (Business rules)
+// Service: business rules
 @Service
 public class OrderService {
-    
     public OrderDto createOrder(OrderCreationDto dto) {
-        // Validate business rules
-        validateBusinessRules(dto);
-        
-        // Proceed with creation
-        // ...
-    }
-    
-    private void validateBusinessRules(OrderCreationDto dto) {
-        // Check inventory availability
-        // Validate customer credit limit
-        // Verify shipping availability
+        // Check inventory
+        // Validate credit limit
+        // Verify shipping
     }
 }
 
-// Layer 3: Domain validation (Invariants)
-@Entity
-public class Order {
-    
-    public void addItem(OrderItem item) {
-        if (items.size() >= 50) {
-            throw new BusinessException("Order cannot exceed 50 items");
-        }
-        items.add(item);
+// Domain: limits
+public void addItem(OrderItem item) {
+    if (items.size() >= 50) {
+        throw new BusinessException("Too many items");
     }
+    items.add(item);
 }
 ```
 
-### 2. Choose the Right Validation Tool
+### 2. Pick the Right Approach
 
-- **Jakarta Bean Validation**: Format and structure validation at the API boundary
-- **JSON Schema**: Complex schema requirements or external schema definitions
-- **Custom Validators**: Business-specific validation rules
-- **Method Validation**: Service method parameter validation
+- **Jakarta Validation** - API format checks
+- **JSON Schema** - Complex data rules
+- **Custom Validators** - Business logic
+- **Method Validation** - Parameter checks
 
-### 3. Consistent Error Response Format
+### 3. Use RFC 7807 Always
 
-Always use RFC 7807 Problem Details for all validation errors:
+Return errors using RFC 7807:
 
 ```json
 {
@@ -534,55 +385,54 @@ Always use RFC 7807 Problem Details for all validation errors:
 }
 ```
 
-### 4. Enable Method Validation Globally
+### 4. Enable Method Validation
 
-Configure method validation at the application level:
+Create this configuration:
 
 ```java
 @Configuration
 public class ValidationConfig {
-    
     @Bean
-    public MethodValidationPostProcessor methodValidationPostProcessor(
+    public MethodValidationPostProcessor processor(
             Validator validator) {
-        MethodValidationPostProcessor processor = 
+        MethodValidationPostProcessor p = 
             new MethodValidationPostProcessor();
-        processor.setValidator(validator);
-        return processor;
+        p.setValidator(validator);
+        return p;
     }
 }
 ```
 
-### 5. Cache JSON Schemas
+### 5. Cache Schemas for Speed
 
-Load and cache JSON schemas to avoid repeated I/O:
+Store loaded schemas in a map:
 
 ```java
 @Component
 public class JsonSchemaValidator {
+    private final Map<String, JsonSchema> cache = 
+        new ConcurrentHashMap<>();
     
-    private final Map<String, JsonSchema> schemaCache = new ConcurrentHashMap<>();
-    
-    public void validate(Object payload, String schemaPath) {
-        JsonSchema schema = schemaCache.computeIfAbsent(
-            schemaPath, this::loadSchema);
-        // Validate using cached schema
+    public void validate(Object payload, String path) {
+        JsonSchema schema = cache.computeIfAbsent(
+            path, this::loadSchema);
+        // validate
     }
 }
 ```
 
-## Related Documentation
+## Related Docs
 
 ### Next Steps
-- [Validation Testing](validation-testing.md) - Test validation patterns
+- [Validation Testing](validation-testing.md)
 
 ### Spring Implementation
-- [Validation Fundamentals](validation-fundamentals.md) - Jakarta Bean Validation basics
-- [Custom Validators](custom-validators.md) - Custom validation logic
-- [Validation Standards](../error-handling/validation-standards.md) - Service-level validation
-- [Imperative Error Handling](../error-handling/imperative-error-handling.md) - Exception handlers
-- [Error Response Formats](../error-handling/error-response-formats.md) - RFC 7807 implementation
+- [Validation Fundamentals](validation-fundamentals.md)
+- [Custom Validators](custom-validators.md)
+- [Validation Standards](../error-handling/validation-standards.md)
+- [Imperative Error Handling](../error-handling/imperative-error-handling.md)
+- [Error Response Formats](../error-handling/error-response-formats.md)
 
-### Language-Agnostic Theory
-- [Advanced Schema Design](../../../guides/api-design/request-response/advanced-schema-design.md) - Schema patterns
-- [Error Response Standards](../../../guides/api-design/request-response/error-response-standards.md) - Error formats
+### Theory
+- [Advanced Schema Design](../../../guides/api-design/request-response/advanced-schema-design.md)
+- [Error Response Standards](../../../guides/api-design/request-response/error-response-standards.md)

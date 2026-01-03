@@ -2,13 +2,15 @@
 
 ## Overview
 
-Metrics and distributed tracing provide operational insights into system performance and behavior. This guide covers Micrometer metrics integration and Spring Cloud Sleuth distributed tracing.
+Metrics measure system performance. Tracing tracks requests as they move between services. Learn how to use Micrometer for metrics and Sleuth for tracing.
 
 ## Metrics Collection
 
+Metrics track what happens in your system. Use Micrometer to collect them.
+
 ### Micrometer Integration
 
-Configure Micrometer for metrics collection:
+Set up Micrometer:
 
 ```java
 @Configuration
@@ -38,7 +40,7 @@ public class MetricsConfig {
 
 ### Custom Metrics
 
-Implement custom metrics for business-specific monitoring:
+Create metrics for your specific business needs:
 
 ```java
 @Service
@@ -53,37 +55,35 @@ public class OrderMetricsService {
     private final DistributionSummary orderValueSummary;
     
     @PostConstruct
-    public void init() {
-        // Initialize metrics
-        orderCreatedCounter = Counter.builder("orders.created")
-            .description("Number of orders created")
-            .register(meterRegistry);
-            
-        orderCancelledCounter = Counter.builder("orders.cancelled")
-            .description("Number of orders cancelled")
-            .register(meterRegistry);
-            
-        orderProcessingTimer = Timer.builder("orders.processing.time")
-            .description("Time taken to process orders")
-            .publishPercentiles(0.5, 0.95, 0.99)
-            .register(meterRegistry);
-            
-        orderValueSummary = DistributionSummary.builder("orders.value")
-            .description("Distribution of order values")
-            .publishPercentiles(0.5, 0.75, 0.95)
-            .baseUnit("dollars")
-            .register(meterRegistry);
+     public void init() {
+         orderCreatedCounter = Counter.builder("orders.created")
+             .description("Orders created")
+             .register(meterRegistry);
+             
+         orderCancelledCounter = Counter.builder("orders.cancelled")
+             .description("Orders cancelled")
+             .register(meterRegistry);
+             
+         orderProcessingTimer = Timer.builder("orders.processing.time")
+             .description("Order processing time")
+             .publishPercentiles(0.5, 0.95, 0.99)
+             .register(meterRegistry);
+             
+         orderValueSummary = DistributionSummary.builder("orders.value")
+             .description("Order values")
+             .publishPercentiles(0.5, 0.75, 0.95)
+             .baseUnit("dollars")
+             .register(meterRegistry);
     }
     
     public void recordOrderCreated(Order order) {
-        orderCreatedCounter.increment();
-        orderValueSummary.record(order.getTotalAmount().doubleValue());
-        
-        // Record tags for more detailed metrics
-        meterRegistry.counter("orders.created.by.customer", 
-            Tags.of("customerId", order.getCustomerId().toString()))
-            .increment();
-    }
+         orderCreatedCounter.increment();
+         orderValueSummary.record(order.getTotalAmount().doubleValue());
+         
+         meterRegistry.counter("orders.created.by.customer", 
+             Tags.of("customerId", order.getCustomerId().toString()))
+             .increment();
+     }
     
     public void recordOrderCancelled(Order order) {
         orderCancelledCounter.increment();
@@ -95,7 +95,7 @@ public class OrderMetricsService {
 }
 ```
 
-### Using Metrics in Services
+### Use Metrics in Services
 
 ```java
 @Service
@@ -160,9 +160,11 @@ public class ReactiveOrderMetricsService {
 
 ## Distributed Tracing
 
+Tracing shows how requests flow through your system.
+
 ### Spring Cloud Sleuth Configuration
 
-Configure distributed tracing with Spring Cloud Sleuth and Zipkin:
+Set up Sleuth and Zipkin:
 
 ```yaml
 # application.yml
@@ -182,7 +184,7 @@ spring:
 
 ### Trace Context Propagation
 
-Ensure trace context propagation in service calls:
+Pass trace context between services:
 
 ```java
 @Service
@@ -204,7 +206,7 @@ public class CustomerClient {
 
 ### Reactive Tracing
 
-For reactive applications, configure trace context propagation:
+Set up trace context for non-blocking code:
 
 ```java
 @Service
@@ -225,7 +227,7 @@ public class ReactiveCustomerClient {
 
 ## Metrics Examples
 
-### Comprehensive Metrics Example
+### Full Metrics Example
 
 ```java
 @Service
@@ -235,52 +237,48 @@ public class OrderMetricsService {
     private final MeterRegistry meterRegistry;
     
     public void recordOrderMetrics(Order order) {
-        // Increment counter
-        meterRegistry.counter("orders.created", 
-            "customerId", order.getCustomerId().toString(),
-            "status", order.getStatus().name()).increment();
-            
-        // Record order amount
-        meterRegistry.summary("orders.amount", 
-            "customerId", order.getCustomerId().toString())
-            .record(order.getTotalAmount().doubleValue());
-            
-        // Record timer for order processing
-        Timer timer = meterRegistry.timer("orders.processing.time",
-            "status", order.getStatus().name());
-        timer.record(Duration.between(order.getCreatedDate(), Instant.now()));
-    }
+         meterRegistry.counter("orders.created", 
+             "customerId", order.getCustomerId().toString(),
+             "status", order.getStatus().name()).increment();
+             
+         meterRegistry.summary("orders.amount", 
+             "customerId", order.getCustomerId().toString())
+             .record(order.getTotalAmount().doubleValue());
+             
+         Timer timer = meterRegistry.timer("orders.processing.time",
+             "status", order.getStatus().name());
+         timer.record(Duration.between(order.getCreatedDate(), Instant.now()));
+     }
 }
 ```
 
 ## Best Practices
 
-### Patterns to Follow
+### Good Patterns
 
-| Pattern | Example | Description |
-|---------|---------|-------------|
-| Business Metrics | Orders created | Track business-specific metrics |
-| Percentile Distribution | 50th, 95th, 99th | Monitor performance distribution |
-| Tagged Metrics | Customer tags | Add context to metrics |
-| Trace Context | Correlation IDs | Propagate context across services |
+| Pattern | Example | Why |
+|---------|---------|-----|
+| Business Metrics | Orders created | Track your goals |
+| Percentiles | 50th, 95th, 99th | See performance variation |
+| Tags | Customer IDs | Filter and group data |
+| Correlation IDs | Trace headers | Link requests across services |
 
-### Anti-patterns to Avoid
+### Avoid These Patterns
 
-| Anti-pattern | Example | Preferred Approach |
-|--------------|---------|-------------------|
-| Generic Metrics | Generic counters | Use specific, meaningful metrics |
-| Missing Tags | No context | Add relevant tags for filtering |
-| High Cardinality Tags | User IDs as tags | Use customer segments instead |
-| Blocking in Reactive | `.block()` everywhere | Use reactive operators |
+| Problem | Example | Fix |
+|---------|---------|-----|
+| Generic names | Generic counter | Use specific names |
+| No tags | No context | Add labels always |
+| Too many tag values | All user IDs | Use segments |
+| Blocking code | Many `.block()` calls | Use reactive calls |
 
 ## Related Documentation
 
-### API Design Standards (Language-Agnostic)
-- [API Observability Standards](../../../guides/api-design/advanced-patterns/api-observability-standards.md) - Protocol-level observability patterns and HTTP standards
+### Related Guides
 
-### Spring Implementation  
-- [Observability Configuration](../configuration/observability-configuration.md) - Configuration patterns for metrics and tracing
-- [Logging Standards](./logging-standards.md) - Structured logging and correlation IDs
-- [Health and Monitoring](./health-and-monitoring.md) - Health checks, alerting, and dashboards
-- [HTTP Client Patterns](../http-clients/http-client-patterns.md) - HTTP client metrics and observability
-- [Security Context Propagation](../security/security-context-propagation.md) - Security context in traces
+- [API Observability](../../../guides/api-design/advanced-patterns/api-observability-standards.md) - HTTP observability patterns
+- [Observability Config](../configuration/observability-configuration.md) - How to set up metrics and tracing
+- [Logging](./logging-standards.md) - Structured logs and IDs
+- [Health Checks](./health-and-monitoring.md) - Monitoring and alerts
+- [HTTP Clients](../http-clients/http-client-patterns.md) - Client metrics
+- [Security Context](../security/security-context-propagation.md) - Security in traces

@@ -2,11 +2,14 @@
 
 ## Overview
 
-Domain layer testing focuses on testing business entities, value objects, and domain services without external dependencies. These tests verify business logic and domain rules in complete isolation.
+Domain layer testing isolates business logic. Test it without external systems, mocks, or dependencies. Verify that business rules work on their own.
 
 ## Testing Domain Entities
 
-Domain entities should be tested without mocks since they contain pure business logic. Focus on testing business rules, state transitions, and invariants.
+Domain entities contain pure business logic. Test them without mocks. Focus on three key areas:
+- Business rules
+- State transitions
+- Invariants
 
 ### Testing Business Rules
 
@@ -178,7 +181,10 @@ class OrderTest {
 
 ## Testing Value Objects
 
-Value objects should be tested for equality, immutability, and validation rules.
+Test three aspects of value objects:
+- Equality
+- Immutability
+- Validation rules
 
 ### Testing Value Object Equality
 
@@ -248,7 +254,7 @@ class MoneyTest {
 
 ## Testing Domain Services
 
-Domain services coordinate business logic across multiple entities and often depend on external services. Mock these dependencies to test business logic in isolation.
+Domain services connect business logic across entities. They call external services. Mock these dependencies. Test the business logic in isolation.
 
 ### Testing Domain Service Logic
 
@@ -407,133 +413,144 @@ class DiscountDomainServiceTest {
 
 ## Testing Domain Events
 
+Domain events represent state changes. Test that they fire at the right times and get cleared properly.
+
 ```java
 class OrderTest {
 
-    @Test
-    void shouldRaiseDomainEventWhenOrderConfirmed() {
-        // Given
-        Order order = createTestOrder(OrderStatus.CREATED);
+     @Test
+     void shouldRaiseDomainEventWhenOrderConfirmed() {
+         // Given
+         Order order = createTestOrder(OrderStatus.CREATED);
 
-        // When
-        order.confirm();
+         // When
+         order.confirm();
 
-        // Then
-        List<DomainEvent> events = order.getDomainEvents();
-        assertThat(events).hasSize(1);
-        assertThat(events.get(0)).isInstanceOf(OrderConfirmedEvent.class);
-        
-        OrderConfirmedEvent event = (OrderConfirmedEvent) events.get(0);
-        assertThat(event.getOrderId()).isEqualTo(order.getId());
-        assertThat(event.getCustomerId()).isEqualTo(order.getCustomerId());
-    }
+         // Then
+         List<DomainEvent> events = order.getDomainEvents();
+         assertThat(events).hasSize(1);
+         assertThat(events.get(0)).isInstanceOf(OrderConfirmedEvent.class);
+         
+         OrderConfirmedEvent event = (OrderConfirmedEvent) events.get(0);
+         assertThat(event.getOrderId()).isEqualTo(order.getId());
+         assertThat(event.getCustomerId()).isEqualTo(order.getCustomerId());
+     }
 
-    @Test
-    void shouldClearDomainEventsAfterRetrieval() {
-        // Given
-        Order order = createTestOrder(OrderStatus.CREATED);
-        order.confirm();
+     @Test
+     void shouldClearDomainEventsAfterRetrieval() {
+         // Given
+         Order order = createTestOrder(OrderStatus.CREATED);
+         order.confirm();
 
-        // When
-        order.getDomainEvents(); // First retrieval
-        List<DomainEvent> events = order.getDomainEvents(); // Second retrieval
+         // When
+         order.getDomainEvents(); // First retrieval
+         List<DomainEvent> events = order.getDomainEvents(); // Second retrieval
 
-        // Then
-        assertThat(events).isEmpty();
-    }
+         // Then
+         assertThat(events).isEmpty();
+     }
 }
 ```
 
 ## Domain Layer Testing Best Practices
 
-### 1. Test Business Logic, Not Getters/Setters
+### 1. Test Behavior, Not Simple Getters
+
+Test what the entity does. Don't test simple getters and setters.
 
 ```java
-// Good: Testing business behavior
+// Good: Test business behavior
 @Test
 void shouldPreventOrderModificationAfterShipment() {
-    Order order = createTestOrder(OrderStatus.SHIPPED);
-    
-    assertThrows(InvalidOrderStatusException.class, 
-        () -> order.addItem(createTestOrderItem()));
+     Order order = createTestOrder(OrderStatus.SHIPPED);
+     
+     assertThrows(InvalidOrderStatusException.class, 
+         () -> order.addItem(createTestOrderItem()));
 }
 
-// Bad: Testing simple accessors
+// Avoid: Testing simple property accessors
 @Test
 void shouldSetAndGetCustomerId() {
-    Order order = new Order();
-    UUID customerId = UUID.randomUUID();
-    
-    order.setCustomerId(customerId);
-    
-    assertThat(order.getCustomerId()).isEqualTo(customerId);
+     Order order = new Order();
+     UUID customerId = UUID.randomUUID();
+     
+     order.setCustomerId(customerId);
+     
+     assertThat(order.getCustomerId()).isEqualTo(customerId);
 }
 ```
 
-### 2. Use Domain-Specific Assertions
+### 2. Write Clear Assertions
+
+Use domain-specific methods. They're clearer than generic status checks.
 
 ```java
-// Good: Domain-specific assertions
+// Good: Domain-specific methods
 assertThat(order.isInShippableState()).isTrue();
 assertThat(order.canBeModified()).isFalse();
 
-// Less ideal: Status checking
+// Avoid: Generic status checking
 assertThat(order.getStatus()).isEqualTo(OrderStatus.CONFIRMED);
 ```
 
-### 3. Test Edge Cases and Boundaries
+### 3. Test Limits and Edge Cases
+
+Test minimum and maximum values. Test boundary conditions.
 
 ```java
 @Test
 void shouldHandleMinimumOrderValue() {
-    Order order = createTestOrderWithAmount(Money.of(BigDecimal.valueOf(0.01), Currency.USD));
-    
-    assertThat(order.getTotalAmount()).isEqualByComparingTo(BigDecimal.valueOf(0.01));
+     Order order = createTestOrderWithAmount(
+         Money.of(BigDecimal.valueOf(0.01), Currency.USD));
+     
+     assertThat(order.getTotalAmount())
+         .isEqualByComparingTo(BigDecimal.valueOf(0.01));
 }
 
 @Test
 void shouldHandleMaximumQuantity() {
-    OrderItem item = OrderItem.builder()
-        .productId(UUID.randomUUID())
-        .quantity(Integer.MAX_VALUE)
-        .unitPrice(BigDecimal.valueOf(0.01))
-        .build();
-        
-    // Test that large quantities are handled correctly
-    assertThat(item.getTotalPrice()).isPositive();
+     OrderItem item = OrderItem.builder()
+         .productId(UUID.randomUUID())
+         .quantity(Integer.MAX_VALUE)
+         .unitPrice(BigDecimal.valueOf(0.01))
+         .build();
+         
+     assertThat(item.getTotalPrice()).isPositive();
 }
 ```
 
-### 4. Use Test Data Factories
+### 4. Use Data Factories for Tests
+
+Reuse test data creation. Use factories instead of building data in each test.
 
 ```java
 public class OrderTestDataFactory {
-    
-    public static Order createTestOrder() {
-        return Order.builder()
-            .customerId(UUID.randomUUID())
-            .status(OrderStatus.CREATED)
-            .items(List.of(createTestOrderItem()))
-            .build();
-    }
-    
-    public static Order createTestOrder(OrderStatus status) {
-        return createTestOrder().toBuilder()
-            .status(status)
-            .build();
-    }
-    
-    public static Order createTestOrderWithAmount(BigDecimal amount) {
-        return Order.builder()
-            .customerId(UUID.randomUUID())
-            .status(OrderStatus.CREATED)
-            .items(List.of(OrderItem.builder()
-                .productId(UUID.randomUUID())
-                .quantity(1)
-                .unitPrice(amount)
-                .build()))
-            .build();
-    }
+     
+     public static Order createTestOrder() {
+         return Order.builder()
+             .customerId(UUID.randomUUID())
+             .status(OrderStatus.CREATED)
+             .items(List.of(createTestOrderItem()))
+             .build();
+     }
+     
+     public static Order createTestOrder(OrderStatus status) {
+         return createTestOrder().toBuilder()
+             .status(status)
+             .build();
+     }
+     
+     public static Order createTestOrderWithAmount(BigDecimal amount) {
+         return Order.builder()
+             .customerId(UUID.randomUUID())
+             .status(OrderStatus.CREATED)
+             .items(List.of(OrderItem.builder()
+                 .productId(UUID.randomUUID())
+                 .quantity(1)
+                 .unitPrice(amount)
+                 .build()))
+             .build();
+     }
 }
 ```
 

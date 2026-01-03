@@ -2,13 +2,19 @@
 
 ## Overview
 
-This document covers the implementation of DTOs, mappers, and validation for controller request and response handling. Proper mapping between API DTOs and application/domain models is crucial for maintaining clean architecture boundaries.
+This document explains how to map API requests and responses in Spring controllers. It covers three key topics:
+
+- **Data Transfer Objects (DTOs)** - Classes that move data between layers
+- **Mappers** - Code that converts data between DTOs
+- **Validation** - Rules that check request data is correct
+
+Proper mapping keeps your API layer separate from your business logic.
 
 ## Request DTOs
 
 ### Request DTO Structure
 
-Request DTOs should include validation annotations and follow clear naming patterns:
+Request DTOs hold data from API clients. Add validation rules to them. Mark required fields and set size limits. Use clear names like `CreateOrderRequest` or `UpdateOrderRequest`.
 
 ```java
 import jakarta.validation.Valid;
@@ -139,7 +145,7 @@ public class OrderRequestValidator implements ConstraintValidator<ValidOrderRequ
 
 ### Response DTO Structure
 
-Response DTOs should be immutable and include all necessary data:
+Response DTOs should be immutable (read-only). Include all data the client needs in the response. Use builder pattern for safe construction.
 
 ```java
 @Data
@@ -236,6 +242,8 @@ public class ErrorResponse {
 ```
 
 ## Mappers
+
+Mappers convert data between different DTO layers. They translate API DTOs to application DTOs and back to responses.
 
 ### Basic Mapper Implementation
 
@@ -374,6 +382,13 @@ public class OrderMapper {
 
 ## Validation Standards
 
+Validation checks request data before processing. Common validation rules:
+- `@NotNull` - Field must have a value
+- `@NotEmpty` - Collections must have items
+- `@Size` - Set length limits
+- `@Pattern` - Use regex patterns
+- `@Email` - Check email format
+
 ### Standard Validation Annotations
 
 ```java
@@ -480,9 +495,14 @@ public class OrderValidationService {
 
 ## Best Practices
 
-### 1. Separation of Concerns
+### 1. Separate API and Application DTOs
 
-Keep API DTOs separate from application DTOs:
+Keep three separate layers:
+- **API layer** - What clients send and receive
+- **Application layer** - What your business logic uses
+- **Domain layer** - Your core business objects
+
+This separation protects your business logic from API changes.
 
 ```java
 // API layer DTOs (controllers package)
@@ -497,9 +517,9 @@ public class OrderDto { /* Application structure */ }
 public class Order { /* Domain structure */ }
 ```
 
-### 2. Immutable Response DTOs
+### 2. Make Response DTOs Immutable
 
-Use builders and make response DTOs immutable:
+Use the `@Value` annotation (instead of `@Data`) to make DTOs read-only. Use builders to create instances safely:
 
 ```java
 @Value
@@ -514,9 +534,9 @@ public class OrderResponse {
 }
 ```
 
-### 3. Null Safety
+### 3. Handle Null Values
 
-Handle null values appropriately:
+Always check for null before using objects. Use Optional to make null handling clearer:
 
 ```java
 public OrderResponse toResponse(OrderDto orderDto) {
@@ -537,9 +557,9 @@ public OrderResponse toResponse(OrderDto orderDto) {
 }
 ```
 
-### 4. Validation Error Handling
+### 4. Format Validation Errors Consistently
 
-Consistent error response formatting:
+Return the same error format for all validation failures. Use `@ControllerAdvice` to centralize error handling:
 
 ```java
 @ControllerAdvice
@@ -573,7 +593,11 @@ public class ValidationExceptionHandler {
 }
 ```
 
-These mapping patterns ensure clean separation between API contracts and internal application structures while providing robust validation and error handling.
+These patterns give you:
+- Clean separation between your API and business logic
+- Strong validation of incoming requests  
+- Consistent error responses
+- Safe data transformations
 
 ## Related Documentation
 

@@ -1,6 +1,6 @@
 # Imperative Examples (Spring MVC)
 
-This document provides concrete examples of implementing the [package organization structure](./package-organization.md) using traditional Spring MVC with blocking I/O operations.
+This document shows how to implement the [package organization structure](./package-organization.md) using Spring MVC. Spring MVC uses blocking I/O, where each request waits for a response before moving on.
 
 ## Domain Layer Examples
 
@@ -272,11 +272,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 ## Key Characteristics of Imperative Implementation
 
-1. **Blocking Operations**: Methods use standard return types like `Optional<T>`, `List<T>`, etc.
-2. **Synchronous Processing**: Operations complete before returning
-3. **Traditional Spring MVC**: Uses `@RestController`, `@RequestMapping` annotations
-4. **JPA Integration**: Standard Spring Data JPA repositories
-5. **Exception Handling**: Traditional try-catch blocks and `@ExceptionHandler`
+1. **Blocking Operations**: Methods return data types like `Optional<T>` and `List<T>` that hold the actual data
+2. **Synchronous Processing**: Each operation finishes before the next one starts
+3. **Traditional Spring MVC**: Uses `@RestController` and `@RequestMapping` annotations
+4. **JPA Integration**: Uses Spring Data JPA repositories for database access
+5. **Exception Handling**: Uses try-catch blocks and `@ExceptionHandler` methods
 
 ## See Also
 
