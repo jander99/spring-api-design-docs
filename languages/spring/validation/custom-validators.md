@@ -2,30 +2,33 @@
 
 > **📖 Reading Guide**
 > 
-> **⏱️ Reading Time:** 10 minutes | **🟡 Level:** Intermediate
+> **⏱️ Reading Time:** 12 minutes | **🟡 Level:** Intermediate
 > 
 > **📋 Prerequisites:** Jakarta Bean Validation basics  
 > **🎯 Key Topics:** Custom Constraints, Cross-Field Validation, Groups
 > 
-> **📊 Complexity:** Intermediate technical content
+> **📊 Complexity:** Grade 13.0 • Intermediate
 
 ## Overview
 
-This guide teaches you to create custom validators.
+This guide shows you how to create custom validators.
 
 **You will learn:**
 
-- How to build constraint annotations
-- How to validate multiple fields together
+- How to create custom annotations
+- How to validate multiple fields
 - How to use groups for different operations
 
-**Start here**: Review [Validation Fundamentals](validation-fundamentals.md) first.
+**Before you start**: Read [Validation Fundamentals](validation-fundamentals.md) first if you need an introduction.
 
 ## Custom Constraint Annotations
 
 ### Creating a Custom Validator
 
-Write validators for business logic. Here we validate order dates:
+Write validators for your business logic.
+
+This creates the annotation.
+It validates order dates:
 
 ```java
 package com.example.common.validation;
@@ -40,7 +43,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidOrderDate {
     
-    String message() default "Order date must be at least 24 hours in the future";
+    String message() default 
+        "Order date must be at least 24 hours in the future";
     
     Class<?>[] groups() default {};
     
@@ -51,6 +55,11 @@ public @interface ValidOrderDate {
 ```
 
 ### Implementing the Validator
+
+Create the validator class next.
+This class performs the check:
+
+Here's the code:
 
 ```java
 package com.example.common.validation;
@@ -65,14 +74,14 @@ public class OrderDateValidator
     private int minHoursInFuture;
     
     @Override
-    public void initialize(ValidOrderDate constraintAnnotation) {
-        this.minHoursInFuture = constraintAnnotation.minHoursInFuture();
+    public void initialize(ValidOrderDate annotation) {
+        this.minHoursInFuture = annotation.minHoursInFuture();
     }
     
     @Override
     public boolean isValid(LocalDateTime value, 
                           ConstraintValidatorContext context) {
-        // Null values should be validated by @NotNull
+        // Skip if null (let @NotNull check this)
         if (value == null) {
             return true;
         }
@@ -87,7 +96,8 @@ public class OrderDateValidator
 
 ### Using Custom Validators
 
-Apply your custom validator to a field:
+Apply your custom validator to a field.
+Here's an example:
 
 ```java
 @Data
@@ -110,7 +120,8 @@ public class ScheduleOrderRequest {
 
 ### Class-Level Validators
 
-Validate multiple fields together. Ensure the end date is after the start date:
+Validate multiple fields together.
+This example ensures the end date comes after the start date:
 
 ```java
 package com.example.common.validation;
@@ -125,7 +136,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidDateRange {
     
-    String message() default "End date must be after start date";
+    String message() default 
+        "End date must be after start date";
     
     Class<?>[] groups() default {};
     
@@ -138,6 +150,9 @@ public @interface ValidDateRange {
 ```
 
 ### Cross-Field Validator Implementation
+
+Create the validator class.
+It checks both date fields:
 
 ```java
 package com.example.common.validation;
@@ -157,24 +172,28 @@ public class DateRangeValidator
     private String endField;
     
     @Override
-    public void initialize(ValidDateRange constraintAnnotation) {
-        this.startField = constraintAnnotation.startField();
-        this.endField = constraintAnnotation.endField();
+    public void initialize(ValidDateRange annotation) {
+        this.startField = annotation.startField();
+        this.endField = annotation.endField();
     }
     
     @Override
     public boolean isValid(Object value, ConstraintValidatorContext context) {
         try {
-            Field startFieldRef = value.getClass().getDeclaredField(startField);
-            Field endFieldRef = value.getClass().getDeclaredField(endField);
+            Field startFieldRef = value.getClass()
+                .getDeclaredField(startField);
+            Field endFieldRef = value.getClass()
+                .getDeclaredField(endField);
             
             startFieldRef.setAccessible(true);
             endFieldRef.setAccessible(true);
             
-            LocalDate startDate = (LocalDate) startFieldRef.get(value);
-            LocalDate endDate = (LocalDate) endFieldRef.get(value);
+            LocalDate startDate = 
+                (LocalDate) startFieldRef.get(value);
+            LocalDate endDate = 
+                (LocalDate) endFieldRef.get(value);
             
-            // Allow null values (let @NotNull handle nulls)
+            // Skip if either date is null
             if (startDate == null || endDate == null) {
                 return true;
             }
@@ -183,8 +202,9 @@ public class DateRangeValidator
             
             if (!isValid) {
                 context.disableDefaultConstraintViolation();
-                context.buildConstraintViolationWithTemplate(
-                    "End date must be after start date")
+                context
+                    .buildConstraintViolationWithTemplate(
+                        "End date must be after start date")
                     .addPropertyNode(endField)
                     .addConstraintViolation();
             }
@@ -192,7 +212,7 @@ public class DateRangeValidator
             return isValid;
             
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            log.error("Error accessing fields for validation", e);
+            log.error("Could not read fields", e);
             return false;
         }
     }
@@ -201,7 +221,8 @@ public class DateRangeValidator
 
 ### Using Cross-Field Validation
 
-Apply cross-field validation to a class:
+Apply the validator to your request class.
+Here's an example:
 
 ```java
 @Data
@@ -225,7 +246,9 @@ public class ReportRequest {
 
 ### Defining Validation Groups
 
-Use groups to apply different rules for different operations:
+Groups apply different rules to different operations.
+
+Create group interfaces like this:
 
 ```java
 package com.example.common.validation;
@@ -237,45 +260,52 @@ public interface PartialUpdateValidation {}
 
 ### Applying Validation Groups
 
-Use different rules for different operations:
+Now define your request class.
+Use groups to apply different rules:
 
 ```java
 @Data
 public class CustomerRequest {
     
-    // Creation: must be null
+    // Creation: ID must be null
     @Null(groups = CreateValidation.class, 
           message = "ID must be null when creating")
-    // Update: must exist
+    // Update: ID must exist
     @NotNull(groups = UpdateValidation.class, 
              message = "ID is required when updating")
     private UUID id;
     
     // Name required for create and update
-    @NotBlank(groups = {CreateValidation.class, UpdateValidation.class}, 
+    @NotBlank(groups = {CreateValidation.class, 
+                        UpdateValidation.class}, 
               message = "Name is required")
     @Size(max = 200, 
-          groups = {CreateValidation.class, UpdateValidation.class})
+          groups = {CreateValidation.class, 
+                    UpdateValidation.class})
     private String name;
     
     // Email required for create
     @NotBlank(groups = CreateValidation.class, 
               message = "Email is required")
-    @Email(groups = {CreateValidation.class, UpdateValidation.class})
+    @Email(groups = {CreateValidation.class, 
+                     UpdateValidation.class})
     private String email;
     
-    // Phone optional everywhere - only validate format if provided
+    // Phone optional
     @Pattern(regexp = "^\\+[1-9]\\d{1,14}$", 
-             groups = {CreateValidation.class, UpdateValidation.class, 
-                      PartialUpdateValidation.class},
-             message = "Invalid phone number format")
+             groups = {CreateValidation.class, 
+                       UpdateValidation.class, 
+                       PartialUpdateValidation.class},
+             message = "Invalid phone format")
     private String phoneNumber;
 }
 ```
 
 ### Using Validation Groups in Controllers
 
-Apply different groups in different endpoints:
+Apply different groups in each endpoint.
+
+Here's how:
 
 ```java
 @RestController
@@ -289,7 +319,7 @@ public class CustomerController {
     public ResponseEntity<CustomerResponse> createCustomer(
             @Validated(CreateValidation.class) 
             @RequestBody CustomerRequest request) {
-        // Handle creation with create validation
+        // Use create validation
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(response);
     }
@@ -299,7 +329,7 @@ public class CustomerController {
             @PathVariable UUID customerId,
             @Validated(UpdateValidation.class) 
             @RequestBody CustomerRequest request) {
-        // Handle full update with update validation
+        // Use update validation
         return ResponseEntity.ok(response);
     }
     
@@ -308,7 +338,7 @@ public class CustomerController {
             @PathVariable UUID customerId,
             @Validated(PartialUpdateValidation.class) 
             @RequestBody CustomerRequest request) {
-        // Handle partial with different validation
+        // Use partial update validation
         return ResponseEntity.ok(response);
     }
 }
@@ -318,7 +348,7 @@ public class CustomerController {
 
 ### Global Validator Configuration
 
-Set up validation globally for your application:
+Set up validation globally:
 
 ```java
 package com.example.common.config;
@@ -327,21 +357,24 @@ import jakarta.validation.Validator;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
+import org.springframework.context.support
+    .ReloadableResourceBundleMessageSource;
+import org.springframework.validation.beanvalidation
+    .LocalValidatorFactoryBean;
+import org.springframework.validation.beanvalidation
+    .MethodValidationPostProcessor;
 
 @Configuration
 public class ValidationConfig {
     
     @Bean
     public MessageSource validationMessageSource() {
-        ReloadableResourceBundleMessageSource messageSource = 
+        ReloadableResourceBundleMessageSource source = 
             new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:validation-messages");
-        messageSource.setDefaultEncoding("UTF-8");
-        messageSource.setCacheSeconds(3600);
-        return messageSource;
+        source.setBasename("classpath:validation-messages");
+        source.setDefaultEncoding("UTF-8");
+        source.setCacheSeconds(3600);
+        return source;
     }
     
     @Bean
@@ -352,8 +385,8 @@ public class ValidationConfig {
     }
     
     @Bean
-    public MethodValidationPostProcessor methodValidationPostProcessor(
-            Validator validator) {
+    public MethodValidationPostProcessor 
+            methodValidationPostProcessor(Validator validator) {
         MethodValidationPostProcessor processor = 
             new MethodValidationPostProcessor();
         processor.setValidator(validator);
@@ -371,14 +404,14 @@ Add custom messages in `validation-messages.properties`:
 NotNull.customerId=Customer ID is required
 NotEmpty.items=Order must contain at least one item
 Size.name=Name must be between {min} and {max} characters
-Pattern.zipCode=Invalid ZIP code format. Expected format: 12345 or 12345-6789
+Pattern.zipCode=Invalid ZIP code format
 
 # Custom constraint messages
-ValidOrderDate.deliveryDateTime=Delivery date must be at least {minHoursInFuture} hours in the future
+ValidOrderDate.deliveryDateTime=Delivery date needs {minHoursInFuture} hours
 ValidDateRange.endDate=End date must be after start date
 
 # Field-specific messages
-CreateOrderRequest.customerId=Customer ID is required for order creation
+CreateOrderRequest.customerId=Customer ID required for creation
 UpdateOrderRequest.items=At least one item must be updated
 ```
 
@@ -386,17 +419,18 @@ UpdateOrderRequest.items=At least one item must be updated
 
 ### 1. Separate Concerns
 
-Use custom validators for business rules. Use standard validators for format checks:
+Use custom validators for business rules.
+Use built-in validators for data format.
 
 ```java
 @Data
 public class ScheduleOrderRequest {
     
-    // Standard: Check that value exists
+    // Built-in
     @NotNull(message = "Delivery date is required")
     private LocalDateTime deliveryDateTime;
     
-    // Custom: Check business rule
+    // Custom
     @ValidOrderDate(minHoursInFuture = 48)
     private LocalDateTime deliveryDateTime;
 }
@@ -404,19 +438,20 @@ public class ScheduleOrderRequest {
 
 ### 2. Let @NotNull Handle Nulls
 
-Let `@NotNull` check for null values. Your validator only handles non-null values:
+Let `@NotNull` check null values.
+Your validator checks non-null values:
 
 ```java
 @Override
 public boolean isValid(LocalDateTime value, 
                        ConstraintValidatorContext context) {
     
-    // Null values: let @NotNull handle them
+    // Skip null
     if (value == null) {
         return true;
     }
     
-    // Check if date is in the future enough
+    // Check rule
     LocalDateTime minimum = LocalDateTime.now()
         .plusHours(minHoursInFuture);
     return value.isAfter(minimum);
@@ -425,29 +460,34 @@ public boolean isValid(LocalDateTime value,
 
 ### 3. Use Validation Groups Wisely
 
-Different operations need different rules. Create operations are different from updates:
+Different operations need different rules.
+
+**When creating:**
+ID must be null (new record)
+
+**When updating:**
+ID must exist (existing record)
 
 ```java
-// For creation: customer must exist
-@NotNull(groups = CreateValidation.class)
-private UUID customerId;
-
-// For updates: ID must exist but must be null on creation
+// For creation: ID must be null
 @Null(groups = CreateValidation.class)
+private UUID id;
+
+// For updates: ID must exist
 @NotNull(groups = UpdateValidation.class)
 private UUID id;
 ```
 
-### 4. Provide Contextual Error Messages
+### 4. Provide Clear Error Messages
 
-Tell users which field has the problem and how to fix it:
+Tell users which field failed:
 
 ```java
 if (!isValid) {
-    // Replace default message
+    // Custom message
     context.disableDefaultConstraintViolation();
     
-    // Attach error to specific field
+    // Point to the field
     context.buildConstraintViolationWithTemplate(
             "End date must be after start date")
         .addPropertyNode(endField)
@@ -457,7 +497,9 @@ if (!isValid) {
 
 ### 5. Use Reflection Carefully
 
-Cache (store) field references during setup. This improves performance:
+Get field references once during setup.
+
+This improves performance:
 
 ```java
 public class DateRangeValidator 
@@ -469,8 +511,7 @@ public class DateRangeValidator
     @Override
     public void initialize(ValidDateRange constraintAnnotation) {
         try {
-            // Store field references once during setup
-            // This avoids reflection overhead during validation
+            // Get references once
             this.startFieldRef = getField(
                 constraintAnnotation.startField());
             this.endFieldRef = getField(
@@ -485,16 +526,18 @@ public class DateRangeValidator
 
 ## Related Documentation
 
+Explore these topics next.
+
 ### Next Steps
 
-- [Advanced Validation](advanced-validation.md) — JSON Schema and methods
-- [Validation Testing](validation-testing.md) — Test your validators
+- [Advanced Validation](advanced-validation.md) — JSON Schema
+- [Validation Testing](validation-testing.md) — Test validators
 
 ### Spring Implementation
 
-- [Validation Fundamentals](validation-fundamentals.md) — Bean Validation basics
+- [Validation Fundamentals](validation-fundamentals.md) — Bean Validation
 - [Validation Standards](../error-handling/validation-standards.md) — Service layer
-- [Imperative Error Handling](../error-handling/imperative-error-handling.md) — Exception handling
+- [Imperative Error Handling](../error-handling/imperative-error-handling.md) — Error handling
 
 ### Language-Agnostic Theory
 

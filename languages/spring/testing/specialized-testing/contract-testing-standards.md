@@ -6,17 +6,17 @@ Contract tests check that services work together correctly. They verify services
 
 ## Core Principles
 
-1. **Consumer-Driven Contracts**: Focus on consumer needs
-2. **Provider Verification**: Test providers meet contracts
-3. **Independent Evolution**: Let services evolve safely
-4. **Version Management**: Track contracts with API versions
+1. **Consumer-Driven Contracts**: Write contracts based on what consumers need
+2. **Provider Verification**: Test that providers keep their contracts
+3. **Independent Evolution**: Let services change without breaking each other
+4. **Version Management**: Track contract changes with API versions
 
 ## Contract Testing Framework
 
-- Use Spring Cloud Contract for testing
-- Store contracts in provider folders
-- Build fake clients from contracts
-- Verify provider code matches the contract
+- Use Spring Cloud Contract to test
+- Store contracts with the provider code
+- Create fake clients from contracts
+- Check that provider code matches contracts
 
 ## Structure and Organization
 
@@ -81,85 +81,85 @@ response:
 
 ## Consumer-Side Testing
 
-- Generate fake providers from the contract
-- Test client code against fake providers
-- Check that error handling works correctly
-- Ensure code works with older contract versions
+- Create fake providers from contracts
+- Test your client code against the fake providers
+- Verify error handling works as expected
+- Make sure your code works with old contract versions
 
 ## Provider-Side Testing
 
-- Check that code matches the contract
-- Use Spring Cloud Contract base classes
-- Verify all contract promises are kept
-- Test multiple contract versions
+- Check that your code matches the contract
+- Use Spring Cloud Contract base classes to test
+- Make sure you keep all contract promises
+- Test all contract versions you support
 
 ## Contract Versioning
 
 ### Version Management
 
-- Add API version to filenames
-- Support old contracts when possible
-- Have a breaking change process
-- Notify users of contract removal
+- Add API version to contract filenames
+- Keep old contracts working when you can
+- Create a process for breaking changes
+- Tell users before you remove contracts
 
 ### Contract Breaking Changes
 
-- Warn teams before breaking a contract
-- Support old and new versions temporarily
-- Match contract and API versions
-- Document dependencies
+- Warn teams before you break a contract
+- Support both old and new versions for a time
+- Keep contract versions in sync with API versions
+- Write down which contracts depend on each other
 
 ## Contract Testing in CI/CD
 
 - Run consumer tests first
-- Verify code matches contracts in CI
-- Block bad deployments
-- Catch issues before deployment
+- Verify your code matches contracts in your CI pipeline
+- Stop bad deployments
+- Find issues before you deploy
 
 ## Contract Registry
 
-- Save contracts centrally
-- Share test stubs with teams
-- Track compatibility
-- Document dependencies
+- Store contracts in one central place
+- Share test stubs with your teams
+- Track which versions work together
+- Write down what each contract needs
 
 ## Common Contract Testing Patterns
 
 ### Basic REST API Contracts
 
-- Define request and response structure
-- Mark required and optional fields
-- List data validation rules
-- Document possible API errors
+- Show what requests and responses look like
+- Say which fields are required and which are optional
+- List the rules for validating data
+- List the errors the API can return
 
 ### Reactive Endpoints Contracts
 
-- Define streaming behavior
-- Specify backpressure handling
-- Explain connection management
-- Document error scenarios
+- Show how streams behave
+- Say how backpressure is handled
+- Explain how to manage connections
+- List the error cases that can happen
 
 ### Messaging Contracts
 
-- Define message structure
-- Specify routing rules
-- List required headers
-- Document acknowledgment behavior
+- Show what messages look like
+- Say how messages are routed
+- List the headers that are required
+- Explain how acknowledgments work
 
 ## Common Anti-patterns to Avoid
 
-1. **Provider-driven contracts**: Write for consumer needs
-2. **Over-specification**: Don't limit provider options
-3. **Missing errors**: Document what fails
-4. **Testing internals**: Test behavior, not implementation
-5. **Stale contracts**: Keep contracts current
+1. **Provider-driven contracts**: Write contracts for what consumers need, not what providers prefer
+2. **Over-specification**: Don't add rules that limit how providers can work
+3. **Missing errors**: Write down what errors can happen
+4. **Testing internals**: Test what the code does, not how it does it
+5. **Stale contracts**: Keep contracts up to date with your code
 
 ## Organizational Aspects
 
-- Assign owners to contracts
-- Create a breaking change process
-- Review contracts in design
-- Teach contracts-first approach
+- Assign an owner to each contract
+- Create a process for breaking changes
+- Review contracts during design
+- Train teams on contracts-first thinking
 
 ## Related Documentation
 

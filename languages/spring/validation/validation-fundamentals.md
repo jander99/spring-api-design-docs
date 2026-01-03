@@ -7,19 +7,19 @@
 > **📋 Prerequisites:** Spring Boot basics, REST API knowledge  
 > **🎯 Key Topics:** Jakarta Validation, Standard Annotations, Error Handling
 > 
-> **📊 Complexity:** Intermediate technical content
+> **📊 Complexity:** Grade 12.8 • 1.7% technical density • Difficult (but accessible)
 
 ## Overview
 
-This guide covers the fundamentals of schema validation in Spring Boot using Jakarta Bean Validation (formerly JSR-380). Learn how to validate request data at the API boundary using standard annotations and handle validation errors properly.
+This guide shows how to validate request data in Spring Boot. You'll learn the basic validation annotations and how to handle validation errors properly at the API boundary.
 
-**Prerequisites**: Review [Advanced Schema Design](../../../guides/api-design/request-response/advanced-schema-design.md) for language-agnostic schema patterns.
+**Prerequisites**: Review [Advanced Schema Design](../../../guides/api-design/request-response/advanced-schema-design.md) for schema patterns that apply to any programming language.
 
 ## Jakarta Bean Validation Fundamentals
 
 ### Core Validation Annotations
 
-Jakarta Validation (formerly JSR-380) provides standard annotations for common validation rules:
+Jakarta Validation provides standard annotations for validation rules. Here are the most common ones:
 
 ```java
 package com.example.orders.api;
@@ -155,7 +155,7 @@ public class OrderController {
 
 ### Global Exception Handler
 
-Validation errors throw `MethodArgumentNotValidException`. Handle them in a global exception handler:
+When validation fails, Spring throws `MethodArgumentNotValidException`. Create a global exception handler to catch and format these errors:
 
 ```java
 package com.example.common.api;
@@ -293,19 +293,19 @@ public class ProblemDetail {
 
 ### 1. Fail Fast at the API Boundary
 
-Validate as early as possible in the request pipeline:
+Validate requests as soon as they arrive, before any other processing:
 
 ```java
 @RestController
 @RequestMapping("/v1/orders")
 public class OrderController {
     
-    // Validation happens immediately when request is bound
-    @PostMapping
-    public ResponseEntity<OrderResponse> createOrder(
-            @Valid @RequestBody CreateOrderRequest request) {
-        // By the time we reach here, basic validation passed
-        // ...
+    // Spring validates the request immediately when it arrives
+     @PostMapping
+     public ResponseEntity<OrderResponse> createOrder(
+             @Valid @RequestBody CreateOrderRequest request) {
+         // If we reach this code, validation has already passed
+         // ...
     }
 }
 ```
@@ -330,7 +330,7 @@ private BigDecimal price;
 
 ### 3. Use Nested Validation
 
-Always validate nested objects with `@Valid`:
+Use `@Valid` to validate nested objects:
 
 ```java
 @Data
@@ -347,7 +347,7 @@ public class CreateOrderRequest {
 
 ### 4. Consistent Error Response Format
 
-Always use RFC 7807 Problem Details for validation errors:
+Use RFC 7807 Problem Details format for all validation errors:
 
 ```json
 {
@@ -371,7 +371,7 @@ Always use RFC 7807 Problem Details for validation errors:
 
 ### 5. Document Validation Rules
 
-Include validation constraints in OpenAPI documentation:
+Add validation constraints to your OpenAPI documentation:
 
 ```yaml
 components:

@@ -2,19 +2,21 @@
 
 ## Overview
 
-Consistent error response formats are crucial for API clients to handle errors predictably. This document outlines the standard error response formats, including RFC 7807 Problem Details and legacy formats for backward compatibility.
+API clients need consistent error responses. This document shows two error formats:
+1. RFC 7807 Problem Details (recommended)
+2. Legacy format (for backward compatibility)
 
 ## Error Response Principles
 
-1. **Consistent Structure**: All error responses follow the same format
-2. **RFC 7807 Compliance**: Primary format follows RFC 7807 Problem Details
-3. **Legacy Support**: Maintain backward compatibility with legacy formats
-4. **Security-Conscious**: Avoid exposing sensitive information in errors
-5. **Actionable Information**: Provide clear, actionable error information
+1. **Consistent Structure**: Use the same format for all errors
+2. **RFC 7807 Compliance**: Use RFC 7807 as primary format
+3. **Legacy Support**: Support old formats for existing clients
+4. **Security First**: Hide sensitive information in production
+5. **Clear Messages**: Help clients understand and fix errors
 
-## RFC 7807 Problem Details (Primary Format)
+## RFC 7807 Problem Details
 
-Use RFC 7807 Problem Details as the primary error response format:
+This is the recommended error format. Use it for all new APIs:
 
 ```java
 package com.example.common.api;
@@ -113,7 +115,7 @@ public class LegacyErrorResponse {
 
 ## Error Response Builder
 
-Create a centralized error response builder supporting both RFC 7807 and legacy formats:
+Use a centralized builder to create both RFC 7807 and legacy error responses:
 
 ```java
 package com.example.common.api;
@@ -299,14 +301,14 @@ app:
 
 ## Security Considerations
 
-1. **Message Sanitization**: Sanitize error messages in production to avoid exposing sensitive information
-2. **Stack Traces**: Never include stack traces in production error responses
-3. **Request IDs**: Use request IDs for correlation without exposing internal details
-4. **Generic Messages**: Use generic messages for technical errors in production
+1. **Hide Sensitive Data**: Remove sensitive information from production errors
+2. **No Stack Traces**: Never show stack traces in production
+3. **Use Request IDs**: Include request IDs to help trace errors without exposing details
+4. **Generic Messages**: Use simple messages for technical errors in production
 
-## Content Negotiation
+## Format Selection
 
-Support different response formats based on client preferences:
+Allow clients to choose their error format through the Accept header:
 
 ```java
 @Component
@@ -341,12 +343,12 @@ public class ContentNegotiatingErrorResponseBuilder {
 
 ## Best Practices
 
-1. **Consistent Format**: Use the same error response format across all endpoints
-2. **Appropriate Status Codes**: Use correct HTTP status codes for different error types
-3. **Meaningful Messages**: Provide clear, actionable error information
-4. **Security First**: Sanitize error messages in production environments
-5. **Request Correlation**: Always include request IDs for tracing
-6. **Validation Details**: Include field-level validation errors for bad requests
+1. **Consistent Format**: Use the same format for all endpoints
+2. **Correct Status Codes**: Match HTTP status codes to error types
+3. **Clear Messages**: Explain what went wrong and how to fix it
+4. **Security First**: Hide details in production
+5. **Include Request IDs**: Help clients trace errors
+6. **Show Validation Errors**: List which fields failed validation
 
 ## Related Documentation
 

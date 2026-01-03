@@ -1,6 +1,10 @@
 # Imperative Examples (Spring MVC)
 
-This document shows how to implement the [package organization structure](./package-organization.md) using Spring MVC. Spring MVC uses blocking I/O, where each request waits for a response before moving on.
+This document shows how to implement the [package organization structure](./package-organization.md) using Spring MVC.
+
+Spring MVC uses blocking I/O. This means each request waits for a response. The next request cannot start until the first one finishes.
+
+Below you'll find code examples for each layer of a microservice. These examples follow the package organization structure described in the core guide.
 
 ## Domain Layer Examples
 
@@ -78,7 +82,8 @@ import com.example.orderservice.domain.model.Order;
 import java.util.Optional;
 import java.util.UUID;
 
-// Port that will be implemented in the infrastructure layer
+// This interface is defined in the domain layer
+// It will be implemented in the infrastructure layer (Port pattern)
 public interface OrderRepository {
     Optional<Order> findById(UUID id);
     Order save(Order order);
@@ -120,29 +125,29 @@ public class OrderApplicationService {
 
     @Transactional
     public OrderResponse createOrder(OrderCreationRequest request) {
-        // Convert request to domain objects
-        Set<OrderItem> orderItems = request.getItems().stream()
-            .map(item -> new OrderItem(
-                item.getProductId(),
-                item.getQuantity(),
-                item.getUnitPrice()))
-            .collect(Collectors.toSet());
+         // Step 1: Convert request to domain objects
+         Set<OrderItem> orderItems = request.getItems().stream()
+             .map(item -> new OrderItem(
+                 item.getProductId(),
+                 item.getQuantity(),
+                 item.getUnitPrice()))
+             .collect(Collectors.toSet());
 
-        // Check inventory
-        inventoryService.validateInventory(orderItems);
+         // Step 2: Validate inventory
+         inventoryService.validateInventory(orderItems);
 
-        // Create domain entity
-        Order order = Order.create(request.getCustomerId(), orderItems);
-        
-        // Save to repository
-        Order savedOrder = orderRepository.save(order);
-        
-        // Publish domain event
-        eventPublisher.publishEvent(new OrderCreatedEvent(savedOrder));
-        
-        // Return response
-        return orderMapper.toResponse(savedOrder);
-    }
+         // Step 3: Create the domain entity
+         Order order = Order.create(request.getCustomerId(), orderItems);
+         
+         // Step 4: Save to repository
+         Order savedOrder = orderRepository.save(order);
+         
+         // Step 5: Publish domain event
+         eventPublisher.publishEvent(new OrderCreatedEvent(savedOrder));
+         
+         // Step 6: Return response
+         return orderMapper.toResponse(savedOrder);
+     }
 }
 ```
 
@@ -200,8 +205,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 public interface JpaOrderRepository extends JpaRepository<OrderEntity, UUID> {
-    // Spring Data JPA specific query methods
-}
+     // Spring Data JPA provides query methods automatically
+ }
 ```
 
 ## Interface Layer Examples
@@ -264,19 +269,27 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@EnableWebMvc
-public class WebMvcConfig implements WebMvcConfigurer {
-    // Spring MVC configuration
-}
+ @EnableWebMvc
+ public class WebMvcConfig implements WebMvcConfigurer {
+     // Add Spring MVC configuration here
+ }
 ```
 
 ## Key Characteristics of Imperative Implementation
 
-1. **Blocking Operations**: Methods return data types like `Optional<T>` and `List<T>` that hold the actual data
-2. **Synchronous Processing**: Each operation finishes before the next one starts
-3. **Traditional Spring MVC**: Uses `@RestController` and `@RequestMapping` annotations
-4. **JPA Integration**: Uses Spring Data JPA repositories for database access
-5. **Exception Handling**: Uses try-catch blocks and `@ExceptionHandler` methods
+Imperative programming means you tell the code what to do step by step.
+
+1. **Blocking Operations**: Methods return data directly. For example, `Optional<T>` and `List<T>` hold the actual data.
+2. **Synchronous Processing**: Operations happen in order. One finishes completely before the next starts.
+3. **Traditional Spring MVC**: Uses standard Spring MVC annotations. These are `@RestController` and `@RequestMapping`.
+4. **JPA Integration**: Spring Data JPA handles database access. This means less boilerplate code.
+5. **Exception Handling**: Uses traditional error handling. This includes try-catch blocks and `@ExceptionHandler` methods.
+
+## Summary
+
+This section showed you imperative Spring MVC code examples. These examples cover all four layers: domain, application, infrastructure, and interface.
+
+You can use these examples as a starting point. Modify them to match your own domain objects and business logic.
 
 ## See Also
 

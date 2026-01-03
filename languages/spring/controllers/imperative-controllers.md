@@ -2,7 +2,7 @@
 
 ## Overview
 
-Spring MVC controllers use the traditional blocking I/O model, making them suitable for most web applications where simplicity and direct request-response patterns are preferred. This document covers implementation patterns for imperative controllers.
+Spring MVC controllers use a traditional blocking I/O model. This approach works well for most web applications. It prioritizes simplicity and direct request-response patterns. This document shows how to build imperative controllers.
 
 ## Basic Controller Structure
 
@@ -88,7 +88,7 @@ public class OrderController {
 
 ## Standard Response Pattern with ApiResponse
 
-For collection endpoints and complex operations, use the ApiResponse wrapper:
+Use the ApiResponse wrapper for collection endpoints. Also use it for complex operations:
 
 ```java
 @RestController
@@ -135,7 +135,7 @@ public class OrderController {
 
 ## File Upload Handling
 
-For handling file uploads in imperative controllers:
+Here's how to handle file uploads in imperative controllers:
 
 ```java
 @PostMapping("/upload")
@@ -159,7 +159,7 @@ public ResponseEntity<FileUploadResponse> uploadFile(
 
 ## Bulk Operations
 
-For handling bulk operations in imperative controllers:
+Here's how to handle bulk operations in imperative controllers:
 
 ```java
 @Data
@@ -202,7 +202,7 @@ public ResponseEntity<BulkOperationResponse> bulkCreateOrders(
 
 ## Security in Imperative Controllers
 
-Implement security with proper JWT handling:
+Here's how to add security with JWT token handling:
 
 ```java
 @RestController
@@ -253,7 +253,7 @@ public class OrderController {
 
 ### 1. Use ResponseEntity for Full Control
 
-Always use `ResponseEntity` to have full control over HTTP status codes and headers:
+Use `ResponseEntity` to control HTTP status codes and headers:
 
 ```java
 @GetMapping("/{orderId}")
@@ -269,7 +269,7 @@ public ResponseEntity<OrderResponse> getOrder(@PathVariable UUID orderId) {
 
 ### 2. Handle Optional Results Properly
 
-For operations that might not find results:
+When operations might not find a result, use Optional:
 
 ```java
 @GetMapping("/{orderId}")
@@ -285,25 +285,25 @@ public ResponseEntity<OrderResponse> getOrder(@PathVariable UUID orderId) {
 
 ### 3. Use Proper Validation
 
-Leverage Jakarta Bean Validation for request validation:
+Use Jakarta Bean Validation to check requests:
 
 ```java
-@PostMapping
-public ResponseEntity<OrderResponse> createOrder(
-        @Valid @RequestBody CreateOrderRequest request,
-        BindingResult bindingResult) {
-    
-    // Validation errors are automatically handled by global exception handler
-    // when using @Valid annotation
-    
-    OrderCreationDto creationDto = orderMapper.toCreationDto(request);
-    OrderDto orderDto = orderService.createOrder(creationDto);
-    OrderResponse response = orderMapper.toResponse(orderDto);
-    
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(response);
-}
+    @PostMapping
+    public ResponseEntity<OrderResponse> createOrder(
+            @Valid @RequestBody CreateOrderRequest request,
+            BindingResult bindingResult) {
+        
+        // The @Valid annotation automatically checks the request.
+        // A global exception handler catches validation errors.
+        
+        OrderCreationDto creationDto = orderMapper.toCreationDto(request);
+        OrderDto orderDto = orderService.createOrder(creationDto);
+        OrderResponse response = orderMapper.toResponse(orderDto);
+        
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(response);
+    }
 ```
 
 ### 4. Use Appropriate Status Codes
@@ -339,7 +339,7 @@ public ResponseEntity<OrderResponse> cancelOrder(@PathVariable UUID orderId) {
 
 ### 5. Exception Handling Strategy
 
-Rely on global exception handlers rather than try-catch blocks in controllers:
+Use global exception handlers instead of try-catch blocks in controllers:
 
 ```java
 @RestController
@@ -354,7 +354,8 @@ public class OrderController {
     public ResponseEntity<OrderResponse> createOrder(
             @Valid @RequestBody CreateOrderRequest request) {
         
-        // Don't catch exceptions here - let GlobalExceptionHandler handle them
+        // Don't catch exceptions here.
+        // Let GlobalExceptionHandler catch them instead.
         OrderCreationDto creationDto = orderMapper.toCreationDto(request);
         OrderDto orderDto = orderService.createOrder(creationDto);
         OrderResponse response = orderMapper.toResponse(orderDto);
@@ -366,7 +367,7 @@ public class OrderController {
 }
 ```
 
-These imperative controller patterns provide a solid foundation for building robust, maintainable REST APIs using Spring MVC's blocking I/O model.
+These patterns help you build solid REST APIs with Spring MVC's blocking I/O model. The code is easy to maintain and understand.
 
 ## Related Documentation
 
