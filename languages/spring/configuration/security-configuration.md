@@ -1,12 +1,28 @@
 # Security Configuration
 
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 16 minutes | **🟡 Level:** Intermediate
+> 
+> **📋 Prerequisites:** HTTP fundamentals, basic API experience  
+> **🎯 Key Topics:** Authentication, Security, Architecture
+> 
+> **📊 Complexity:** 10.3 grade level • 1.6% technical density • fairly difficult
+
 ## Overview
 
-This document outlines the security configuration patterns for Spring Boot microservices, covering JWT resource server setup, CORS configuration, and security patterns for both reactive and imperative applications.
+This guide shows how to set up security in Spring Boot apps.
 
-## Security Configuration Properties
+You will learn:
+- JWT token validation
+- CORS setup
+- Security for reactive and imperative apps
 
-### Security Properties Structure
+## Security Properties
+
+### Basic Setup
+
+Store security settings in YAML files.
 
 ```yaml
 # application.yml
@@ -21,7 +37,9 @@ app:
       allow-credentials: ${CORS_ALLOW_CREDENTIALS:true}
 ```
 
-### Security Properties Class
+### Java Configuration
+
+Use a record to hold settings. Records ensure type safety.
 
 ```java
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -52,9 +70,11 @@ public record SecurityProperties(
 }
 ```
 
-## Reactive Security Configuration
+## Reactive Security
 
-### WebFlux Security Configuration
+### WebFlux Setup
+
+Use this config for reactive apps with Spring WebFlux.
 
 ```java
 import org.springframework.context.annotation.Bean;
@@ -119,9 +139,11 @@ public class ReactiveSecurityConfig {
 }
 ```
 
-## Imperative Security Configuration
+## Traditional Security
 
-### Web MVC Security Configuration
+### Web MVC Setup
+
+Use this config for standard Spring MVC apps.
 
 ```java
 import org.springframework.context.annotation.Bean;
@@ -186,9 +208,11 @@ public class WebSecurityConfig {
 }
 ```
 
-## Advanced JWT Configuration
+## Advanced JWT Setup
 
-### Custom JWT Converter
+### Custom Token Processing
+
+This converts JWT tokens to Spring security objects. It extracts roles and permissions from the token.
 
 ```java
 import org.springframework.core.convert.converter.Converter;
@@ -249,7 +273,9 @@ public class CustomJwtAuthenticationConverter
 }
 ```
 
-### JWT Validation Configuration
+### Token Validation
+
+Always validate JWT tokens first. Check the issuer, timestamps, and audience.
 
 ```java
 import org.springframework.context.annotation.Bean;
@@ -294,9 +320,11 @@ public class JwtValidationConfig {
 }
 ```
 
-## CORS Configuration
+## CORS Setup
 
-### Development CORS Configuration
+### Development Mode
+
+Allow all origins when you develop locally. This makes testing easier.
 
 ```java
 @Configuration
@@ -319,7 +347,9 @@ public class DevelopmentCorsConfig {
 }
 ```
 
-### Production CORS Configuration
+### Production Mode
+
+Restrict origins in production. Only allow known domains. This blocks attacks.
 
 ```java
 @Configuration
@@ -355,9 +385,11 @@ public class ProductionCorsConfig {
 }
 ```
 
-## Method-Level Security
+## Method Security
 
-### Security Annotations
+### Using Annotations
+
+Add security to each method. Use `@PreAuthorize` to control access.
 
 ```java
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -396,7 +428,9 @@ public class OrderController {
 }
 ```
 
-### Custom Security Expressions
+### Custom Rules
+
+Write custom security rules. Check ownership and other business logic.
 
 ```java
 import org.springframework.security.access.expression.SecurityExpressionRoot;
@@ -449,9 +483,11 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot
 }
 ```
 
-## Security Testing Configuration
+## Testing Security
 
-### Test Security Configuration
+### Test Setup
+
+Mock JWT tokens for tests. You do not need a real auth server.
 
 ```java
 import org.springframework.boot.test.context.TestConfiguration;
@@ -486,7 +522,9 @@ public class TestSecurityConfig {
 }
 ```
 
-### Security Integration Tests
+### Integration Tests
+
+Test security with WebTestClient. Verify that access controls work.
 
 ```java
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -529,9 +567,11 @@ class SecurityIntegrationTest {
 }
 ```
 
-## Security Configuration by Environment
+## Environment Configs
 
-### Development Security (Relaxed)
+### Development Settings
+
+Use relaxed security for local dev. Enable debug logging.
 
 ```yaml
 # application-development.yml
@@ -550,7 +590,9 @@ logging:
     org.springframework.security: DEBUG
 ```
 
-### Production Security (Strict)
+### Production Settings
+
+Use strict security in production. Limit logging to warnings.
 
 ```yaml
 # application-production.yml
@@ -569,27 +611,23 @@ logging:
     org.springframework.security: WARN
 ```
 
-## Security Best Practices
+## Best Practices
 
-### 1. Principle of Least Privilege
+### 1. Least Privilege
 
-- Grant minimal required authorities
-- Use specific scopes instead of broad permissions
-- Implement resource-based authorization
+Give users only what they need. Use specific scopes. Always check resource ownership.
 
-### 2. JWT Validation
+### 2. Token Validation
 
-- Always validate JWT signature
-- Verify issuer and audience claims
-- Implement proper token expiration handling
+Always validate JWT signatures. Check the issuer and audience. Handle expired tokens correctly.
 
-### 3. CORS Configuration
+### 3. CORS Rules
 
-- Never use wildcard origins in production
-- Specify explicit allowed headers and methods
-- Implement proper preflight handling
+Never use wildcards in production. List all allowed origins. Set allowed methods and headers.
 
 ### 4. Security Headers
+
+Add security headers to every response. This prevents clickjacking. Enable HSTS for secure connections.
 
 ```java
 @Bean
@@ -608,11 +646,13 @@ public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
 }
 ```
 
-## Related Documentation
+## Related Guides
 
-- [Configuration Principles](configuration-principles.md) - Core configuration concepts
-- [Environment Profiles](environment-profiles.md) - Profile-specific security configuration
-- [External Services](external-services.md) - Secure service-to-service communication
-- [Authorization Patterns](../security/authorization-patterns.md) - Authorization implementation patterns
+- [Configuration Principles](configuration-principles.md) - Basic config concepts
+- [Environment Profiles](environment-profiles.md) - Profile setup
+- [External Services](external-services.md) - Service auth
+- [Authorization Patterns](../security/authorization-patterns.md) - Access control
 
-This security configuration ensures robust authentication and authorization for Spring Boot microservices while maintaining flexibility across different environments.
+## Summary
+
+This guide showed you Spring Boot security. You learned JWT validation and CORS setup. You also learned environment settings. These patterns work for reactive and traditional apps.
