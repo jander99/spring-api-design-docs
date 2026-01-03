@@ -255,5 +255,5 @@ GET /v1/orders?page=0&size=20
 
 - [Main Pagination Guide](../../pagination-and-filtering.md)
 - [Advanced Patterns](advanced-patterns.md)
-- [Complete Examples](../examples/pagination/complete-examples.md)
-- [Common Issues](../troubleshooting/pagination/common-issues.md)
+- [Complete Examples](../../examples/pagination/complete-examples.md)
+- [Common Issues](../../troubleshooting/pagination/common-issues.md)

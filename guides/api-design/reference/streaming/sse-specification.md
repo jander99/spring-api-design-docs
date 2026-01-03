@@ -97,32 +97,82 @@ event: token-refresh-required
 data: {"expiresIn":300,"refreshUrl":"/v1/auth/refresh"}
 ```
 
-## Client Implementation
+## Client Connection Protocol
 
-### Browser EventSource
-```javascript
-const eventSource = new EventSource('/v1/orders/events');
+### Initial Connection
+Clients connect to SSE endpoints with proper headers:
 
-eventSource.onmessage = function(event) {
-  const data = JSON.parse(event.data);
-  console.log('Received:', data);
-};
+```http
+GET /v1/orders/events HTTP/1.1
+Host: api.example.com
+Accept: text/event-stream
+Cache-Control: no-cache
 
-eventSource.addEventListener('order-created', function(event) {
-  const order = JSON.parse(event.data);
-  console.log('New order:', order);
-});
+HTTP/1.1 200 OK
+Content-Type: text/event-stream
+Cache-Control: no-cache
+Connection: keep-alive
+
+id: 1
+event: order-created
+data: {"orderId":"order-123","customerId":"cust-456","status":"CREATED"}
+
+id: 2
+event: order-updated
+data: {"orderId":"order-123","status":"PROCESSING"}
 ```
 
-### Reconnection Logic
-```javascript
-eventSource.addEventListener('error', function(event) {
-  if (eventSource.readyState === EventSource.CLOSED) {
-    // Reconnect with last event ID
-    setTimeout(() => {
-      const lastEventId = localStorage.getItem('lastEventId');
-      const newEventSource = new EventSource(`/v1/orders/events?lastEventId=${lastEventId}`);
-    }, 5000);
-  }
-});
+### Handling Multiple Event Types
+SSE streams can contain different event types. The `event:` field identifies each type:
+
+```
+id: 100
+event: order-created
+data: {"orderId":"order-789","total":99.99}
+
+id: 101
+event: inventory-updated
+data: {"sku":"WIDGET-001","quantity":42}
+
+id: 102
+event: heartbeat
+data: {"timestamp":"2024-07-15T14:30:00Z"}
+```
+
+### Reconnection with Last-Event-ID
+When a connection drops, clients reconnect using the `Last-Event-ID` header to resume:
+
+```http
+GET /v1/orders/events HTTP/1.1
+Host: api.example.com
+Accept: text/event-stream
+Cache-Control: no-cache
+Last-Event-ID: 101
+
+HTTP/1.1 200 OK
+Content-Type: text/event-stream
+Cache-Control: no-cache
+Connection: keep-alive
+
+id: 102
+event: heartbeat
+data: {"timestamp":"2024-07-15T14:30:00Z"}
+
+id: 103
+event: order-shipped
+data: {"orderId":"order-789","trackingNumber":"1Z999AA10123456784"}
+```
+
+### Server-Controlled Retry Interval
+Servers can specify reconnection delay using the `retry:` field (in milliseconds):
+
+```
+retry: 5000
+id: 1
+event: connected
+data: {"message":"Stream started","serverTime":"2024-07-15T14:30:00Z"}
+
+id: 2
+event: order-created
+data: {"orderId":"order-456"}
 ```

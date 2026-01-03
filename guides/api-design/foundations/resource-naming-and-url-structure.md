@@ -235,19 +235,19 @@ GET /orders/stream  - Returns streaming collection (NDJSON or SSE)
 ### Well-Designed Endpoints
 
 ```
-GET /customers                     - List all customers (paginated)
-GET /customer/{customerId}         - Get a specific customer
-POST /customers                    - Create a new customer
-PUT /customer/{customerId}         - Replace a customer
-PATCH /customer/{customerId}       - Update a customer partially
-DELETE /customer/{customerId}      - Delete a customer
+GET /customers                      - List all customers (paginated)
+GET /customers/{customerId}         - Get a specific customer
+POST /customers                     - Create a new customer
+PUT /customers/{customerId}         - Replace a customer
+PATCH /customers/{customerId}       - Update a customer partially
+DELETE /customers/{customerId}      - Delete a customer
 
-GET /customer/{customerId}/orders  - List orders for a customer
-POST /customer/{customerId}/orders - Create an order for a customer
+GET /customers/{customerId}/orders  - List orders for a customer
+POST /customers/{customerId}/orders - Create an order for a customer
 
-GET /orders                        - List all orders (paginated)
-GET /order/{orderId}               - Get a specific order
-POST /order/{orderId}/cancel       - Cancel an order (action)
+GET /orders                         - List all orders (paginated)
+GET /orders/{orderId}               - Get a specific order
+POST /orders/{orderId}/cancel       - Cancel an order (action)
 ```
 
 These examples demonstrate the consistent application of the principles outlined in this guide.

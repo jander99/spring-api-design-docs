@@ -199,52 +199,49 @@ GET /v1/orders?cursor=eyJpZCI6IjEyMzQ0IiwiZGF0ZSI6IjIwMjQtMDctMTQifQ==&size=20&d
 ### Cursor Implementation Details
 
 #### Cursor Structure
-```javascript
-// Cursor contains sort key values
-const cursor = {
-  id: "12345",
-  createdDate: "2024-07-15T10:30:00Z",
-  total: 299.99
-};
 
-// Base64 encoded for URL safety
-const encodedCursor = Buffer.from(JSON.stringify(cursor)).toString('base64');
+A cursor encodes the position in the result set using sort key values. The cursor is Base64-encoded for URL safety:
+
+```json
+{
+  "id": "12345",
+  "createdDate": "2024-07-15T10:30:00Z",
+  "total": 299.99
+}
+```
+
+When Base64-encoded, this becomes:
+```
+eyJpZCI6IjEyMzQ1IiwiY3JlYXRlZERhdGUiOiIyMDI0LTA3LTE1VDEwOjMwOjAwWiIsInRvdGFsIjoyOTkuOTl9
 ```
 
 #### Query Generation
-```javascript
-// For next page (forward pagination)
-const query = {
-  $or: [
-    { createdDate: { $lt: cursor.createdDate } },
-    { 
-      createdDate: cursor.createdDate,
-      total: { $lt: cursor.total }
-    },
-    {
-      createdDate: cursor.createdDate,
-      total: cursor.total,
-      _id: { $gt: cursor.id }
-    }
-  ]
-};
 
-// For previous page (backward pagination)
-const query = {
-  $or: [
-    { createdDate: { $gt: cursor.createdDate } },
-    { 
-      createdDate: cursor.createdDate,
-      total: { $gt: cursor.total }
-    },
-    {
-      createdDate: cursor.createdDate,
-      total: cursor.total,
-      _id: { $lt: cursor.id }
-    }
-  ]
-};
+For **forward pagination** (next page), the query uses `less than` operators on descending fields and `greater than` on ascending fields:
+
+```http
+GET /v1/orders?cursor=eyJpZCI6IjEyMzQ1Ii...&direction=next&size=20 HTTP/1.1
+Accept: application/json
 ```
+
+The server interprets this cursor to find records that come after the cursor position in the sort order.
+
+For **backward pagination** (previous page), the operators are reversed:
+
+```http
+GET /v1/orders?cursor=eyJpZCI6IjEyMzQ1Ii...&direction=prev&size=20 HTTP/1.1
+Accept: application/json
+```
+
+#### Cursor Query Logic
+
+The cursor comparison follows this precedence for multi-field sorting:
+
+| Sort Order | Forward (next) | Backward (prev) |
+|------------|----------------|-----------------|
+| `createdDate DESC` | Find records with `createdDate < cursor.createdDate` | Find records with `createdDate > cursor.createdDate` |
+| `total DESC` (tie-breaker) | Find records with same `createdDate` AND `total < cursor.total` | Find records with same `createdDate` AND `total > cursor.total` |
+| `id ASC` (final tie-breaker) | Find records with same values AND `id > cursor.id` | Find records with same values AND `id < cursor.id` |
 
 ## Hybrid Pagination
 
@@ -273,16 +270,48 @@ For APIs that need both offset-based and cursor-based pagination:
 
 ### Adaptive Pagination
 
-Switch between pagination types based on query characteristics:
+Switch between pagination types based on query characteristics. The server can automatically choose the optimal strategy:
 
-```javascript
-// Use offset pagination for small result sets
-if (estimatedTotal < 1000) {
-  return offsetPagination(query, page, size);
+**Small result sets (< 1000 items)** - Use offset pagination:
+```http
+GET /v1/orders?page=0&size=20 HTTP/1.1
+Accept: application/json
+```
+
+Response includes offset-based metadata:
+```json
+{
+  "data": [...],
+  "meta": {
+    "pagination": {
+      "page": 0,
+      "size": 20,
+      "totalElements": 543,
+      "totalPages": 28
+    }
+  }
 }
+```
 
-// Use cursor pagination for large result sets
-return cursorPagination(query, cursor, size);
+**Large result sets (>= 1000 items)** - Use cursor pagination:
+```http
+GET /v1/orders?size=20 HTTP/1.1
+Accept: application/json
+```
+
+Response includes cursor-based metadata:
+```json
+{
+  "data": [...],
+  "meta": {
+    "cursor": {
+      "next": "eyJpZCI6IjEyMzQ2Ii4uLn0=",
+      "hasNext": true
+    },
+    "paginationType": "cursor",
+    "estimatedTotal": 15000
+  }
+}
 ```
 
 ## Advanced Sorting Patterns
@@ -394,33 +423,35 @@ GET /v1/orders?page=0&size=20&includeCount=false
 ### Index-Optimized Queries
 
 #### Composite Index Strategy
-```javascript
-// Create indexes that support common query patterns
-db.orders.createIndex({ 
-  status: 1, 
-  createdDate: -1, 
-  customerId: 1 
-});
 
-// Query that uses the index efficiently
-const query = {
-  status: { $in: ['ACTIVE', 'PENDING'] },
-  createdDate: { $gte: new Date('2024-01-01') },
-  customerId: 'cust-123'
-};
+Design indexes that support common query patterns. For a query filtering by status, date range, and customer:
+
+```http
+GET /v1/orders?status[in]=ACTIVE,PENDING&createdDate[gte]=2024-01-01&customerId=cust-123 HTTP/1.1
+Accept: application/json
 ```
+
+The database index should include these fields in order of selectivity:
+
+| Index Position | Field | Direction | Purpose |
+|----------------|-------|-----------|---------|
+| 1 | `status` | ASC | Equality filter (most selective) |
+| 2 | `createdDate` | DESC | Range filter |
+| 3 | `customerId` | ASC | Equality filter |
 
 #### Covering Index Pattern
-```javascript
-// Index that covers all projected fields
-db.orders.createIndex({ 
-  status: 1, 
-  createdDate: -1,
-  customerId: 1,
-  total: 1,
-  id: 1
-});
-```
+
+For optimal performance, the index can include all projected fields to avoid table lookups:
+
+| Index Position | Field | Purpose |
+|----------------|-------|---------|
+| 1 | `status` | Filter |
+| 2 | `createdDate` | Filter + Sort |
+| 3 | `customerId` | Filter |
+| 4 | `total` | Projection |
+| 5 | `id` | Projection |
+
+This allows the query to be satisfied entirely from the index without accessing the main table.
 
 ## Real-Time Pagination
 
@@ -522,103 +553,125 @@ Content-Type: application/problem+json
 
 ### Query Parser Architecture
 
-```javascript
-class QueryParser {
-  constructor() {
-    this.operators = {
-      eq: (field, value) => ({ [field]: value }),
-      ne: (field, value) => ({ [field]: { $ne: value } }),
-      in: (field, values) => ({ [field]: { $in: values.split(',') } }),
-      gt: (field, value) => ({ [field]: { $gt: this.parseValue(value) } }),
-      gte: (field, value) => ({ [field]: { $gte: this.parseValue(value) } }),
-      lt: (field, value) => ({ [field]: { $lt: this.parseValue(value) } }),
-      lte: (field, value) => ({ [field]: { $lte: this.parseValue(value) } }),
-      contains: (field, value) => ({ [field]: { $regex: value, $options: 'i' } }),
-      startsWith: (field, value) => ({ [field]: { $regex: `^${value}`, $options: 'i' } }),
-      endsWith: (field, value) => ({ [field]: { $regex: `${value}$`, $options: 'i' } })
-    };
-  }
+The query parser transforms URL query parameters with operators into database filter conditions:
 
-  parseFilters(query) {
-    const filters = {};
-    
-    for (const [key, value] of Object.entries(query)) {
-      const match = key.match(/^(.+)\[(.+)\]$/);
-      
-      if (match) {
-        const [, field, operator] = match;
-        if (this.operators[operator]) {
-          Object.assign(filters, this.operators[operator](field, value));
-        }
-      } else {
-        // Default to equality
-        Object.assign(filters, this.operators.eq(key, value));
-      }
+**Input URL:**
+```http
+GET /v1/orders?status[in]=ACTIVE,PENDING&total[gte]=100&customerName[contains]=smith HTTP/1.1
+Accept: application/json
+```
+
+**Parsed filter structure:**
+```json
+{
+  "filters": [
+    {
+      "field": "status",
+      "operator": "in",
+      "values": ["ACTIVE", "PENDING"]
+    },
+    {
+      "field": "total",
+      "operator": "gte",
+      "value": 100
+    },
+    {
+      "field": "customerName",
+      "operator": "contains",
+      "value": "smith"
     }
-    
-    return filters;
-  }
+  ]
 }
 ```
 
+**Operator mapping reference:**
+
+| URL Syntax | Filter Type | Description |
+|------------|-------------|-------------|
+| `?field=value` | Equality (default) | Exact match |
+| `?field[ne]=value` | Not equals | Exclude matches |
+| `?field[in]=a,b,c` | In list | Match any value |
+| `?field[gt]=value` | Greater than | Numeric/date comparison |
+| `?field[gte]=value` | Greater than or equal | Numeric/date range |
+| `?field[lt]=value` | Less than | Numeric/date comparison |
+| `?field[lte]=value` | Less than or equal | Numeric/date range |
+| `?field[contains]=value` | Contains | Case-insensitive substring |
+| `?field[startsWith]=value` | Starts with | Prefix match |
+| `?field[endsWith]=value` | Ends with | Suffix match |
+
 ### Cursor Generator
 
-```javascript
-class CursorGenerator {
-  constructor(sortFields) {
-    this.sortFields = sortFields;
-  }
+The cursor generator creates opaque cursor tokens from result documents and parses them for subsequent requests.
 
-  generate(document) {
-    const cursor = {};
-    
-    for (const field of this.sortFields) {
-      cursor[field.name] = document[field.name];
-    }
-    
-    // Always include ID for uniqueness
-    cursor.id = document.id;
-    
-    return Buffer.from(JSON.stringify(cursor)).toString('base64');
-  }
+#### Generating a Cursor
 
-  parse(cursorString) {
-    try {
-      const decoded = Buffer.from(cursorString, 'base64').toString();
-      return JSON.parse(decoded);
-    } catch (error) {
-      throw new Error('Invalid cursor format');
-    }
-  }
+Given a document and sort configuration:
 
-  buildQuery(cursor, direction = 'next') {
-    const conditions = [];
-    
-    for (let i = 0; i < this.sortFields.length; i++) {
-      const field = this.sortFields[i];
-      const operator = this.getOperator(field.direction, direction);
-      
-      // Build condition for this field
-      const condition = { [field.name]: { [operator]: cursor[field.name] } };
-      
-      // Add equality conditions for previous fields
-      const equalityConditions = {};
-      for (let j = 0; j < i; j++) {
-        const prevField = this.sortFields[j];
-        equalityConditions[prevField.name] = cursor[prevField.name];
-      }
-      
-      conditions.push({ ...equalityConditions, ...condition });
-    }
-    
-    return { $or: conditions };
-  }
+```json
+{
+  "document": {
+    "id": "order-456",
+    "createdDate": "2024-07-15T10:30:00Z",
+    "total": 299.99,
+    "customerName": "John Smith"
+  },
+  "sortFields": [
+    {"name": "createdDate", "direction": "DESC"},
+    {"name": "total", "direction": "DESC"}
+  ]
+}
+```
+
+The cursor captures only the sort field values plus the unique identifier:
+
+```json
+{
+  "createdDate": "2024-07-15T10:30:00Z",
+  "total": 299.99,
+  "id": "order-456"
+}
+```
+
+Base64-encoded for the response:
+```
+eyJjcmVhdGVkRGF0ZSI6IjIwMjQtMDctMTVUMTA6MzA6MDBaIiwidG90YWwiOjI5OS45OSwiaWQiOiJvcmRlci00NTYifQ==
+```
+
+#### Parsing a Cursor
+
+When receiving a cursor in a request:
+
+```http
+GET /v1/orders?cursor=eyJjcmVhdGVkRGF0ZSI6IjIwMjQt...&direction=next HTTP/1.1
+Accept: application/json
+```
+
+The server decodes and validates the cursor:
+
+1. Base64 decode the cursor string
+2. Parse the JSON structure
+3. Validate required fields exist
+4. Use values to build the continuation query
+
+#### Invalid Cursor Response
+
+If the cursor cannot be parsed:
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json
+
+{
+  "type": "https://example.com/problems/invalid-cursor",
+  "title": "Invalid Cursor",
+  "status": 400,
+  "detail": "The cursor format is invalid or corrupted"
 }
 ```
 
 ## Related Documentation
 
 - [Main Pagination Guide](../../pagination-and-filtering.md)
-- [Complete Examples](../examples/pagination/complete-examples.md)
-- [Common Issues](../troubleshooting/pagination/common-issues.md)
-- [Performance Problems](../troubleshooting/pagination/performance-problems.md)
+- [Complete Examples](../../examples/pagination/complete-examples.md)
+- [Common Issues](../../troubleshooting/pagination/common-issues.md)
+- [Performance Problems](../../troubleshooting/pagination/performance-problems.md)
