@@ -4,7 +4,13 @@ This section covers Spring HTTP client implementations for making requests to ex
 
 ## Contents
 
-- [HTTP Client Patterns](./http-client-patterns.md) - Comprehensive guide to RestTemplate and WebClient with resilience patterns
+### Core Guides
+- [RestClient Guide](./restclient-guide.md) - RestTemplate configuration, usage patterns, and testing
+- [WebClient Guide](./webclient-guide.md) - WebClient reactive patterns, configuration, and testing
+- [HTTP Client Resilience](./http-client-resilience.md) - Circuit breakers, retries, rate limiting, and bulkhead patterns
+
+### Legacy Documentation
+- [HTTP Client Patterns](./http-client-patterns.md) - Original comprehensive guide (33 minutes)
 
 ## Overview
 
@@ -30,6 +36,8 @@ public class RestTemplateConfig {
 }
 ```
 
+See the [RestClient Guide](./restclient-guide.md) for complete RestTemplate patterns.
+
 ### WebClient (Reactive)
 
 ```java
@@ -44,16 +52,19 @@ public class WebClientConfig {
 }
 ```
 
+See the [WebClient Guide](./webclient-guide.md) for complete reactive patterns.
+
 ## Key Topics Covered
 
 ### HTTP Client Fundamentals
-- RestTemplate configuration and usage
-- WebClient configuration and usage
-- Connection pooling
-- Timeout configuration
-- Error handling patterns
+- RestTemplate configuration and usage ([RestClient Guide](./restclient-guide.md))
+- WebClient configuration and usage ([WebClient Guide](./webclient-guide.md))
+- Connection pooling (covered in both guides)
+- Timeout configuration (covered in both guides)
+- Error handling patterns (covered in both guides)
 
 ### Resilience Patterns
+See [HTTP Client Resilience](./http-client-resilience.md) for:
 - Circuit breakers with Resilience4j
 - Retry mechanisms with exponential backoff
 - Rate limiting
@@ -61,9 +72,9 @@ public class WebClientConfig {
 - Combined resilience strategies
 
 ### Testing
-- MockRestServiceServer for RestTemplate
-- WireMock for integration testing
-- Reactive testing with StepVerifier
+- MockRestServiceServer for RestTemplate ([RestClient Guide](./restclient-guide.md))
+- WireMock for integration testing ([WebClient Guide](./webclient-guide.md))
+- Reactive testing with StepVerifier ([WebClient Guide](./webclient-guide.md))
 
 ## When to Use Each Client
 

@@ -8,7 +8,9 @@ This directory contains comprehensive guidelines for implementing observability 
 
 ### Core Observability Documentation
 
-- **[Logging and Monitoring](logging-and-monitoring.md)**: Complete guide to structured logging, metrics collection, health checks, and monitoring best practices for both imperative and reactive Spring Boot applications.
+- **[Logging Standards](logging-standards.md)**: Structured logging, Logback configuration, correlation IDs (imperative & reactive), log levels, and best practices
+- **[Metrics and Tracing](metrics-and-tracing.md)**: Micrometer metrics integration, custom metrics, reactive metrics, and Spring Cloud Sleuth distributed tracing
+- **[Health and Monitoring](health-and-monitoring.md)**: Spring Boot Actuator health checks, Prometheus alerting, Kubernetes integration, and operational dashboards
 
 ## Key Observability Principles
 
@@ -200,6 +202,9 @@ management:
 - [API Observability Standards](../../../guides/api-design/advanced-patterns/api-observability-standards.md) - Protocol-level observability patterns
 
 ### Spring Implementation
+- [Logging Standards](logging-standards.md) - Structured logging and correlation IDs
+- [Metrics and Tracing](metrics-and-tracing.md) - Metrics collection and distributed tracing
+- [Health and Monitoring](health-and-monitoring.md) - Health checks, alerting, and dashboards
 - [Observability Configuration](../configuration/observability-configuration.md)
 - [Error Logging and Monitoring](../error-handling/error-logging-and-monitoring.md)  
 - [Infrastructure Testing](../testing/specialized-testing/infrastructure-testing.md)

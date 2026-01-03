@@ -12,9 +12,21 @@ This directory contains comprehensive guidelines for integration testing in Spri
 
 - **[Database Integration Testing](database-integration-testing.md)**: Comprehensive guide to testing with real databases, repository testing, transaction management, and data persistence verification using Testcontainers.
 
-- **[API Integration Testing](api-integration-testing.md)**: End-to-end API testing patterns, HTTP request/response testing, and full application context integration testing.
+### API Integration Testing
 
-- **[External Service Testing](external-service-testing.md)**: Testing external service integrations using WireMock, service virtualization, and fault tolerance testing patterns.
+- **[Spring Boot Test Fundamentals](springboot-test-fundamentals.md)**: Complete guide to API testing with `@SpringBootTest` and `TestRestTemplate`. Covers CRUD operations, validation, error handling, HTTP headers, and security testing for imperative Spring MVC applications.
+
+- **[Reactive API Testing](reactive-api-testing.md)**: WebFlux testing with `WebTestClient`. Covers reactive CRUD operations, streaming endpoints (NDJSON, SSE), backpressure, reactive error handling, and StepVerifier patterns.
+
+- **[Advanced API Testing](advanced-api-testing.md)**: HTTP-specific features including content negotiation, CORS policies, rate limiting, HTTP caching, and custom headers. Advanced patterns for both imperative and reactive APIs.
+
+### External Service Testing Documentation
+
+- **[WireMock Testing](wiremock-testing.md)**: HTTP service mocking with WireMock, stubbing patterns, request verification, retry logic testing, and circuit breaker testing.
+
+- **[Message Broker Testing](message-broker-testing.md)**: RabbitMQ and Kafka integration testing, message production and consumption, serialization testing, and dead letter queue handling.
+
+- **[OAuth Client Testing](oauth-client-testing.md)**: OAuth 2.0 and OIDC flow testing, token lifecycle management, client credentials flow, authorization code flow, and JWT validation.
 
 ## Key Integration Testing Principles
 
@@ -110,7 +122,7 @@ class OrderApiIntegrationTest {
 }
 ```
 
-### External Service Testing
+### WireMock HTTP Service Testing
 ```java
 @SpringBootTest
 class PaymentServiceIntegrationTest {
@@ -142,6 +154,73 @@ class PaymentServiceIntegrationTest {
         // Verify external service was called
         wireMock.verify(postRequestedFor(urlEqualTo("/payments"))
             .withHeader("Content-Type", equalTo("application/json")));
+    }
+}
+```
+
+### Message Broker Integration Testing
+```java
+@SpringBootTest
+@Testcontainers
+class OrderEventIntegrationTest {
+    @Container
+    static RabbitMQContainer rabbitMQ = new RabbitMQContainer("rabbitmq:3.11-management");
+    
+    @Autowired
+    private OrderEventPublisher eventPublisher;
+    
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+    
+    @Test
+    void shouldPublishOrderCreatedEvent() {
+        // Given
+        OrderCreatedEvent event = OrderCreatedEvent.builder()
+            .orderId(UUID.randomUUID())
+            .customerId(UUID.randomUUID())
+            .totalAmount(BigDecimal.valueOf(100.00))
+            .build();
+        
+        // When
+        eventPublisher.publishOrderCreated(event);
+        
+        // Then
+        Message message = rabbitTemplate.receive("order.events.created", 5000);
+        assertThat(message).isNotNull();
+    }
+}
+```
+
+### OAuth Client Testing
+```java
+@SpringBootTest
+class OAuthClientIntegrationTest {
+    @RegisterExtension
+    static WireMockExtension authServer = WireMockExtension.newInstance()
+        .options(wireMockConfig().port(8090))
+        .build();
+    
+    @Test
+    void shouldObtainAccessTokenViaClientCredentials() {
+        // Given
+        authServer.stubFor(post(urlEqualTo("/oauth/token"))
+            .withRequestBody(containing("grant_type=client_credentials"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withBody("""
+                    {
+                        "access_token": "access-token-123",
+                        "token_type": "Bearer",
+                        "expires_in": 3600
+                    }
+                    """)));
+        
+        // When
+        UserProfile profile = externalApiClient.getUserProfile("user-123");
+        
+        // Then
+        assertThat(profile.getId()).isEqualTo("user-123");
+        authServer.verify(postRequestedFor(urlEqualTo("/oauth/token")));
     }
 }
 ```

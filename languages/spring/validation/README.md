@@ -8,7 +8,16 @@ Validation ensures data quality at the API boundary and throughout the applicati
 
 ## Contents
 
-- [Schema Validation](schema-validation.md) - Complete validation patterns for Spring Boot
+### Getting Started
+- [Validation Fundamentals](validation-fundamentals.md) - Jakarta Bean Validation basics, standard annotations, error handling
+- [Custom Validators](custom-validators.md) - Custom constraint annotations, cross-field validation, validation groups
+
+### Advanced Topics
+- [Advanced Validation](advanced-validation.md) - JSON Schema validation, method-level validation, RFC 7807 integration
+- [Validation Testing](validation-testing.md) - Unit and integration testing for validation logic
+
+### Legacy Documentation
+- [Schema Validation](schema-validation.md) - Original comprehensive guide (being phased out)
 
 ## Key Concepts
 
@@ -37,6 +46,13 @@ Apply different validation rules in different contexts:
 ### JSON Schema Validation
 
 Validate against JSON Schema definitions for complex schema requirements.
+
+### Method-Level Validation
+
+Validate service method parameters and return values:
+- Parameter validation with `@Validated`
+- Return value validation
+- `ConstraintViolationException` handling
 
 ## Quick Example
 
