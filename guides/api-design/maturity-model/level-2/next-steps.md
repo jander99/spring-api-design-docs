@@ -97,99 +97,190 @@ API tells client what's possible!
 ## Step 2: Add Links to Responses
 
 ### Start Simple - Add Self Links:
-```javascript
-// Level 2
-app.get('/users/:id', (req, res) => {
-  const user = getUser(req.params.id);
-  res.json(user);
-});
 
-// Level 3
-app.get('/users/:id', (req, res) => {
-  const user = getUser(req.params.id);
-  res.json({
-    ...user,
-    _links: {
-      self: { href: `/users/${user.id}` }
-    }
-  });
-});
+**Level 2 Response** (no links):
+```http
+GET /users/42 HTTP/1.1
+Accept: application/json
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "id": 42,
+  "name": "Jane Smith",
+  "email": "jane@example.com"
+}
+```
+
+**Level 3 Response** (with self link):
+```http
+GET /users/42 HTTP/1.1
+Accept: application/json
+
+HTTP/1.1 200 OK
+Content-Type: application/hal+json
+
+{
+  "id": 42,
+  "name": "Jane Smith",
+  "email": "jane@example.com",
+  "_links": {
+    "self": { "href": "/users/42" }
+  }
+}
 ```
 
 ### Add Related Resource Links:
-```javascript
-const orderResponse = {
-  id: 123,
-  status: order.status,
-  _links: {
-    self: { href: `/orders/${order.id}` },
-    customer: { href: `/customers/${order.customerId}` },
-    items: { href: `/orders/${order.id}/items` },
-    invoice: order.invoiceId ? { href: `/invoices/${order.invoiceId}` } : null
+
+Include links to associated resources that clients commonly need:
+
+```http
+GET /orders/123 HTTP/1.1
+Accept: application/hal+json
+
+HTTP/1.1 200 OK
+Content-Type: application/hal+json
+
+{
+  "id": 123,
+  "status": "pending",
+  "total": 149.99,
+  "_links": {
+    "self": { "href": "/orders/123" },
+    "customer": { "href": "/customers/456" },
+    "items": { "href": "/orders/123/items" },
+    "invoice": { "href": "/invoices/789" }
   }
-};
+}
 ```
 
 ### Add Available Actions:
-```javascript
-const orderResponse = {
-  id: 123,
-  status: order.status,
-  _links: {
-    self: { href: `/orders/${order.id}` },
-    // Include actions based on state
-    ...(order.status === 'pending' && {
-      cancel: { 
-        href: `/orders/${order.id}/cancel`,
-        method: 'POST'
-      },
-      update: {
-        href: `/orders/${order.id}`,
-        method: 'PUT'
-      }
-    }),
-    ...(order.status === 'confirmed' && {
-      ship: {
-        href: `/orders/${order.id}/ship`,
-        method: 'POST'
-      }
-    })
+
+Links change based on resource state. A pending order offers different actions than a confirmed order:
+
+**Pending Order** (can cancel or update):
+```http
+GET /orders/123 HTTP/1.1
+Accept: application/hal+json
+
+HTTP/1.1 200 OK
+Content-Type: application/hal+json
+
+{
+  "id": 123,
+  "status": "pending",
+  "total": 149.99,
+  "_links": {
+    "self": { "href": "/orders/123" },
+    "cancel": { "href": "/orders/123/cancel", "method": "POST" },
+    "update": { "href": "/orders/123", "method": "PUT" }
   }
-};
+}
+```
+
+**Confirmed Order** (can ship):
+```http
+GET /orders/123 HTTP/1.1
+Accept: application/hal+json
+
+HTTP/1.1 200 OK
+Content-Type: application/hal+json
+
+{
+  "id": 123,
+  "status": "confirmed",
+  "total": 149.99,
+  "_links": {
+    "self": { "href": "/orders/123" },
+    "ship": { "href": "/orders/123/ship", "method": "POST" }
+  }
+}
 ```
 
 ## Step 3: State-Based Navigation
 
 ### Order State Machine:
-```javascript
-const getOrderLinks = (order) => {
-  const links = {
-    self: { href: `/orders/${order.id}` }
-  };
 
-  switch(order.status) {
-    case 'draft':
-      links.submit = { href: `/orders/${order.id}/submit`, method: 'POST' };
-      links.update = { href: `/orders/${order.id}`, method: 'PUT' };
-      break;
-    
-    case 'pending':
-      links.cancel = { href: `/orders/${order.id}/cancel`, method: 'POST' };
-      links.payment = { href: `/orders/${order.id}/payment`, method: 'POST' };
-      break;
-    
-    case 'paid':
-      links.ship = { href: `/orders/${order.id}/ship`, method: 'POST' };
-      links.refund = { href: `/orders/${order.id}/refund`, method: 'POST' };
-      break;
-    
-    case 'shipped':
-      links.track = { href: `/shipments/${order.shipmentId}` };
-      break;
+Each order state exposes different available actions through links:
+
+**Draft Order** (can submit or update):
+```http
+GET /orders/123 HTTP/1.1
+Accept: application/hal+json
+
+HTTP/1.1 200 OK
+Content-Type: application/hal+json
+
+{
+  "id": 123,
+  "status": "draft",
+  "total": 0.00,
+  "_links": {
+    "self": { "href": "/orders/123" },
+    "submit": { "href": "/orders/123/submit", "method": "POST" },
+    "update": { "href": "/orders/123", "method": "PUT" }
   }
+}
+```
 
-  return links;
-};
+**Pending Order** (can cancel or pay):
+```http
+GET /orders/123 HTTP/1.1
+Accept: application/hal+json
+
+HTTP/1.1 200 OK
+Content-Type: application/hal+json
+
+{
+  "id": 123,
+  "status": "pending",
+  "total": 149.99,
+  "_links": {
+    "self": { "href": "/orders/123" },
+    "cancel": { "href": "/orders/123/cancel", "method": "POST" },
+    "payment": { "href": "/orders/123/payment", "method": "POST" }
+  }
+}
+```
+
+**Paid Order** (can ship or refund):
+```http
+GET /orders/123 HTTP/1.1
+Accept: application/hal+json
+
+HTTP/1.1 200 OK
+Content-Type: application/hal+json
+
+{
+  "id": 123,
+  "status": "paid",
+  "total": 149.99,
+  "_links": {
+    "self": { "href": "/orders/123" },
+    "ship": { "href": "/orders/123/ship", "method": "POST" },
+    "refund": { "href": "/orders/123/refund", "method": "POST" }
+  }
+}
+```
+
+**Shipped Order** (can track):
+```http
+GET /orders/123 HTTP/1.1
+Accept: application/hal+json
+
+HTTP/1.1 200 OK
+Content-Type: application/hal+json
+
+{
+  "id": 123,
+  "status": "shipped",
+  "total": 149.99,
+  "_links": {
+    "self": { "href": "/orders/123" },
+    "track": { "href": "/shipments/ship-456" }
+  }
+}
 ```
 
 ## Step 4: Collection Navigation
@@ -283,22 +374,82 @@ You've reached Level 3 when:
 4. **Documentation**: API self-describes operations
 5. **State Management**: Clear workflow navigation
 
-## Client Implementation Example
+## Client Behavior Example
 
-### Level 2 Client (Hardcoded):
-```javascript
-// Client knows all URLs
-const user = await fetch('/users/123');
-const orders = await fetch('/users/123/orders');
+### Level 2 Client (Hardcoded URLs):
+
+The client must know all URLs in advance and construct them manually:
+
+```http
+GET /users/123 HTTP/1.1
+Accept: application/json
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "id": 123,
+  "name": "Jane Smith"
+}
 ```
 
-### Level 3 Client (Dynamic):
-```javascript
-// Client follows links
-const user = await fetch('/users/123');
-const userLinks = user._links;
-const orders = await fetch(userLinks.orders.href);
+Client then constructs the next URL manually: `/users/123/orders`
+
+```http
+GET /users/123/orders HTTP/1.1
+Accept: application/json
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+[
+  { "id": 1, "total": 99.99 },
+  { "id": 2, "total": 149.99 }
+]
 ```
+
+### Level 3 Client (Follows Links):
+
+The client discovers URLs from the response and follows them:
+
+```http
+GET /users/123 HTTP/1.1
+Accept: application/hal+json
+
+HTTP/1.1 200 OK
+Content-Type: application/hal+json
+
+{
+  "id": 123,
+  "name": "Jane Smith",
+  "_links": {
+    "self": { "href": "/users/123" },
+    "orders": { "href": "/users/123/orders" }
+  }
+}
+```
+
+Client extracts `_links.orders.href` and follows it:
+
+```http
+GET /users/123/orders HTTP/1.1
+Accept: application/hal+json
+
+HTTP/1.1 200 OK
+Content-Type: application/hal+json
+
+{
+  "items": [
+    { "id": 1, "total": 99.99 },
+    { "id": 2, "total": 149.99 }
+  ],
+  "_links": {
+    "self": { "href": "/users/123/orders" }
+  }
+}
+```
+
+The client never hardcodes URLs—it discovers them at runtime.
 
 ## Is It Worth It?
 

@@ -8,14 +8,19 @@ This document covers frequently encountered problems when implementing paginatio
 
 **Problem:** Users request page numbers that exceed the total number of pages.
 
-**Example:**
-```
-GET /v1/orders?page=999&size=20
+**Example Request:**
+```http
+GET /v1/orders?page=999&size=20 HTTP/1.1
+Host: api.example.com
+Accept: application/json
 ```
 
 **Solution:** Return empty results with correct metadata:
 
-```json
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
 {
   "data": [],
   "meta": {
@@ -29,23 +34,7 @@ GET /v1/orders?page=999&size=20
 }
 ```
 
-**Implementation:**
-```javascript
-// Don't throw errors for out-of-bounds pages
-if (page >= totalPages) {
-  return {
-    data: [],
-    meta: {
-      pagination: {
-        page,
-        size,
-        totalElements: total,
-        totalPages: Math.ceil(total / size)
-      }
-    }
-  };
-}
-```
+**Key Behavior:** Do not return an error for out-of-bounds pages. Return an empty `data` array with accurate pagination metadata showing the actual total pages available.
 
 ### Issue: Inconsistent Results Due to Data Changes
 
@@ -53,102 +42,211 @@ if (page >= totalPages) {
 
 **Example:** User on page 2 sees items they already saw on page 1 because new items were inserted.
 
-**Solution 1:** Use cursor-based pagination:
-```javascript
-// Cursor-based pagination provides stable results
-const cursor = {
-  id: lastItemId,
-  createdDate: lastItemCreatedDate
-};
+**Solution 1: Use cursor-based pagination**
 
-const query = {
-  $or: [
-    { createdDate: { $lt: cursor.createdDate } },
-    { 
-      createdDate: cursor.createdDate,
-      _id: { $gt: cursor.id }
-    }
-  ]
-};
+Cursor-based pagination provides stable results by anchoring to a specific position in the dataset.
+
+**Initial Request:**
+```http
+GET /v1/orders?size=20 HTTP/1.1
+Host: api.example.com
+Accept: application/json
 ```
 
-**Solution 2:** Use snapshot isolation:
-```javascript
-// Capture snapshot timestamp
-const snapshot = req.query.snapshot || new Date().toISOString();
+**Response with Cursor:**
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
 
-// Filter data based on snapshot
-const query = {
-  ...filters,
-  createdDate: { $lte: new Date(snapshot) }
-};
+{
+  "data": [
+    {"id": "order-100", "createdDate": "2024-01-15T10:30:00Z"},
+    {"id": "order-099", "createdDate": "2024-01-15T09:15:00Z"}
+  ],
+  "meta": {
+    "pagination": {
+      "size": 20,
+      "hasNext": true,
+      "nextCursor": "eyJpZCI6Im9yZGVyLTA5OSIsImNyZWF0ZWREYXRlIjoiMjAyNC0wMS0xNVQwOToxNTowMFoifQ=="
+    }
+  }
+}
+```
+
+**Next Page Request:**
+```http
+GET /v1/orders?size=20&cursor=eyJpZCI6Im9yZGVyLTA5OSIsImNyZWF0ZWREYXRlIjoiMjAyNC0wMS0xNVQwOToxNTowMFoifQ== HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
+**Cursor Structure (decoded from Base64):**
+```json
+{
+  "id": "order-099",
+  "createdDate": "2024-01-15T09:15:00Z"
+}
+```
+
+**Solution 2: Use snapshot isolation**
+
+Include a snapshot timestamp to filter results consistently across pages.
+
+**Initial Request:**
+```http
+GET /v1/orders?size=20 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
+**Response with Snapshot:**
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "data": [...],
+  "meta": {
+    "pagination": {
+      "page": 0,
+      "size": 20,
+      "totalElements": 100,
+      "totalPages": 5
+    },
+    "snapshot": "2024-01-15T10:30:00Z"
+  }
+}
+```
+
+**Subsequent Request with Snapshot:**
+```http
+GET /v1/orders?page=1&size=20&snapshot=2024-01-15T10:30:00Z HTTP/1.1
+Host: api.example.com
+Accept: application/json
 ```
 
 ### Issue: Performance Degradation with Deep Pagination
 
 **Problem:** Queries become slow with large offset values (e.g., page 1000 with 20 items per page).
 
-**Example:**
-```sql
--- This becomes slow with large offsets
-SELECT * FROM orders LIMIT 20 OFFSET 20000;
+**Example of Slow Request:**
+```http
+GET /v1/orders?page=1000&size=20 HTTP/1.1
+Host: api.example.com
+Accept: application/json
 ```
 
-**Solution:** Implement cursor-based pagination for deep pages:
+**Solution:** For deep pagination (beyond page 100), switch to cursor-based pagination or return an error guiding the user.
 
-```javascript
-// Detect deep pagination
-const DEEP_PAGINATION_THRESHOLD = 100;
+**Option 1: Return Cursor-Based Alternative**
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json
 
-if (page > DEEP_PAGINATION_THRESHOLD) {
-  // Switch to cursor-based pagination
-  return cursorPagination(query, cursor, size);
+{
+  "type": "https://example.com/problems/deep-pagination",
+  "title": "Deep Pagination Not Supported",
+  "status": 400,
+  "detail": "Offset pagination is limited to page 100. Use cursor-based pagination for deeper access.",
+  "instance": "/v1/orders",
+  "recommendation": "Use the 'cursor' parameter instead of 'page' for efficient deep pagination"
 }
+```
 
-// Use offset pagination for shallow pages
-return offsetPagination(query, page, size);
+**Option 2: Automatically Switch to Cursor Mode**
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "data": [...],
+  "meta": {
+    "pagination": {
+      "size": 20,
+      "hasNext": true,
+      "nextCursor": "eyJpZCI6Im9yZGVyLTIwMDAwIn0=",
+      "paginationMode": "cursor",
+      "notice": "Switched to cursor-based pagination for better performance"
+    }
+  }
+}
 ```
 
 ### Issue: Total Count Queries Are Slow
 
 **Problem:** Counting all matching records becomes expensive for large datasets.
 
-**Solution 1:** Use estimated counts:
-```javascript
-// Use database statistics for estimates
-const estimatedTotal = await db.collection('orders').estimatedDocumentCount();
+**Solution 1: Use estimated counts**
 
-return {
-  data: results,
-  meta: {
-    pagination: {
-      page,
-      size,
-      totalElements: estimatedTotal,
-      totalPages: Math.ceil(estimatedTotal / size),
-      estimated: true
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "data": [...],
+  "meta": {
+    "pagination": {
+      "page": 0,
+      "size": 20,
+      "totalElements": 1000000,
+      "totalPages": 50000,
+      "estimated": true
     }
   }
-};
+}
 ```
 
-**Solution 2:** Make counts optional:
-```javascript
-const includeCount = req.query.includeCount === 'true';
+**Solution 2: Make counts optional**
 
-const meta = {
-  pagination: {
-    page,
-    size,
-    hasNext: results.length === size,
-    hasPrevious: page > 0
+**Request Without Count (faster):**
+```http
+GET /v1/orders?page=0&size=20 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
+**Response Without Total Count:**
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "data": [...],
+  "meta": {
+    "pagination": {
+      "page": 0,
+      "size": 20,
+      "hasNext": true,
+      "hasPrevious": false
+    }
   }
-};
+}
+```
 
-if (includeCount) {
-  const total = await Order.countDocuments(query);
-  meta.pagination.totalElements = total;
-  meta.pagination.totalPages = Math.ceil(total / size);
+**Request With Count (slower):**
+```http
+GET /v1/orders?page=0&size=20&includeCount=true HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
+**Response With Total Count:**
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "data": [...],
+  "meta": {
+    "pagination": {
+      "page": 0,
+      "size": 20,
+      "totalElements": 1000000,
+      "totalPages": 50000,
+      "hasNext": true,
+      "hasPrevious": false
+    }
+  }
 }
 ```
 
@@ -156,67 +254,106 @@ if (includeCount) {
 
 ### Issue: SQL Injection in Dynamic Filters
 
-**Problem:** User input is directly concatenated into queries.
+**Problem:** User input is directly incorporated into queries without sanitization.
 
-**Bad Example:**
-```javascript
-// NEVER DO THIS
-const query = `SELECT * FROM orders WHERE status = '${status}'`;
+**Malicious Request Example:**
+```http
+GET /v1/orders?status=PENDING';DROP%20TABLE%20orders;-- HTTP/1.1
+Host: api.example.com
 ```
 
-**Solution:** Use parameterized queries:
-```javascript
-// Use parameterized queries
-const query = 'SELECT * FROM orders WHERE status = ?';
-const results = await db.query(query, [status]);
+**Expected Behavior:** The server must use parameterized queries internally. The request should either:
+- Be validated and rejected as an invalid status value
+- Be safely escaped and treated as a literal string
 
-// Or use ORM/ODM
-const results = await Order.find({ status: status });
+**Proper Error Response:**
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json
+
+{
+  "type": "https://example.com/problems/invalid-filter-value",
+  "title": "Invalid Filter Value",
+  "status": 400,
+  "detail": "Invalid status value provided",
+  "errors": [
+    {
+      "field": "status",
+      "code": "INVALID_VALUE",
+      "message": "Status must be one of: PENDING, PROCESSING, COMPLETED, CANCELLED",
+      "providedValue": "PENDING';DROP TABLE orders;--"
+    }
+  ]
+}
 ```
 
 ### Issue: Invalid Date Formats
 
 **Problem:** Users provide dates in various formats that cause parsing errors.
 
-**Examples of problematic input:**
-- `2024-13-01` (invalid month)
-- `2024/01/01` (wrong format)
-- `tomorrow` (relative date)
+**Examples of Invalid Requests:**
 
-**Solution:** Validate and normalize date formats:
-```javascript
-function parseDateFilter(dateString) {
-  if (!dateString) return null;
-  
-  // Only accept ISO 8601 format
-  const isoDateRegex = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?)?$/;
-  
-  if (!isoDateRegex.test(dateString)) {
-    throw new Error('Date must be in ISO 8601 format (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ssZ)');
-  }
-  
-  const date = new Date(dateString);
-  
-  if (isNaN(date.getTime())) {
-    throw new Error('Invalid date provided');
-  }
-  
-  return date;
+```http
+GET /v1/orders?createdAfter=2024-13-01 HTTP/1.1
+```
+Invalid month (13).
+
+```http
+GET /v1/orders?createdAfter=2024/01/01 HTTP/1.1
+```
+Wrong date separator (slashes instead of dashes).
+
+```http
+GET /v1/orders?createdAfter=tomorrow HTTP/1.1
+```
+Relative date not supported.
+
+**Expected Error Response:**
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json
+
+{
+  "type": "https://example.com/problems/invalid-date",
+  "title": "Invalid Date Format",
+  "status": 400,
+  "detail": "Date must be in ISO 8601 format (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ssZ)",
+  "instance": "/v1/orders",
+  "errors": [
+    {
+      "field": "createdAfter",
+      "code": "INVALID_DATE_FORMAT",
+      "message": "Date must be in ISO 8601 format",
+      "providedValue": "2024-13-01",
+      "expectedFormat": "YYYY-MM-DD or YYYY-MM-DDTHH:mm:ssZ",
+      "examples": ["2024-01-15", "2024-01-15T10:30:00Z"]
+    }
+  ]
 }
+```
 
-// Usage
-try {
-  const createdAfter = parseDateFilter(req.query.createdAfter);
-  if (createdAfter) {
-    query.createdDate = { $gte: createdAfter };
+**Valid Request:**
+```http
+GET /v1/orders?createdAfter=2024-01-15T00:00:00Z HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
+**Successful Response:**
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "data": [
+    {"id": "order-123", "createdDate": "2024-01-16T08:00:00Z"}
+  ],
+  "meta": {
+    "pagination": {...},
+    "filters": {
+      "createdAfter": "2024-01-15T00:00:00Z"
+    }
   }
-} catch (error) {
-  return res.status(400).json({
-    type: 'https://example.com/problems/invalid-date',
-    title: 'Invalid Date Format',
-    status: 400,
-    detail: error.message
-  });
 }
 ```
 
@@ -224,49 +361,48 @@ try {
 
 **Problem:** Users provide filter values that don't match the expected enum values.
 
-**Example:**
-```
-GET /v1/orders?status=active
+**Invalid Request (lowercase):**
+```http
+GET /v1/orders?status=active HTTP/1.1
+Host: api.example.com
 ```
 
 But the system expects `ACTIVE` (uppercase).
 
-**Solution:** Validate filter values against allowed options:
-```javascript
-const VALID_STATUSES = ['PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED'];
+**Option 1: Strict Validation - Error Response:**
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json
 
-function validateStatus(status) {
-  if (!status) return null;
-  
-  const upperStatus = status.toUpperCase();
-  
-  if (!VALID_STATUSES.includes(upperStatus)) {
-    throw new Error(`Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}`);
-  }
-  
-  return upperStatus;
+{
+  "type": "https://example.com/problems/invalid-filter-value",
+  "title": "Invalid Filter Value",
+  "status": 400,
+  "detail": "Invalid status value. Must be one of: PENDING, PROCESSING, COMPLETED, CANCELLED",
+  "errors": [
+    {
+      "field": "status",
+      "code": "INVALID_VALUE",
+      "message": "Invalid status value",
+      "providedValue": "active",
+      "allowedValues": ["PENDING", "PROCESSING", "COMPLETED", "CANCELLED"]
+    }
+  ]
 }
+```
 
-// Usage
-try {
-  const status = validateStatus(req.query.status);
-  if (status) {
-    query.status = status;
+**Option 2: Case-Insensitive Matching - Success Response:**
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "data": [...],
+  "meta": {
+    "filters": {
+      "status": "ACTIVE"
+    }
   }
-} catch (error) {
-  return res.status(400).json({
-    type: 'https://example.com/problems/invalid-filter-value',
-    title: 'Invalid Filter Value',
-    status: 400,
-    detail: error.message,
-    errors: [{
-      field: 'status',
-      code: 'INVALID_VALUE',
-      message: error.message,
-      providedValue: req.query.status,
-      allowedValues: VALID_STATUSES
-    }]
-  });
 }
 ```
 
@@ -274,37 +410,46 @@ try {
 
 **Problem:** Users expect OR logic between filters, but the system uses AND logic.
 
-**Example:**
-```
-GET /v1/orders?status=PENDING&status=PROCESSING
+**Request with Multiple Status Values:**
+```http
+GET /v1/orders?status=PENDING,PROCESSING HTTP/1.1
+Host: api.example.com
+Accept: application/json
 ```
 
 User expects orders with PENDING OR PROCESSING status.
 
-**Solution:** Support multiple values for OR logic:
-```javascript
-function parseMultipleValues(value) {
-  if (!value) return null;
-  
-  // Support comma-separated values
-  if (typeof value === 'string') {
-    return value.split(',').map(v => v.trim());
-  }
-  
-  // Support array format
-  if (Array.isArray(value)) {
-    return value;
-  }
-  
-  return [value];
-}
+**Alternative Syntax (repeated parameter):**
+```http
+GET /v1/orders?status=PENDING&status=PROCESSING HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
 
-// Usage
-const statuses = parseMultipleValues(req.query.status);
-if (statuses) {
-  query.status = { $in: statuses };
+**Expected Response:**
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "data": [
+    {"id": "order-001", "status": "PENDING"},
+    {"id": "order-002", "status": "PROCESSING"},
+    {"id": "order-003", "status": "PENDING"}
+  ],
+  "meta": {
+    "filters": {
+      "status": ["PENDING", "PROCESSING"]
+    }
+  }
 }
 ```
+
+**Document the Behavior:**
+APIs should clearly document whether multiple values use AND or OR logic. Common conventions:
+- Comma-separated values: OR logic (`status=PENDING,PROCESSING`)
+- Repeated parameters: OR logic (`status=PENDING&status=PROCESSING`)
+- Different fields: AND logic (`status=PENDING&priority=HIGH`)
 
 ## Common Sorting Issues
 
@@ -312,26 +457,64 @@ if (statuses) {
 
 **Problem:** Users sort by fields that aren't indexed, causing slow queries.
 
-**Solution:** Validate sortable fields and provide index recommendations:
-```javascript
-const SORTABLE_FIELDS = {
-  id: { indexed: true, type: 'string' },
-  createdDate: { indexed: true, type: 'date' },
-  total: { indexed: true, type: 'number' },
-  status: { indexed: true, type: 'string' },
-  customerName: { indexed: false, type: 'string' } // Not indexed
-};
+**Request with Non-Indexed Sort Field:**
+```http
+GET /v1/orders?sort=description,asc HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
 
-function validateSortField(field) {
-  if (!SORTABLE_FIELDS[field]) {
-    throw new Error(`Field '${field}' is not available for sorting. Available fields: ${Object.keys(SORTABLE_FIELDS).join(', ')}`);
+**Option 1: Reject Non-Indexed Sorts**
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json
+
+{
+  "type": "https://example.com/problems/invalid-sort-field",
+  "title": "Invalid Sort Field",
+  "status": 400,
+  "detail": "Field 'description' is not available for sorting",
+  "errors": [
+    {
+      "field": "sort",
+      "code": "UNSUPPORTED_SORT_FIELD",
+      "message": "Field 'description' is not available for sorting",
+      "providedValue": "description",
+      "allowedFields": ["id", "createdDate", "total", "status"]
+    }
+  ]
+}
+```
+
+**Option 2: Allow with Warning Header**
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-Performance-Warning: Sorting by 'description' may be slow as it is not indexed
+
+{
+  "data": [...],
+  "meta": {
+    "sort": {
+      "field": "description",
+      "direction": "asc",
+      "indexed": false,
+      "warning": "This sort field is not indexed and may cause slow queries"
+    }
   }
-  
-  if (!SORTABLE_FIELDS[field].indexed) {
-    console.warn(`Sorting by '${field}' may be slow as it's not indexed`);
+}
+```
+
+**Sortable Fields Configuration (JSON Schema):**
+```json
+{
+  "sortableFields": {
+    "id": {"indexed": true, "type": "string"},
+    "createdDate": {"indexed": true, "type": "date"},
+    "total": {"indexed": true, "type": "number"},
+    "status": {"indexed": true, "type": "string"},
+    "customerName": {"indexed": false, "type": "string"}
   }
-  
-  return field;
 }
 ```
 
@@ -341,49 +524,97 @@ function validateSortField(field) {
 
 **Example:** Multiple orders with the same `createdDate` appear in random order.
 
-**Solution:** Always include a unique field as the final sort criteria:
-```javascript
-function buildSortCriteria(sortParam) {
-  const sorts = parseSortParam(sortParam);
-  
-  // Always add ID as final sort criteria for consistent ordering
-  const hasIdSort = sorts.some(sort => sort.field === 'id');
-  
-  if (!hasIdSort) {
-    sorts.push({ field: 'id', direction: 'ASC' });
+**Request:**
+```http
+GET /v1/orders?sort=createdDate,desc HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
+**Inconsistent Response (Problem):**
+First request might return orders in one order, second request in a different order when `createdDate` values are identical.
+
+**Solution:** Always include a unique field (like `id`) as the final sort criteria internally.
+
+**Consistent Response:**
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "data": [
+    {"id": "order-003", "createdDate": "2024-01-15T10:00:00Z"},
+    {"id": "order-001", "createdDate": "2024-01-15T10:00:00Z"},
+    {"id": "order-002", "createdDate": "2024-01-14T15:00:00Z"}
+  ],
+  "meta": {
+    "sort": [
+      {"field": "createdDate", "direction": "desc"},
+      {"field": "id", "direction": "asc"}
+    ]
   }
-  
-  return sorts;
 }
 ```
+
+Items with the same `createdDate` are consistently ordered by `id`.
 
 ### Issue: Invalid Sort Direction
 
 **Problem:** Users provide invalid sort directions.
 
-**Examples:**
-- `?sort=createdDate,ascending`
-- `?sort=createdDate,1`
-- `?sort=createdDate,up`
+**Invalid Requests:**
+```http
+GET /v1/orders?sort=createdDate,ascending HTTP/1.1
+```
 
-**Solution:** Validate and normalize sort directions:
-```javascript
-function parseSortDirection(direction) {
-  if (!direction) return 'ASC'; // Default
-  
-  const normalizedDirection = direction.toLowerCase();
-  
-  switch (normalizedDirection) {
-    case 'asc':
-    case 'ascending':
-    case '1':
-      return 'ASC';
-    case 'desc':
-    case 'descending':
-    case '-1':
-      return 'DESC';
-    default:
-      throw new Error(`Invalid sort direction '${direction}'. Use 'asc' or 'desc'`);
+```http
+GET /v1/orders?sort=createdDate,1 HTTP/1.1
+```
+
+```http
+GET /v1/orders?sort=createdDate,up HTTP/1.1
+```
+
+**Option 1: Strict Validation - Error Response:**
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json
+
+{
+  "type": "https://example.com/problems/invalid-sort-direction",
+  "title": "Invalid Sort Direction",
+  "status": 400,
+  "detail": "Invalid sort direction 'ascending'. Use 'asc' or 'desc'",
+  "errors": [
+    {
+      "field": "sort",
+      "code": "INVALID_DIRECTION",
+      "message": "Invalid sort direction",
+      "providedValue": "ascending",
+      "allowedValues": ["asc", "desc"]
+    }
+  ]
+}
+```
+
+**Option 2: Accept Common Variations**
+
+The server can normalize common variations:
+- `asc`, `ascending`, `1` → `ASC`
+- `desc`, `descending`, `-1` → `DESC`
+
+**Successful Response After Normalization:**
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "data": [...],
+  "meta": {
+    "sort": {
+      "field": "createdDate",
+      "direction": "asc"
+    }
   }
 }
 ```
@@ -394,8 +625,18 @@ function parseSortDirection(direction) {
 
 **Issue:** Different behaviors when no results are found.
 
+**Request:**
+```http
+GET /v1/orders?status=NONEXISTENT_STATUS HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
 **Solution:** Always return consistent empty result structure:
-```json
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
 {
   "data": [],
   "meta": {
@@ -416,34 +657,54 @@ function parseSortDirection(direction) {
 
 **Issue:** Cursors become invalid due to data changes or time limits.
 
-**Solution:** Handle cursor expiration gracefully:
-```javascript
-function validateCursor(cursor) {
-  try {
-    const decoded = JSON.parse(Buffer.from(cursor, 'base64').toString());
-    
-    // Check if cursor is expired (example: 1 hour TTL)
-    if (decoded.timestamp && Date.now() - decoded.timestamp > 3600000) {
-      throw new Error('Cursor has expired');
-    }
-    
-    return decoded;
-  } catch (error) {
-    throw new Error('Invalid or expired cursor');
-  }
-}
+**Request with Expired Cursor:**
+```http
+GET /v1/orders?cursor=eyJpZCI6Im9yZGVyLTEwMCIsInRpbWVzdGFtcCI6MTcwNDAwMDAwMDAwMH0= HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
 
-// Usage
-try {
-  const cursorData = validateCursor(req.query.cursor);
-  // Use cursor data
-} catch (error) {
-  return res.status(400).json({
-    type: 'https://example.com/problems/invalid-cursor',
-    title: 'Invalid Cursor',
-    status: 400,
-    detail: error.message
-  });
+**Cursor Structure (decoded):**
+```json
+{
+  "id": "order-100",
+  "timestamp": 1704000000000
+}
+```
+
+If the cursor is older than the allowed TTL (e.g., 1 hour), return an error:
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json
+
+{
+  "type": "https://example.com/problems/invalid-cursor",
+  "title": "Invalid Cursor",
+  "status": 400,
+  "detail": "Cursor has expired. Please start a new pagination request without a cursor.",
+  "instance": "/v1/orders",
+  "recommendation": "Remove the 'cursor' parameter to start from the beginning"
+}
+```
+
+**Request with Malformed Cursor:**
+```http
+GET /v1/orders?cursor=invalid-base64-data HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json
+
+{
+  "type": "https://example.com/problems/invalid-cursor",
+  "title": "Invalid Cursor",
+  "status": 400,
+  "detail": "The cursor format is invalid or corrupted",
+  "instance": "/v1/orders"
 }
 ```
 
@@ -451,25 +712,61 @@ try {
 
 **Issue:** Users request extremely large page sizes that could crash the system.
 
-**Solution:** Enforce reasonable limits:
-```javascript
-const DEFAULT_PAGE_SIZE = 20;
-const MAX_PAGE_SIZE = 100;
+**Request with Excessive Page Size:**
+```http
+GET /v1/orders?size=10000 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
 
-function validatePageSize(size) {
-  if (!size) return DEFAULT_PAGE_SIZE;
-  
-  const pageSize = parseInt(size);
-  
-  if (isNaN(pageSize) || pageSize < 1) {
-    throw new Error('Page size must be a positive number');
-  }
-  
-  if (pageSize > MAX_PAGE_SIZE) {
-    throw new Error(`Page size cannot exceed ${MAX_PAGE_SIZE}`);
-  }
-  
-  return pageSize;
+**Error Response:**
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json
+
+{
+  "type": "https://example.com/problems/resource-limit-exceeded",
+  "title": "Resource Limit Exceeded",
+  "status": 400,
+  "detail": "Page size cannot exceed 100 items",
+  "errors": [
+    {
+      "field": "size",
+      "code": "EXCEEDS_MAX_PAGE_SIZE",
+      "message": "Page size must be between 1 and 100",
+      "providedValue": 10000,
+      "minValue": 1,
+      "maxValue": 100,
+      "defaultValue": 20
+    }
+  ]
+}
+```
+
+**Request with Invalid Page Size:**
+```http
+GET /v1/orders?size=-5 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json
+
+{
+  "type": "https://example.com/problems/invalid-parameter",
+  "title": "Invalid Parameter",
+  "status": 400,
+  "detail": "Page size must be a positive number",
+  "errors": [
+    {
+      "field": "size",
+      "code": "INVALID_VALUE",
+      "message": "Page size must be a positive number between 1 and 100",
+      "providedValue": -5
+    }
+  ]
 }
 ```
 
@@ -477,29 +774,41 @@ function validatePageSize(size) {
 
 **Issue:** Data changes while user is paginating through results.
 
-**Solution:** Use consistent snapshots:
-```javascript
-// Create a snapshot reference
-const snapshot = req.query.snapshot || Date.now();
+**Solution:** Use consistent snapshots.
 
-// Include snapshot in all queries
-const query = {
-  ...filters,
-  $or: [
-    { updatedAt: { $lte: new Date(snapshot) } },
-    { updatedAt: { $exists: false } }
-  ]
-};
-
-// Include snapshot in response for subsequent requests
-return {
-  data: results,
-  meta: {
-    pagination: { ... },
-    snapshot: snapshot
-  }
-};
+**Initial Request:**
+```http
+GET /v1/orders?size=20 HTTP/1.1
+Host: api.example.com
+Accept: application/json
 ```
+
+**Response with Snapshot:**
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "data": [...],
+  "meta": {
+    "pagination": {
+      "page": 0,
+      "size": 20,
+      "hasNext": true
+    },
+    "snapshot": "2024-01-15T10:30:00Z"
+  }
+}
+```
+
+**Subsequent Request with Snapshot:**
+```http
+GET /v1/orders?page=1&size=20&snapshot=2024-01-15T10:30:00Z HTTP/1.1
+Host: api.example.com
+Accept: application/json
+```
+
+The server filters results to only include data that existed at or before the snapshot timestamp, ensuring consistent pagination even as data changes.
 
 ## Error Response Examples
 
@@ -579,58 +888,67 @@ Content-Type: application/problem+json
 
 ### Identifying Slow Queries
 
-```javascript
-// Log slow pagination queries
-const startTime = Date.now();
+APIs should track query performance and include timing information in responses when queries exceed thresholds.
 
-const results = await Order.find(query)
-  .sort(sortCriteria)
-  .skip(page * size)
-  .limit(size);
+**Response with Performance Warning:**
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-Response-Time: 2500ms
+X-Performance-Warning: Query exceeded 1000ms threshold
 
-const queryTime = Date.now() - startTime;
-
-if (queryTime > 1000) { // Log queries taking more than 1 second
-  console.warn('Slow pagination query:', {
-    queryTime,
-    page,
-    size,
-    filters: query,
-    sort: sortCriteria
-  });
+{
+  "data": [...],
+  "meta": {
+    "pagination": {
+      "page": 50,
+      "size": 20,
+      "totalElements": 100000,
+      "totalPages": 5000
+    },
+    "performance": {
+      "queryTimeMs": 2500,
+      "warning": "Consider using cursor-based pagination for better performance",
+      "recommendations": [
+        "Use cursor parameter instead of page for deep pagination",
+        "Add filters to reduce result set size"
+      ]
+    }
+  }
 }
 ```
 
 ### Query Optimization Recommendations
 
-```javascript
-// Analyze query patterns and suggest optimizations
-function analyzeQuery(query, sort, page, size) {
-  const recommendations = [];
-  
-  // Deep pagination warning
-  if (page > 50) {
-    recommendations.push({
-      type: 'DEEP_PAGINATION',
-      message: 'Consider using cursor-based pagination for better performance',
-      impact: 'HIGH'
-    });
+APIs can provide optimization recommendations in error responses or metadata.
+
+**Response with Optimization Hints:**
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "data": [...],
+  "meta": {
+    "pagination": {...},
+    "optimization": {
+      "recommendations": [
+        {
+          "type": "DEEP_PAGINATION",
+          "message": "Consider using cursor-based pagination for better performance",
+          "impact": "HIGH",
+          "currentPage": 150,
+          "threshold": 100
+        },
+        {
+          "type": "UNINDEXED_FILTERS",
+          "message": "Filters on unindexed fields may slow queries",
+          "impact": "MEDIUM",
+          "fields": ["customerName", "description"]
+        }
+      ]
+    }
   }
-  
-  // Unindexed filter warning
-  const unindexedFilters = Object.keys(query).filter(field => 
-    !INDEXED_FIELDS.includes(field)
-  );
-  
-  if (unindexedFilters.length > 0) {
-    recommendations.push({
-      type: 'UNINDEXED_FILTERS',
-      message: `Filters on unindexed fields: ${unindexedFilters.join(', ')}`,
-      impact: 'MEDIUM'
-    });
-  }
-  
-  return recommendations;
 }
 ```
 

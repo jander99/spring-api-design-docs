@@ -233,8 +233,7 @@ Level 3 ████████████ You are here (True REST!)
 
 You've reached the top! Focus on:
 - [Best Practices](best-practices.md) - Optimize your Level 3 API
-- [Case Studies](case-studies.md) - Learn from successful implementations
-- [Performance Optimization](performance.md) - Handle hypermedia efficiently
+- [Hypermedia Controls](../../advanced-patterns/hypermedia-controls.md) - Deep dive into HATEOAS patterns
 - Share your knowledge with teams at lower levels!
 
 ## 📚 Real-World Examples

@@ -105,7 +105,7 @@ Content-Type: application/problem+json
 - **Extensible** with custom properties
 - **Wide framework support** in modern web frameworks
 
-### RFC 7807 Required Fields
+### RFC 7807 Standard Fields
 
 | Field | Description | Example |
 |-------|-------------|---------|
@@ -114,6 +114,8 @@ Content-Type: application/problem+json
 | `status` | HTTP status code | `400` |
 | `detail` | Human-readable explanation | `The request contains invalid parameters` |
 | `instance` | URI reference to problem occurrence | `/v1/orders` |
+
+> **Note**: Per RFC 7807, all fields are technically optional. However, including these standard fields ensures consistent, machine-readable error responses.
 
 ### RFC 7807 Optional Extensions
 

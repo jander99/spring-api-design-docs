@@ -19,10 +19,7 @@ This guide covers the most frequent issues encountered when implementing API ver
 
 #### Immediate Actions
 1. **Identify high-usage clients**:
-   ```bash
-   # Example monitoring query
-   # Find clients with >100 requests/day to deprecated endpoints
-   ```
+   Review API analytics to find clients with significant requests to deprecated endpoints.
 
 2. **Direct outreach**:
    - Send personalized emails to high-usage clients
@@ -31,8 +28,11 @@ This guide covers the most frequent issues encountered when implementing API ver
 
 3. **Extend sunset date if necessary**:
    ```http
-   # Update sunset header
+   HTTP/1.1 200 OK
+   Content-Type: application/json
+   Deprecation: true
    Sunset: Sat, 30 Jun 2026 23:59:59 GMT
+   Link: </v2/customers>; rel="successor-version"
    ```
 
 #### Long-term Prevention
@@ -78,10 +78,7 @@ API Team
 
 #### Immediate Response
 1. **Identify the breaking change**:
-   ```bash
-   # Compare API responses before/after deployment
-   diff old_response.json new_response.json
-   ```
+   Compare API responses before and after deployment to identify differences.
 
 2. **Assess impact**:
    - Check error rates and affected client count
@@ -98,16 +95,18 @@ API Team
 // Before (breaking change)
 {
   "id": "123",
-  "status": "active"  // Changed from "status_code": 1
+  "status": "active"
 }
 
 // After (hotfix - support both formats)
 {
   "id": "123",
   "status": "active",
-  "status_code": 1  // Restored for backward compatibility
+  "status_code": 1
 }
 ```
+
+The hotfix restores the `status_code` field for backward compatibility while keeping the new `status` field.
 
 #### Prevention Strategies
 - Implement automated compatibility testing
@@ -143,7 +142,7 @@ API Team
 
 #### Fix Routing Configuration
 ```yaml
-# Example routing fix
+# Routing configuration to ensure consistent aliasing
 routes:
   - path: /customers/{id}
     redirect: /v1/customers/{id}
@@ -152,29 +151,52 @@ routes:
     handler: CustomerController.getCustomer
 ```
 
-#### Ensure Consistent Responses
-```python
-# Example controller implementation
-def get_customer(customer_id, version="v1"):
-    # Single code path for both /customers/123 and /v1/customers/123
-    return customer_service.get_customer(customer_id, version)
+#### HTTP Redirect Example
+When a client requests an unversioned endpoint, redirect to the versioned equivalent:
+
+```http
+GET /customers/123 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+
+HTTP/1.1 301 Moved Permanently
+Location: /v1/customers/123
 ```
 
 #### Add Version Information to Responses
+Include version headers so clients always know which version they received:
+
 ```http
+GET /v1/customers/123 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+
 HTTP/1.1 200 OK
+Content-Type: application/json
 X-API-Version: 1.0
 X-Actual-Endpoint: /v1/customers/123
-Content-Type: application/json
+
+{
+  "id": "123",
+  "name": "Acme Corp",
+  "email": "contact@acme.com"
+}
 ```
 
 ### Testing Strategy
-```bash
-# Test version aliasing
-curl -v /customers/123
-curl -v /v1/customers/123
-# Compare responses - should be identical
+Verify that both endpoints return identical responses:
+
+```http
+GET /customers/123 HTTP/1.1
+Host: api.example.com
+
+---
+
+GET /v1/customers/123 HTTP/1.1
+Host: api.example.com
 ```
+
+Compare responses to confirm they are identical (after following redirects).
 
 ## Problem 4: Sunset Date Conflicts
 
@@ -201,15 +223,24 @@ api_deprecations:
     migration_guide: "https://docs.example.com/migrate-v1-to-v2"
 ```
 
-#### Automated Header Generation
-```python
-# Example automatic header generation
-def add_deprecation_headers(response, version):
-    config = get_deprecation_config(version)
-    if config:
-        response.headers['Deprecation'] = 'true'
-        response.headers['Sunset'] = config['sunset_date']
-        response.headers['Link'] = f'</{config["successor_version"]}/resource>; rel="successor-version"'
+#### Consistent Deprecation Headers
+All deprecated endpoints should return consistent headers derived from the centralized configuration:
+
+```http
+GET /v1/customers HTTP/1.1
+Host: api.example.com
+Accept: application/json
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+Deprecation: true
+Sunset: Tue, 31 Dec 2024 23:59:59 GMT
+Link: </v2/customers>; rel="successor-version"
+Link: <https://docs.example.com/migrate-v1-to-v2>; rel="deprecation"
+
+{
+  "customers": [...]
+}
 ```
 
 #### Synchronize Documentation
@@ -234,42 +265,78 @@ Please migrate to {{successor_version}}.
 
 ### Solutions
 
-#### Optimize Data Layer
-```python
-# Example: Efficient version-specific data fetching
-def get_customer_data(customer_id, version):
-    base_query = "SELECT id, name, email FROM customers WHERE id = ?"
-    
-    if version == "v1":
-        # v1 only needs basic fields
-        return db.execute(base_query, customer_id)
-    elif version == "v2":
-        # v2 needs additional fields
-        extended_query = base_query.replace("email", "email, phone, address")
-        return db.execute(extended_query, customer_id)
+#### Optimize Response Payloads by Version
+Different versions may need different data. Avoid fetching unnecessary data:
+
+```http
+# v1 returns basic fields only
+GET /v1/customers/123 HTTP/1.1
+Accept: application/json
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "id": "123",
+  "name": "Acme Corp",
+  "email": "contact@acme.com"
+}
+```
+
+```http
+# v2 returns extended fields
+GET /v2/customers/123 HTTP/1.1
+Accept: application/json
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "id": "123",
+  "name": "Acme Corp",
+  "email": "contact@acme.com",
+  "phone": "+1-555-0123",
+  "address": {
+    "street": "123 Main St",
+    "city": "Springfield"
+  }
+}
 ```
 
 #### Implement Version-Specific Caching
-```python
-# Example: Version-aware caching
-def get_customer(customer_id, version):
-    cache_key = f"customer:{customer_id}:v{version}"
-    
-    cached_data = cache.get(cache_key)
-    if cached_data:
-        return cached_data
-    
-    data = fetch_customer_data(customer_id, version)
-    cache.set(cache_key, data, ttl=300)
-    return data
+Use version-aware cache keys to prevent cache pollution:
+
+```http
+# Cache key includes version
+GET /v1/customers/123 HTTP/1.1
+Accept: application/json
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+Cache-Control: max-age=300
+ETag: "v1-customer-123-abc123"
+Vary: Accept, API-Version
+
+{
+  "id": "123",
+  "name": "Acme Corp"
+}
 ```
 
 #### Monitor Version Performance
-```python
-# Example: Version-specific metrics
-def track_version_performance(version, response_time):
-    metrics.histogram(f"api.version.{version}.response_time", response_time)
-    metrics.counter(f"api.version.{version}.requests").increment()
+Track metrics separately for each API version:
+
+```yaml
+# Prometheus metrics example
+metrics:
+  - name: api_request_duration_seconds
+    labels:
+      - version: "v1"
+      - endpoint: "/customers"
+  - name: api_requests_total
+    labels:
+      - version: "v1"
+      - status: "200"
 ```
 
 ## Problem 6: Inconsistent Error Handling Across Versions
@@ -287,8 +354,18 @@ def track_version_performance(version, response_time):
 ### Solutions
 
 #### Standardize Error Response Format
-```json
-// v1 error format (maintain for compatibility)
+
+**v1 error format** (maintain for backward compatibility):
+```http
+POST /v1/customers HTTP/1.1
+Content-Type: application/json
+
+{"email": "invalid-email"}
+
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+X-API-Version: 1.0
+
 {
   "error": {
     "code": "VALIDATION_ERROR",
@@ -296,8 +373,19 @@ def track_version_performance(version, response_time):
     "version": "1.0"
   }
 }
+```
 
-// v2 error format (RFC 7807)
+**v2 error format** (RFC 7807 Problem Details):
+```http
+POST /v2/customers HTTP/1.1
+Content-Type: application/json
+
+{"email": "invalid-email"}
+
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json
+X-API-Version: 2.0
+
 {
   "type": "https://example.com/problems/validation-error",
   "title": "Validation Error",
@@ -308,33 +396,23 @@ def track_version_performance(version, response_time):
 }
 ```
 
-#### Create Error Handling Library
-```python
-# Example: Version-aware error handling
-class ErrorHandler:
-    def format_error(self, error, version):
-        if version == "v1":
-            return self._format_v1_error(error)
-        elif version == "v2":
-            return self._format_v2_error(error)
-    
-    def _format_v1_error(self, error):
-        return {
-            "error": {
-                "code": error.code,
-                "message": error.message,
-                "version": "1.0"
-            }
-        }
-    
-    def _format_v2_error(self, error):
-        return {
-            "type": f"https://example.com/problems/{error.type}",
-            "title": error.title,
-            "status": error.status,
-            "detail": error.detail,
-            "api_version": "2.0"
-        }
+#### Document Error Format per Version
+```yaml
+# OpenAPI error documentation
+components:
+  responses:
+    ValidationError_v1:
+      description: Validation error (v1 format)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorV1'
+    ValidationError_v2:
+      description: Validation error (RFC 7807)
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
 ```
 
 ## Problem 7: Documentation Inconsistencies
@@ -353,7 +431,8 @@ class ErrorHandler:
 
 #### Automate Documentation Generation
 ```yaml
-# Example: OpenAPI spec with deprecation info
+# OpenAPI spec with deprecation info
+openapi: 3.1.0
 paths:
   /v1/customers:
     get:
@@ -364,6 +443,18 @@ paths:
         Please use /v2/customers instead.
         
         Migration guide: https://docs.example.com/migrate-v1-to-v2
+      responses:
+        '200':
+          description: Success
+          headers:
+            Deprecation:
+              schema:
+                type: string
+              example: "true"
+            Sunset:
+              schema:
+                type: string
+              example: "Tue, 31 Dec 2024 23:59:59 GMT"
 ```
 
 #### Create Documentation Review Process
@@ -377,14 +468,28 @@ paths:
 - [ ] Authentication requirements current
 ```
 
-#### Implement Documentation Testing
-```python
-# Example: Test documentation examples
-def test_documentation_examples():
-    # Test all code examples in documentation
-    for example in get_documentation_examples():
-        response = make_request(example.endpoint, example.payload)
-        assert response.status_code == example.expected_status
+#### Test Documentation Examples
+Ensure all documented examples work correctly:
+
+```http
+# Test documented request
+GET /v1/customers?limit=10 HTTP/1.1
+Host: api.example.com
+Authorization: Bearer <token>
+Accept: application/json
+
+# Expected response per documentation
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "customers": [...],
+  "pagination": {
+    "limit": 10,
+    "offset": 0,
+    "total": 150
+  }
+}
 ```
 
 ## Problem 8: Client Library Version Conflicts
@@ -403,10 +508,9 @@ def test_documentation_examples():
 
 #### Follow Semantic Versioning for Client Libraries
 ```json
-// package.json example
 {
   "name": "api-client",
-  "version": "2.1.0",  // Major.Minor.Patch
+  "version": "2.1.0",
   "description": "Client library for API v2",
   "peerDependencies": {
     "api-types": "^2.0.0"
@@ -427,30 +531,36 @@ api-client-v2@2.1.0  // For API v2
 ## Upgrading from v1 to v2
 
 ### Installation
-```bash
-npm uninstall api-client-v1
-npm install api-client-v2
+Replace the v1 client with v2:
+- Remove: api-client-v1
+- Install: api-client-v2
+
+### Endpoint Changes
+| v1 Endpoint | v2 Endpoint | Notes |
+|-------------|-------------|-------|
+| GET /v1/customers | GET /v2/customers | Response format changed |
+| POST /v1/orders | POST /v2/orders | New required field: `currency` |
+
+### Request/Response Examples
+
+**v1 Request:**
+```http
+GET /v1/customers HTTP/1.1
+Authorization: Bearer <token>
 ```
 
-### Code Changes
-```javascript
-// v1 client
-const client = new ApiClient({ version: 'v1' });
-const customers = await client.customers.list();
-
-// v2 client
-const client = new ApiClient({ version: 'v2' });
-const customers = await client.customers.list();
+**v2 Request:**
+```http
+GET /v2/customers HTTP/1.1
+Authorization: Bearer <token>
+API-Version: 2024-01-15
+```
 ```
 
 ## Prevention Strategies
 
 ### 1. Automated Testing
-```bash
-# Run compatibility tests before deployment
-npm run test:compatibility
-npm run test:version-matrix
-```
+Run compatibility tests before deployment to verify backward compatibility.
 
 ### 2. Monitoring and Alerting
 ```yaml

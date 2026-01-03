@@ -51,22 +51,50 @@ tc qdisc add dev eth0 root tbf rate 1mbit burst 32kbit latency 400ms
 
 ## Client Behavior Testing
 
-### Browser Testing
-```javascript
-// Test EventSource reconnection
-const eventSource = new EventSource('/v1/orders/events');
-let reconnectCount = 0;
+### SSE Reconnection Testing
+```bash
+# Test SSE endpoint connectivity and reconnection behavior
+curl -N -H "Accept: text/event-stream" \
+     http://localhost:8080/v1/orders/events
 
-eventSource.addEventListener('error', function(event) {
-  if (eventSource.readyState === EventSource.CLOSED) {
-    reconnectCount++;
-    console.log(`Reconnection attempt ${reconnectCount}`);
-    
-    setTimeout(() => {
-      // Reconnect logic
-    }, 5000);
-  }
-});
+# Expected initial response:
+# HTTP/1.1 200 OK
+# Content-Type: text/event-stream
+# Cache-Control: no-cache
+# Connection: keep-alive
+#
+# event: connected
+# data: {"status": "ready"}
+#
+# event: order
+# data: {"id": 1, "status": "created"}
+```
+
+```bash
+# Test reconnection with Last-Event-ID header
+# (simulates client reconnecting after disconnect)
+curl -N -H "Accept: text/event-stream" \
+     -H "Last-Event-ID: 42" \
+     http://localhost:8080/v1/orders/events
+
+# Expected response resumes from event 43:
+# HTTP/1.1 200 OK
+# Content-Type: text/event-stream
+#
+# id: 43
+# event: order
+# data: {"id": 43, "status": "updated"}
+```
+
+```bash
+# Test retry directive from server
+curl -N -H "Accept: text/event-stream" \
+     http://localhost:8080/v1/orders/events
+
+# Server should send retry interval:
+# retry: 5000
+# event: connected
+# data: {"status": "ready"}
 ```
 
 ### Different Client Patterns
@@ -100,40 +128,79 @@ netstat -an | grep :8080 | grep ESTABLISHED | wc -l
 
 ## Automated Testing
 
-### Unit Tests
-```javascript
-// Test streaming response parsing
-test('should parse NDJSON stream', () => {
-  const stream = '{"id":1}\n{"id":2}\n{"id":3}\n';
-  const lines = stream.split('\n').filter(line => line.trim());
-  const objects = lines.map(line => JSON.parse(line));
-  
-  expect(objects).toHaveLength(3);
-  expect(objects[0].id).toBe(1);
-});
+### NDJSON Format Validation Tests
+```bash
+# Test NDJSON stream format compliance
+curl -s -H "Accept: application/x-ndjson" \
+     http://localhost:8080/v1/orders/stream | head -5
+
+# Expected response - each line is valid JSON:
+# {"id":1,"status":"created","timestamp":"2024-01-15T10:00:00Z"}
+# {"id":2,"status":"processing","timestamp":"2024-01-15T10:00:01Z"}
+# {"id":3,"status":"completed","timestamp":"2024-01-15T10:00:02Z"}
 ```
 
-### Integration Tests
-```javascript
-// Test end-to-end streaming
-test('should stream orders', async () => {
-  const response = await fetch('/v1/orders/stream', {
-    headers: { 'Accept': 'application/x-ndjson' }
-  });
-  
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  
-  let result = '';
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    result += decoder.decode(value);
-  }
-  
-  const lines = result.split('\n').filter(line => line.trim());
-  expect(lines.length).toBeGreaterThan(0);
-});
+```bash
+# Validate each line is parseable JSON
+curl -s -H "Accept: application/x-ndjson" \
+     http://localhost:8080/v1/orders/stream | \
+     head -10 | while read line; do
+       echo "$line" | jq . > /dev/null 2>&1 && \
+         echo "PASS: Valid JSON" || \
+         echo "FAIL: Invalid JSON - $line"
+     done
+
+# Expected output:
+# PASS: Valid JSON
+# PASS: Valid JSON
+# PASS: Valid JSON
+```
+
+### End-to-End Streaming Tests
+```bash
+# Test complete NDJSON stream with timeout
+timeout 10 curl -s -H "Accept: application/x-ndjson" \
+     http://localhost:8080/v1/orders/stream > /tmp/stream_output.txt
+
+# Verify response contains data
+wc -l /tmp/stream_output.txt
+# Expected: at least 1 line of output
+
+# Validate response headers
+curl -s -I -H "Accept: application/x-ndjson" \
+     http://localhost:8080/v1/orders/stream
+
+# Expected headers:
+# HTTP/1.1 200 OK
+# Content-Type: application/x-ndjson
+# Transfer-Encoding: chunked
+```
+
+```bash
+# Test SSE stream end-to-end
+timeout 10 curl -N -H "Accept: text/event-stream" \
+     http://localhost:8080/v1/orders/events 2>&1 | \
+     grep -E "^(event:|data:|id:)" | head -10
+
+# Expected output format:
+# event: connected
+# data: {"status":"ready"}
+# id: 1
+# event: order
+# data: {"id":1,"status":"created"}
+```
+
+```bash
+# Test stream with authentication
+curl -s -H "Accept: application/x-ndjson" \
+     -H "Authorization: Bearer <token>" \
+     http://localhost:8080/v1/orders/stream | head -3
+
+# Without valid token, expect:
+# HTTP/1.1 401 Unauthorized
+# Content-Type: application/problem+json
+#
+# {"type":"about:blank","title":"Unauthorized","status":401}
 ```
 
 ## Performance Benchmarking
