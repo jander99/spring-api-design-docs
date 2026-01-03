@@ -2,24 +2,45 @@
 
 > **📖 Reading Guide**
 > 
-> **⏱️ Reading Time:** 6 minutes | **🔴 Level:** Advanced
+> **⏱️ Reading Time:** 6 minutes | **🟡 Level:** Intermediate
 > 
-> **📋 Prerequisites:** Strong API background, experience with complex systems  
-> **🎯 Key Topics:** Architecture, Data
+> **📋 Prerequisites:** Basic REST API knowledge  
+> **🎯 Key Topics:** Data, Architecture
 > 
-> **📊 Complexity:** 15.6 grade level • 1.6% technical density • difficult
+> **📊 Complexity:** 11.2 grade level • 1.4% technical density • fairly difficult
 
 ## Overview
 
-Consistent resource naming and URL structure are fundamental to creating intuitive, maintainable APIs across our microservices ecosystem. This document establishes standards for designing RESTful and Reactive API endpoints with predictable patterns that enhance discoverability and usability.
+Good URLs make APIs easy to understand and use. This guide shows how to design clear, consistent API endpoints. You'll learn standards for naming resources and organizing URLs.
+
+## Quick Examples
+
+Here's what good API design looks like:
+
+```
+GET /customers                      - List all customers
+GET /customers/12345                - Get one customer
+POST /customers                     - Create a customer
+PATCH /customers/12345              - Update a customer
+DELETE /customers/12345             - Delete a customer
+
+GET /orders?customerId=12345        - List customer's orders
+POST /orders/{orderId}/cancel       - Cancel an order
+```
+
+Notice:
+- Resources use plural nouns (`/customers`, not `/customer`)
+- HTTP verbs describe the action (GET, POST, PATCH, DELETE)
+- IDs go in the URL path (`/customers/12345`)
+- Filters use query parameters (`?customerId=12345`)
 
 ## Core Principles
 
-1. **Resources as Nouns**: APIs represent resources (entities or concepts), not actions or operations
-2. **HTTP Verbs for Operations**: Use standard HTTP methods to perform operations on resources
-3. **Hierarchical Organization**: Resources should reflect natural domain hierarchies
-4. **Consistency**: Apply the same patterns across all microservices
-5. **Semantic Clarity**: Resource names and paths should be self-explanatory
+1. **Resources as Nouns**: APIs represent things, not actions
+2. **HTTP Verbs for Operations**: Use HTTP methods for operations
+3. **Hierarchical Organization**: Resources reflect domain hierarchies
+4. **Consistency**: Apply the same patterns everywhere
+5. **Semantic Clarity**: Names and paths should be clear
 
 ## URL Design Patterns
 
@@ -27,12 +48,12 @@ Consistent resource naming and URL structure are fundamental to creating intuiti
 
 | Pattern | Example | Description |
 |---------|---------|-------------|
-| Use nouns for resources | `/orders`, `/customers` | Resources represent entities, not actions |
-| Use plural for collections | `/orders` | Endpoints returning multiple resources use plural nouns |
-| Use consistent plural resources | `/orders/{orderId}` | All resource endpoints use plural nouns for consistency |
-| Use kebab-case for multi-word resources | `/shipping-addresses` | Multi-word resource names should use kebab-case |
-| Use lowercase letters | `/orders` not `/Orders` | All URL paths should use lowercase letters |
-| Use descriptive identifiers | `/orders/12345` not `/orders/id/12345` | Avoid redundant path segments |
+| Use nouns for resources | `/orders`, `/customers` | Resources are things, not actions |
+| Use plural for collections | `/orders` | Endpoints returning many items use plural nouns |
+| Use consistent plural resources | `/orders/{orderId}` | All endpoints use plural nouns |
+| Use kebab-case for multi-word resources | `/shipping-addresses` | Multi-word names use kebab-case |
+| Use lowercase letters | `/orders` not `/Orders` | All URL paths use lowercase |
+| Use descriptive identifiers | `/orders/12345` not `/orders/id/12345` | Avoid redundant segments |
 
 ### HTTP Verbs Usage
 
@@ -46,29 +67,29 @@ Consistent resource naming and URL structure are fundamental to creating intuiti
 
 ### Important Distinction
 
-A key distinction in our API convention is the semantic difference between collection and specific resource endpoints:
+Collection endpoints and single resource endpoints serve different purposes:
 
-- **Plural Endpoint (`/orders`)**: 
-  - Represents a collection resource
-  - Returns a collection of resources (array/list)
-  - Used for collection operations
+**Plural Endpoint (`/orders`):**
+- Represents a collection of resources
+- Returns an array or list
+- Used for operations on multiple items
 
-- **Specific Resource (`/orders/{orderId}`)**: 
-  - Represents a specific resource instance
-  - Returns a single resource object
-  - Used for instance operations
+**Specific Resource (`/orders/{orderId}`):**
+- Represents one resource instance
+- Returns a single object
+- Used for operations on one item
 
-This is not merely a "folder" structure - the distinction carries semantic meaning about the return type and operation scope.
+This distinction affects what data you get back. It's not just about URL structure.
 
 ## Resource Hierarchy
 
 ### Parent-Child Relationships and Domain Boundaries
 
-When expressing relationships between resources, consider the domain boundaries and aggregate roots according to Domain Driven Design principles:
+How should you organize related resources? Consider your domain model and business boundaries.
 
 #### Primary Domain Resources
 
-Resources that represent aggregate roots or important domain concepts should have direct top-level endpoints:
+Important domain concepts get top-level endpoints:
 
 ```
 /employees
@@ -79,34 +100,34 @@ Resources that represent aggregate roots or important domain concepts should hav
 
 #### Relationships Through Query Parameters
 
-For filtering resources based on relationships, prefer query parameters when the requested resource is the primary focus:
+Use query parameters to filter by relationships. This works when you focus on the main resource:
 
 ```
-/employees?departmentId={departmentId}    // Preferred over /departments/{departmentId}/employees
-/orders?customerId={customerId}           // Preferred over /customers/{customerId}/orders when the focus is on orders
+/employees?departmentId={departmentId}    // Preferred
+/orders?customerId={customerId}           // Better than /customers/{customerId}/orders
 ```
 
-This approach respects domain boundaries and keeps the focus on the primary resource being queried.
+Query parameters keep the focus on what you're querying. They also respect domain boundaries.
 
 #### When to Use Nested Paths
 
-Use nested paths only when:
-1. The relationship represents a true parent-child ownership
-2. The child cannot exist independently of the parent
-3. The child is an integral part of the parent's domain
+Nested paths work best for true parent-child relationships. Use them when:
+1. The child cannot exist without the parent
+2. The child is owned by the parent
+3. The child is part of the parent's domain
 
-Example of appropriate nesting:
+Examples:
 ```
-/orders/{orderId}/items              // Order items typically don't exist outside an order
-/products/{productId}/variants       // Product variants are part of a product
+/orders/{orderId}/items              // Items belong to orders
+/products/{productId}/variants       // Variants belong to products
 ```
 
 Guidelines:
 
-1. Limit hierarchy depth to 2 levels to maintain readability
-2. Always provide top-level endpoints for domain aggregate roots
-3. Use query parameters for filtering by related entities
-4. Consider the bounded context when designing resource paths
+1. Keep nesting to 2 levels maximum
+2. Give aggregate roots their own top-level endpoints
+3. Use query parameters for filters
+4. Think about bounded contexts when designing paths
 
 ### Alternative Access Paths
 
@@ -138,11 +159,11 @@ All collection endpoints should support pagination with these parameters:
 /orders?page=0&size=20
 ```
 
-Default values if not specified:
+Default values:
 - `page`: 0 (first page)
 - `size`: 20 items
 
-These default values should be applied automatically if the client does not provide pagination parameters. All APIs must implement these defaults consistently across microservices.
+Apply these defaults when clients don't provide pagination. Use these values consistently across all services.
 
 ### Sorting Parameters
 
@@ -160,9 +181,9 @@ Resource-specific filters should use intuitive parameter names:
 /orders?status=PROCESSING&createdAfter=2024-01-01
 ```
 
-For more complex filtering, consider these approaches:
-1. Multiple specific parameters (preferred for common filters)
-2. A structured query language parameter for advanced cases
+For complex filtering:
+1. Use multiple specific parameters for common filters
+2. Use a query language parameter for advanced cases
 
 ## Special Endpoints
 
@@ -194,17 +215,17 @@ Use the verb after the resource, prefixed with an appropriate HTTP method.
 |--------------|---------|-------------------|
 | Verbs in URLs | `/getOrders` | `GET /orders` |
 | Operation names in URLs | `/orders/findByCustomer` | `GET /orders?customerId=123` |
-| Inconsistent pluralization | Mix of `/order` and `/customers/{id}` | Consistent use of singular for single resources, plural for collections |
-| Deep nesting | `/customers/{id}/accounts/{id}/transactions/{id}/details` | Limit nesting depth, provide alternative access paths |
+| Inconsistent pluralization | Mix of `/order` and `/customers/{id}` | Use plural consistently |
+| Deep nesting | `/customers/{id}/accounts/{id}/transactions/{id}/details` | Limit nesting depth to 2 levels |
 | Non-resource endpoints | `/generateReport` | `POST /reports` with appropriate request body |
 
 ## Special Considerations for Streaming APIs
 
-When designing endpoints that support streaming or real-time data:
+Design streaming endpoints with these considerations:
 
-1. **Collection endpoints**: Consider providing both complete and streaming variants
-2. **Streaming protocols**: Use appropriate content types and HTTP methods
-3. **Backpressure handling**: Document expected client behavior for flow control
+1. **Collection endpoints**: Provide both complete and streaming variants
+2. **Streaming protocols**: Use the right content types and HTTP methods
+3. **Backpressure handling**: Document how clients should handle flow control
 
 Example URL patterns:
 ```
@@ -250,14 +271,14 @@ GET /orders/{orderId}               - Get a specific order
 POST /orders/{orderId}/cancel       - Cancel an order (action)
 ```
 
-These examples demonstrate the consistent application of the principles outlined in this guide.
+These examples show the principles from this guide in action.
 
 ## Implementation Notes
 
 When implementing these URL structures:
 
-- **REST framework compatibility**: These patterns work with any REST framework
-- **HTTP method semantics**: Follow standard HTTP method definitions regardless of implementation technology
-- **Error handling**: Use appropriate HTTP status codes and RFC 7807 Problem Details format
+- **REST framework compatibility**: These patterns work with any framework
+- **HTTP method semantics**: Follow standard HTTP method definitions
+- **Error handling**: Use HTTP status codes and RFC 7807 format
 
-The principles outlined here are based on REST architectural constraints and HTTP standards, making them universally applicable.
+These principles apply to any REST API. They follow HTTP standards and REST architecture.

@@ -2,100 +2,100 @@
 
 > **📖 Reading Guide**
 > 
-> **⏱️ Reading Time:** 3 minutes | **🔴 Level:** Advanced
+> **⏱️ Reading Time:** 2 minutes | **🟢 Level:** Beginner
 > 
-> **📋 Prerequisites:** Strong API background, experience with complex systems  
-> **🎯 Key Topics:** Authentication, REST, Architecture
+> **📋 Prerequisites:** Basic HTTP knowledge  
+> **🎯 Key Topics:** REST, JSON, HTTP
 > 
-> **📊 Complexity:** 18.1 grade level • 2.8% technical density • very difficult
+> **📊 Complexity:** 11.6 grade level • 2.7% technical density • fairly difficult
 
-This section shows how to format API requests and responses. These guides work with any technology and help keep your APIs consistent.
+Format API requests and responses. Use these guides with any technology. Keep APIs consistent.
 
 ## Overview
 
-Good request and response formats make APIs easy to use. These standards show how to structure data in your APIs, covering content types, error handling, and collections.
+Good formats make APIs easy. They help users. Structure data well. We cover content types. We cover errors. We cover collections.
 
 ## Documentation Structure
 
 ### 📄 [Content Types and Structure](content-types-and-structure.md)
-**How to structure API requests and responses**
-- Standard content types and alternatives
-- How to validate requests
+**Structure requests and responses**
+- Content types
+- Validation
 - Response structure
-- HATEOAS link patterns
-- How to handle empty fields
+- HATEOAS links
+- Empty fields
 
 ### 🔤 [Schema Conventions](schema-conventions.md)
-**JSON field naming and data format standards**
-- Field naming conventions (camelCase, snake_case)
-- Date and time format standards
-- Null handling strategies
-- Enum representation patterns
-- Boolean and numeric conventions
+**JSON field names and formats**
+- Field naming
+- Date formats
+- Null handling
+- Enum patterns
+- Number formats
 
 ### 🔄 [Content Negotiation](content-negotiation.md)
-**Media type selection and content negotiation patterns**
-- Accept header handling
-- Media type versioning
-- Language negotiation
-- Character encoding selection
-- Compression negotiation
+**Select media types**
+- Accept headers
+- Type versions
+- Language
+- Encoding
+- Compression
 
 ### ❌ [Error Response Standards](error-response-standards.md)
-**How to handle errors properly**
-- HTTP status codes
-- Standardized error response formats
-- RFC 7807 Problem Details implementation
-- Error code naming conventions
-- Framework-agnostic error handling patterns
+**Handle errors**
+- Status codes
+- Error formats
+- RFC 7807
+- Code names
+- Error patterns
 
 ### 📊 [Pagination and Filtering](pagination-and-filtering.md)
-**Collection response patterns for lists and search results**
-- Pagination response structures
-- Filtering and search patterns
-- Sorting criteria standards
-- Advanced query capabilities
-- Performance optimization guidelines
+**Collection responses**
+- Pagination
+- Filtering
+- Sorting
+- Queries
+- Performance
 
 ### 🔧 [Advanced Schema Design](advanced-schema-design.md)
-**Advanced patterns for complex schema design and evolution**
-- JSON Schema composition (allOf, anyOf, oneOf, not)
-- Reusable schema definitions with $defs and $ref
-- OpenAPI schema organization and polymorphism
-- Schema evolution and versioning strategies
-- Backward compatibility patterns
-- Schema validation best practices
+**Complex schemas**
+- Schema composition
+- Reusable parts
+- OpenAPI setup
+- Schema changes
+- Compatibility
+- Validation
 
 ### 🌊 [Streaming APIs](streaming-apis.md)
-**Streaming response formats for real-time and bulk data**
-- NDJSON streaming patterns
-- Server-Sent Events (SSE) implementation
-- Flow control and backpressure handling
-- Streaming error management
-- Performance considerations for large datasets
+**Streaming responses**
+- NDJSON streaming
+- Server-Sent Events
+- Flow control
+- Error handling
+- Performance
 
-## Key Design Principles
+## Design Principles
 
-### Framework Agnostic
-All patterns are based on HTTP and JSON standards, working with any REST framework.
+### Any Framework
+Use with any REST framework. Based on HTTP and JSON.
 
-### Consistency First
-- Standardized field naming conventions
-- Consistent metadata structures
-- Uniform error response formats
-- Predictable pagination patterns
+### Be Consistent
+- Same field names
+- Same metadata
+- Same error format
+- Same pagination
 
 ### Modern Standards
-- RFC 7807 Problem Details for errors
-- JSON Schema for validation
-- HTTP streaming protocols
-- OAuth 2.1/OIDC security integration
+- RFC 7807 for errors
+- JSON Schema
+- HTTP streaming
+- OAuth 2.1
 
-### Developer Experience
-- Clear documentation with examples
-- Comprehensive error messages
-- Intuitive API contracts
-- Excellent debugging capabilities
+### Good Experience
+- Clear examples
+- Helpful errors
+- Simple contracts
+- Easy debugging
 
 ## Common Patterns
 
@@ -143,69 +143,70 @@ All patterns are based on HTTP and JSON standards, working with any REST framewo
 
 ### Content Types
 - **Default**: `application/json`
-- **Errors**: `application/problem+json` (RFC 7807)
+- **Errors**: `application/problem+json`
 - **Streaming**: `application/x-ndjson`, `text/event-stream`
 - **Files**: `multipart/form-data`, `application/octet-stream`
 
-### Schema Conventions
-- **Field Naming**: camelCase for JSON fields
-- **Dates**: ISO 8601 format (`YYYY-MM-DDTHH:mm:ssZ`)
-- **Nulls**: Omit null fields from responses
-- **Enums**: String values in UPPER_SNAKE_CASE
-- **Booleans**: Use `true`/`false`, never `1`/`0`
+### Schema Rules
+- **Field Names**: Use camelCase
+- **Dates**: Use ISO 8601
+- **Nulls**: Omit null fields
+- **Enums**: Use UPPER_SNAKE_CASE
+- **Booleans**: Use `true` or `false`
 
 ### HTTP Status Codes
-- **200**: Success with response body
-- **201**: Resource created
-- **400**: Client error (validation, format)
-- **401**: Authentication required
-- **403**: Authorization denied
-- **404**: Resource not found
-- **422**: Business validation error
+- **200**: Success
+- **201**: Created
+- **400**: Bad request
+- **401**: Not authenticated
+- **403**: Not authorized
+- **404**: Not found
+- **422**: Validation error
 - **500**: Server error
 
 ### Pagination Parameters
-- `page`: Page number (0-indexed)
-- `size`: Items per page (default: 20)
-- `sort`: Sorting criteria (`field,direction`)
+- `page`: Page number
+- `size`: Items per page
+- `sort`: Sort order
 
-## Implementation Notes
+## Implementation
 
-### Validation Integration
-Modern APIs should integrate validation with RFC 7807 Problem Details:
-- JSON Schema validation
-- Standard validation patterns
-- Consistent error response formats
+### Validation
+Use validation with RFC 7807:
+- Use JSON Schema
+- Use standard patterns
+- Use same formats
 
-### Security Considerations
-- OAuth 2.1/OIDC token validation
-- Proper HTTP security headers
-- Request payload size limits
-- Rate limiting implementation
+### Security
+- Validate OAuth tokens
+- Use security headers
+- Limit request size
+- Use rate limiting
 
-### Performance Optimization
-- Efficient pagination strategies
-- Database index optimization
-- Streaming for large datasets
-- Proper HTTP caching headers
+### Performance
+- Use good pagination
+- Optimize indexes
+- Stream large data
+- Use caching
 
-## Framework Integration
+## Framework Use
 
-These standards are framework-agnostic and can be implemented using any REST framework's standard features.
+Works with any REST framework. Uses standard features.
 
-## Related Documentation
+## Related Docs
 
-- **[API Design Standards](../)**: Complete API design documentation
-- **[Spring Design Standards](../../../languages/spring/)**: Spring Boot-specific implementation patterns
-- **[Security Standards](../security/security-standards.md)**: Security implementation standards
-- **[API Version Strategy](../foundations/api-version-strategy.md)**: Versioning strategies and patterns
+- **[API Design Standards](../)**: Full API design
+- **[Spring Design Standards](../../../languages/spring/)**: Spring Boot
+- **[Security Standards](../security/security-standards.md)**: Security
+- **[API Version Strategy](../foundations/api-version-strategy.md)**: Versioning
 
-## Usage Examples
+## Examples
 
-Each document includes comprehensive examples showing:
-- Complete HTTP request/response examples
-- Error scenario handling
-- Edge case management
-- Framework integration patterns
+Each document has examples:
+- HTTP requests
+- HTTP responses
+- Error handling
+- Edge cases
+- Framework use
 
-These standards ensure consistent, predictable interaction patterns across all APIs in our ecosystem, supporting both traditional REST APIs and modern streaming services.
+These standards create consistent APIs. They work for REST and streaming.

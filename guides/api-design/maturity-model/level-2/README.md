@@ -1,17 +1,26 @@
 # Level 2: HTTP Verbs
 
+> **📖 Reading Guide**
+> 
+> **⏱️ Reading Time:** 4 minutes | **🟢 Level:** Intermediate
+> 
+> **📋 Prerequisites:** Basic API knowledge, HTTP understanding  
+> **🎯 Key Topics:** HTTP Methods, Status Codes, REST
+> 
+> **📊 Complexity:** 11.9 grade level • 2.3% technical density • fairly difficult
+
 ## 📍 You Are Here - Industry Standard!
 
-Congratulations! Your API has reached Level 2 of the Richardson Maturity Model. This is where most successful REST APIs operate.
+Congratulations! Your API reached Level 2. This is the industry standard. Most successful REST APIs operate here.
 
 ## What This Means
 
-### Characteristics of Level 2 APIs:
-- **Proper HTTP methods** (GET, POST, PUT, DELETE)
-- **Correct status codes** (200, 201, 404, etc.)
-- **Resource-based URLs** with appropriate verbs
-- **Stateless interactions**
-- **Standard error responses**
+### Level 2 API Features:
+- **HTTP methods**: Uses GET, POST, PUT, DELETE correctly
+- **Status codes**: Returns 200, 201, 404 based on results
+- **Resource URLs**: Uses nouns with verbs
+- **Stateless**: Each request is independent
+- **Error responses**: Uses consistent formats
 
 ### Typical Level 2 Requests:
 ```
@@ -23,27 +32,27 @@ DELETE /users/123         → Delete user
 
 ## 🎯 Current State Checklist
 
-Your API now properly uses:
+Your API now uses:
 
-- [x] **GET** for safe, idempotent reads
-- [x] **POST** for creating new resources
+- [x] **GET** for safe reads
+- [x] **POST** for creating resources
 - [x] **PUT/PATCH** for updates
 - [x] **DELETE** for removal
-- [x] **Meaningful status codes** (not just 200)
-- [x] **Resource URLs** without actions
-- [x] **Stateless requests** (no sessions)
+- [x] **Status codes** beyond 200
+- [x] **Resource URLs** without verbs
+- [x] **Stateless requests**
 - [x] **Standard error formats**
-- [x] **HTTP headers** appropriately
+- [x] **HTTP headers** correctly
 
-## 💡 What You've Achieved:
-- ✅ Industry-standard REST API
-- ✅ Full HTTP protocol utilization
+## 💡 What You Achieved:
+- ✅ Industry standard REST API
+- ✅ Uses full HTTP protocol
 - ✅ Cacheable GET requests
-- ✅ Clear operation semantics
-- ✅ Standard tooling compatibility
+- ✅ Clear operations
+- ✅ Works with tools
 - ✅ Predictable behavior
 
-## 🌟 Level 2 Best Practices You Follow:
+## 🌟 Level 2 Best Practices
 
 ### Proper Method Usage:
 ```bash
@@ -68,88 +77,88 @@ PUT /products/123                    # Full replacement
 DELETE /products/123                 # Returns 204 No Content
 ```
 
-### Status Code Mastery:
-| Code | Meaning | When You Use It |
-|------|---------|-----------------|
-| 200 | OK | Successful GET, PUT |
-| 201 | Created | Successful POST |
-| 204 | No Content | Successful DELETE |
-| 400 | Bad Request | Invalid input |
-| 401 | Unauthorized | Missing auth |
-| 403 | Forbidden | No permission |
-| 404 | Not Found | Resource missing |
-| 409 | Conflict | Business rule violation |
-| 500 | Server Error | System failure |
+### Status Code Guide:
+| Code | Meaning | When to Use |
+|------|---------|-------------|
+| 200 | OK | GET or PUT works |
+| 201 | Created | POST works |
+| 204 | No Content | DELETE works |
+| 400 | Bad Request | Bad input |
+| 401 | Unauthorized | No auth |
+| 403 | Forbidden | No access |
+| 404 | Not Found | Resource gone |
+| 409 | Conflict | Rule broken |
+| 500 | Server Error | System fails |
 
 ## 📊 Your API Patterns
 
 ### Collection Operations:
 ```
-GET    /orders              → List orders (200)
+GET    /orders              → List all orders (200)
 POST   /orders              → Create order (201)
-GET    /orders?status=pending → Filtered list (200)
+GET    /orders?status=pending → Filter orders (200)
 ```
 
-### Individual Resource:
+### Single Resource:
 ```
-GET    /orders/123          → Get specific order (200/404)
-PUT    /orders/123          → Update order (200/404)
-DELETE /orders/123          → Cancel order (204/404)
+GET    /orders/123          → Get one order (200 or 404)
+PUT    /orders/123          → Update order (200 or 404)
+DELETE /orders/123          → Cancel order (204 or 404)
 ```
 
 ### Nested Resources:
 ```
-GET    /orders/123/items    → Order items (200)
+GET    /orders/123/items    → Get order items (200)
 POST   /orders/123/items    → Add item (201)
 DELETE /orders/123/items/1  → Remove item (204)
 ```
 
-## 🎉 What's Working Great
+## 🎉 What Works Great
 
-1. **Caching**: CDNs and browsers cache GET requests
-2. **Security**: Method-based authorization rules
-3. **Monitoring**: Clear metrics per operation type
-4. **Documentation**: Standard tools understand your API
-5. **Testing**: Predictable request/response patterns
+1. **Caching**: CDNs cache GET requests
+2. **Security**: Set rules by method
+3. **Monitoring**: Track each operation
+4. **Documentation**: Tools read your API
+5. **Testing**: Clear request patterns
 
 ## 🤔 Should You Go to Level 3?
 
-### Consider Level 3 If:
-- Building a public API
-- Need client flexibility
-- Long-term API evolution
-- Complex state transitions
-- Multiple client types
+### Consider Level 3 If You:
+- Build a public API
+- Need flexible clients
+- Plan long-term changes
+- Have complex workflows
+- Support many client types
 
-### Stay at Level 2 If:
-- Internal microservices
-- Simple CRUD operations
-- Performance is critical
-- Team REST experience limited
-- Rapid development needed
+### Stay at Level 2 If You:
+- Build internal services
+- Use simple CRUD
+- Need top performance
+- Have a new REST team
+- Need fast development
 
 ## 📈 Optional Enhancements at Level 2
 
-### Already Doing:
-- ✅ Proper HTTP methods
-- ✅ Correct status codes
-- ✅ Resource-based design
+### You Already Do:
+- ✅ Use HTTP methods correctly
+- ✅ Send correct status codes
+- ✅ Design with resources
 
 ### Consider Adding:
-- [ ] Content negotiation (Accept headers)
+- [ ] Content negotiation with Accept headers
 - [ ] ETags for caching
-- [ ] Rate limiting headers
-- [ ] CORS properly configured
-- [ ] Pagination standards
-- [ ] Consistent error format (RFC 7807)
+- [ ] Rate limit headers
+- [ ] CORS setup
+- [ ] Standard pagination
+- [ ] RFC 7807 errors
 
 ## 🚀 If You Want Level 3
 
-Level 3 adds hypermedia controls (HATEOAS). This means:
-- Responses include links
-- Clients discover capabilities
-- API self-documenting
-- True REST as defined by Fielding
+Level 3 adds hypermedia controls. This is called HATEOAS. HATEOAS means "Hypermedia as the Engine of Application State." With HATEOAS:
+- Responses include action links
+- Clients discover available actions
+- API documents itself
+- You get true REST as Roy Fielding defined it
 
 [→ **Explore Level 3 Benefits**](next-steps.md)
 
@@ -162,38 +171,38 @@ Level 2 ████████████ You are here (Industry Standard!)
 Level 3 ░░░░ Optional enhancement
 ```
 
-**You've achieved what 80% of successful APIs use!** Level 2 provides excellent balance between complexity and functionality.
+**You achieved what 80% of successful APIs use!** Level 2 balances complexity and features well.
 
 ## 🔍 Validate Your Implementation
 
-Use our checklist to ensure full Level 2 compliance:
+Use this checklist for full Level 2 compliance:
 
 ### HTTP Methods:
-- [ ] GET never modifies data
-- [ ] POST creates new resources
-- [ ] PUT replaces entire resource
-- [ ] PATCH updates partially (optional)
+- [ ] GET reads data only
+- [ ] POST creates resources
+- [ ] PUT replaces whole resource
+- [ ] PATCH updates parts (optional)
 - [ ] DELETE removes resources
 
 ### Status Codes:
-- [ ] Success codes vary by operation
-- [ ] Client errors use 4xx codes
-- [ ] Server errors use 5xx codes
-- [ ] Never return 200 for errors
+- [ ] Success codes match operations
+- [ ] Client errors use 4xx
+- [ ] Server errors use 5xx
+- [ ] Errors never return 200
 
 ### Resources:
-- [ ] URLs are nouns, not verbs
-- [ ] Collections are plural
-- [ ] Nesting represents relationships
-- [ ] Query parameters for filtering
+- [ ] URLs use nouns, not verbs
+- [ ] Collections use plural names
+- [ ] Nesting shows relationships
+- [ ] Query strings filter results
 
-## 🎯 You've Made It!
+## 🎯 You Made It!
 
-Level 2 is a fantastic place to be. Your API is:
+Level 2 is a great place to be. Your API is:
 - **Standard compliant**
 - **Well understood**
 - **Tool friendly**
-- **Performance optimized**
+- **Fast and efficient**
 - **Enterprise ready**
 
-Whether you stay here or explore Level 3, you've built a solid REST API!
+You built a solid REST API. Stay here or explore Level 3!
