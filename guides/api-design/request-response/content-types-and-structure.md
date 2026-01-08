@@ -36,7 +36,7 @@ When supporting alternative content types, follow these guidelines:
 | `multipart/form-data` | File uploads | Document part specifications clearly |
 | `application/x-ndjson` | Streaming JSON data | Newline-delimited JSON for streaming APIs |
 | `text/event-stream` | Server-Sent Events | For real-time data streaming |
-| `application/problem+json` | RFC 7807 Problem Details | Modern error response format |
+| `application/problem+json` | RFC 9457 Problem Details | Modern error response format |
 
 ## Request Payload Structure
 
@@ -95,7 +95,7 @@ Implement consistent validation across all APIs:
 }
 ```
 
-**Validation Response Integration**: Modern APIs should return RFC 7807 Problem Details format for validation errors. See [Error Response Standards](error-response-standards.md) for detailed error handling patterns.
+**Validation Response Integration**: Modern APIs should return RFC 9457 Problem Details format for validation errors. See [Error Response Standards](error-response-standards.md) for detailed error handling patterns.
 
 ### Bulk Operations
 
@@ -207,14 +207,14 @@ Response:
 
 When implementing these request/response formats:
 
-- **Validation**: Use JSON Schema validation or standard validation patterns that produce RFC 7807 responses
+- **Validation**: Use JSON Schema validation or standard validation patterns that produce RFC 9457 responses
 - **Content negotiation**: Implement proper Accept header handling for different response formats
 
 These patterns are based on HTTP and JSON standards and work with any REST framework.
 
 ## Related Documentation
 
-- [Error Response Standards](error-response-standards.md) - Error handling and RFC 7807 Problem Details
+- [Error Response Standards](error-response-standards.md) - Error handling and RFC 9457 Problem Details
 - [Pagination and Filtering](pagination-and-filtering.md) - Collection response patterns
 - [Streaming APIs](streaming-apis.md) - Streaming response formats
 - [Advanced Schema Design](advanced-schema-design.md) - Schema composition and evolution strategies

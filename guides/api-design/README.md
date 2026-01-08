@@ -62,7 +62,7 @@ Format data and errors.
 
 - **[Content Types](request-response/content-types-and-structure.md)** - Structure JSON data
 - **[Content Negotiation](request-response/content-negotiation.md)** - Support many formats
-- **[Error Standards](request-response/error-response-standards.md)** - Use RFC 7807
+- **[Error Standards](request-response/error-response-standards.md)** - Use RFC 9457
 - **[Pagination & Filtering](request-response/pagination-and-filtering.md)** - Handle large data
 - **[Schema Conventions](request-response/schema-conventions.md)** - Name fields well
 - **[Streaming APIs](request-response/streaming-apis.md)** - Stream with SSE and NDJSON
@@ -116,7 +116,7 @@ Check and improve API quality.
 
 We follow these standards:
 
-- **Errors:** RFC 7807 - [Error Standards](request-response/error-response-standards.md)
+- **Errors:** RFC 9457 - [Error Standards](request-response/error-response-standards.md)
 - **Deprecation:** RFC 8594 - [API Lifecycle](foundations/api-lifecycle.md)
 - **Caching:** RFC 7234 - [HTTP Caching](advanced-patterns/http-caching.md)
 - **Security:** OAuth 2.1, JWT - [Security Standards](security/security-standards.md)

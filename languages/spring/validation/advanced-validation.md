@@ -5,7 +5,7 @@
 > **⏱️ Reading Time:** 12 minutes | **🟡 Level:** Advanced
 > 
 > **📋 Prerequisites:** Jakarta Bean Validation, Custom validators  
-> **🎯 Key Topics:** JSON Schema, Method-Level Validation, RFC 7807 Integration
+> **🎯 Key Topics:** JSON Schema, Method-Level Validation, RFC 9457 Integration
 > 
 > **📊 Complexity:** Grade 13.8 • 2.1% technical density • Difficult
 
@@ -15,7 +15,7 @@ This guide covers three validation approaches:
 
 1. **JSON Schema** - Validate complex data
 2. **Method Validation** - Check service parameters
-3. **RFC 7807** - Standard error format
+3. **RFC 9457** - Standard error format
 
 Read [Validation Fundamentals](validation-fundamentals.md) first.
 
@@ -261,7 +261,7 @@ public class CustomerService {
 }
 ```
 
-## RFC 7807 Error Responses
+## RFC 9457 Error Responses
 
 ### Handle All Validation Errors
 
@@ -361,9 +361,9 @@ public void addItem(OrderItem item) {
 - **Custom Validators** - Business logic
 - **Method Validation** - Parameter checks
 
-### 3. Use RFC 7807 Always
+### 3. Use RFC 9457 Always
 
-Return errors using RFC 7807:
+Return errors using RFC 9457:
 
 ```json
 {

@@ -800,7 +800,7 @@ Validate these on the server:
 - Number ranges
 - Required fields
 
-Return RFC 7807 Problem Details for validation errors. See [Error Response Standards](error-response-standards.md).
+Return RFC 9457 Problem Details for validation errors. See [Error Response Standards](error-response-standards.md).
 
 ### Backward Compatibility
 
@@ -921,7 +921,7 @@ with, yield
 ## Related Documentation
 
 - [Content Types and Structure](content-types-and-structure.md) - Request/response payload patterns
-- [Error Response Standards](error-response-standards.md) - Error handling with RFC 7807
+- [Error Response Standards](error-response-standards.md) - Error handling with RFC 9457
 - [Pagination and Filtering](pagination-and-filtering.md) - Collection response patterns
 - [OpenAPI Standards](../documentation/openapi-standards.md) - API documentation with schema definitions
 - [Advanced Schema Design](advanced-schema-design.md) - Schema composition, versioning, and evolution strategies

@@ -1427,7 +1427,7 @@ Use this checklist for comprehensive client testing:
 - **[Documentation Testing](../documentation/documentation-testing.md)** - API documentation validation
 
 ### Error Handling
-- **[Error Response Standards](../request-response/error-response-standards.md)** - Error formats and RFC 7807
+- **[Error Response Standards](../request-response/error-response-standards.md)** - Error formats and RFC 9457
 - **[Reactive Error Handling](../advanced-patterns/reactive-error-handling.md)** - Async error patterns
 
 ---

@@ -585,7 +585,7 @@ void shouldReturnBadRequest_WhenZipCodeFormatIsInvalid() { }
 
 ### 3. Test Error Response Format
 
-Check that errors follow RFC 7807 format:
+Check that errors follow RFC 9457 format:
 
 ```java
 @Test

@@ -775,7 +775,7 @@ Note: A single batch request counts as one request, not one per item.
 
 ### Error Handling
 
-1. **Use RFC 7807**: Follow problem details standard.
+1. **Use RFC 9457**: Follow problem details standard.
 2. **Map to Index**: Show which request failed.
 3. **Give Details**: Help clients fix problems.
 4. **Classify Errors**: Split validation, conflict, and system errors.

@@ -32,7 +32,7 @@ This directory provides complete guides for handling errors in Spring Boot. You'
    - Follow proven exception patterns
 
 2. **[Error Response Formats](./error-response-formats.md)**
-   - Use RFC 7807 standard error format
+   - Use RFC 9457 Problem Details standard
    - Build consistent error messages
    - Support older error formats when needed
    - Customize errors for your API
@@ -66,7 +66,7 @@ This directory provides complete guides for handling errors in Spring Boot. You'
 ### Consistent Error Handling
 
 - **Unified Exception Hierarchy**: All exceptions share a common base
-- **Standard Error Format**: Use RFC 7807 Problem Details (a web standard)
+- **Standard Error Format**: Use RFC 9457 Problem Details (a web standard)
 - **Global Exception Handlers**: Handle all errors in one place
 - **Request Tracking**: Track errors across distributed systems
 
@@ -102,7 +102,7 @@ throw new ResourceNotFoundException("Order", orderId);
 }
 ```
 
-This follows RFC 7807, a standard way to format errors in REST APIs. The standard defines five fields that describe what went wrong.
+This follows RFC 9457 Problem Details, a standard way to format errors in REST APIs. The standard defines five fields that describe what went wrong.
 
 ### 1. Exception Hierarchy Setup
 
@@ -188,7 +188,7 @@ public class CreateOrderRequest {
 ```yaml
 app:
   error:
-    use-rfc7807: true
+    use-rfc9457: true
     problem-base-uri: https://api.example.com/problems
     sanitize-messages: true
     

@@ -586,7 +586,7 @@ Use redaction patterns:
 ## Related Standards
 
 - [HTTP Observability Endpoints](../api-design/advanced-patterns/api-observability-standards.md) - Health check and metrics HTTP endpoints
-- [Error Response Standards](../api-design/request-response/error-response-standards.md) - Error handling and RFC 7807
+- [Error Response Standards](../api-design/request-response/error-response-standards.md) - Error handling and RFC 9457
 - [Security Standards](../api-design/security/security-standards.md) - Authentication and authorization
 
 ## Examples

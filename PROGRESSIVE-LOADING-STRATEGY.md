@@ -64,7 +64,7 @@ This allows:
 - Content-Types-and-Structure.md
 - Content-Negotiation.md (Accept headers, media types)
 - Schema-Conventions.md (JSON field naming, dates, nulls)
-- Error-Response-Standards.md (RFC 7807)
+- Error-Response-Standards.md (RFC 9457)
 - Pagination-and-Filtering.md
 - Streaming-APIs.md
 - Plus examples, reference, and troubleshooting subdirectories

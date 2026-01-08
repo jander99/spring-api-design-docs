@@ -222,7 +222,7 @@ public class ValidationExceptionHandler {
 
 ### Error Response Format
 
-Example validation error response following RFC 7807:
+Example validation error response following RFC 9457:
 
 ```json
 {
@@ -250,7 +250,7 @@ Example validation error response following RFC 7807:
 }
 ```
 
-See [Error Response Formats](../error-handling/error-response-formats.md) for complete RFC 7807 implementation details.
+See [Error Response Formats](../error-handling/error-response-formats.md) for complete RFC 9457 implementation details.
 
 ## Problem Detail DTO
 
@@ -347,7 +347,7 @@ public class CreateOrderRequest {
 
 ### 4. Consistent Error Response Format
 
-Use RFC 7807 Problem Details format for all validation errors:
+Use RFC 9457 Problem Details format for all validation errors:
 
 ```json
 {
@@ -407,7 +407,7 @@ See [OpenAPI Standards](../../../guides/api-design/documentation/openapi-standar
 
 ### Spring Implementation
 - [Imperative Error Handling](../error-handling/imperative-error-handling.md) - Global exception handlers
-- [Error Response Formats](../error-handling/error-response-formats.md) - RFC 7807 implementation
+- [Error Response Formats](../error-handling/error-response-formats.md) - RFC 9457 implementation
 - [Request Response Mapping](../controllers/request-response-mapping.md) - DTO and mapper patterns
 
 ### Language-Agnostic Theory

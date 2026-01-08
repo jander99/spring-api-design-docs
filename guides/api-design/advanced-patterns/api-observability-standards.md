@@ -245,7 +245,7 @@ Content-Type: application/problem+json
 ## Related Standards
 
 - [Observability Standards](../../observability/observability-standards.md) - Comprehensive observability practices
-- [Error Response Standards](../request-response/error-response-standards.md) - Error handling and RFC 7807
+- [Error Response Standards](../request-response/error-response-standards.md) - Error handling and RFC 9457
 - [Security Standards](../security/security-standards.md) - Authentication and authorization
 - [Performance Standards](./performance-standards.md): Server-Timing headers, percentile tracking, and performance budgets
 

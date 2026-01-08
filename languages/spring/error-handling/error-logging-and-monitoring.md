@@ -634,7 +634,7 @@ public class LogAccessController {
 ## Related Documentation
 
 - [Exception Hierarchy](./exception-hierarchy.md) - Exception classes and inheritance
-- [Error Response Formats](./error-response-formats.md) - RFC 7807 and response structures
+- [Error Response Formats](./error-response-formats.md) - RFC 9457 and response structures
 - [Imperative Error Handling](./imperative-error-handling.md) - Spring MVC global exception handlers
 - [Reactive Error Handling](./reactive-error-handling.md) - WebFlux error handling patterns
 - [Validation Standards](./validation-standards.md) - Bean validation and custom validators

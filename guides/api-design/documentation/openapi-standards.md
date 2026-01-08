@@ -303,13 +303,13 @@ paths:
 
 ### Error Examples
 
-Show what errors look like. Use RFC 7807 Problem Details format.
+Show what errors look like. Use RFC 9457 Problem Details format.
 
 ```yaml
 components:
   examples:
     ValidationError:
-      summary: Validation error example (RFC 7807)
+      summary: Validation error example (RFC 9457)
       value:
         type: "https://example.com/problems/validation-error"
         title: "Validation Error"

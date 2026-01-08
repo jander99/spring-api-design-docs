@@ -11,7 +11,9 @@
 
 ## Overview
 
-Consistent error handling is crucial for creating predictable, debuggable APIs. This document outlines the standards for error responses, including HTTP status codes, error formats, and the RFC 7807 Problem Details standard.
+Consistent error handling is crucial for creating predictable, debuggable APIs. This document outlines the standards for error responses, including HTTP status codes, error formats, and the RFC 9457 Problem Details standard.
+
+> **Note**: RFC 9457 (July 2023) supersedes RFC 7807. The core structure remains identical, ensuring full backward compatibility. Existing RFC 7807 implementations automatically comply with RFC 9457.
 
 ## HTTP Status Codes
 
@@ -30,7 +32,7 @@ Use appropriate HTTP status codes for different error scenarios:
 
 ## Error Response Structure
 
-All error responses must follow RFC 7807 Problem Details standard with Content-Type `application/problem+json`:
+All error responses must follow RFC 9457 Problem Details standard with Content-Type `application/problem+json`:
 
 ```json
 {
@@ -48,7 +50,7 @@ All error responses must follow RFC 7807 Problem Details standard with Content-T
 }
 ```
 
-### RFC 7807 Standard Fields
+### RFC 9457 Standard Fields
 
 | Field | Required | Description |
 |-------|----------|-------------|
@@ -74,9 +76,9 @@ All error responses must follow RFC 7807 Problem Details standard with Content-T
 | Authentication | `AUTH_` | `AUTH_TOKEN_EXPIRED`, `AUTH_INVALID_CREDENTIALS` |
 | Payment Processing | `PAY_` | `PAY_INSUFFICIENT_FUNDS`, `PAY_GATEWAY_ERROR` |
 
-## RFC 7807 Problem Details Standard
+## RFC 9457 Problem Details Standard
 
-Use RFC 7807 Problem Details for consistent error responses across all APIs:
+Use RFC 9457 Problem Details for consistent error responses across all APIs:
 
 ```http
 HTTP/1.1 400 Bad Request
@@ -98,14 +100,15 @@ Content-Type: application/problem+json
 }
 ```
 
-### RFC 7807 Benefits
+### RFC 9457 Benefits
 
 - **Standardized format** across different services and clients
 - **Machine-readable** error types with URIs
 - **Extensible** with custom properties
 - **Wide framework support** in modern web frameworks
+- **IANA registry** for common, reusable problem types
 
-### RFC 7807 Standard Fields
+### RFC 9457 Standard Fields
 
 | Field | Description | Example |
 |-------|-------------|---------|
@@ -115,9 +118,9 @@ Content-Type: application/problem+json
 | `detail` | Human-readable explanation | `The request contains invalid parameters` |
 | `instance` | URI reference to problem occurrence | `/v1/orders` |
 
-> **Note**: Per RFC 7807, all fields are technically optional. However, including these standard fields ensures consistent, machine-readable error responses.
+> **Note**: Per RFC 9457, all fields are technically optional. However, including these standard fields ensures consistent, machine-readable error responses.
 
-### RFC 7807 Optional Extensions
+### RFC 9457 Optional Extensions
 
 You can extend the Problem Details format with custom fields:
 
@@ -138,6 +141,107 @@ You can extend the Problem Details format with custom fields:
   ],
   "requestId": "req-12345",
   "timestamp": "2024-07-15T14:32:22Z"
+}
+```
+
+## IANA Problem Types Registry
+
+RFC 9457 introduces a formal IANA registry for common problem types. This registry promotes reuse and interoperability across APIs.
+
+### Registry Location
+
+The registry is available at: `https://iana.org/assignments/http-problem-types`
+
+### Registered Problem Types
+
+| Type URI | Description | Use Case |
+|----------|-------------|----------|
+| `about:blank` | Default type with no additional semantics | When HTTP status code alone is sufficient |
+
+### Using the Registry
+
+1. **Check existing types first**: Before creating custom problem types, check if a registered type fits your use case
+2. **Register common types**: If your problem type is widely applicable, consider registering it
+3. **Use stable URIs**: For custom types, use URIs under your control that will remain stable
+
+### When to Use `about:blank`
+
+Use the default `about:blank` type when:
+- The HTTP status code fully conveys the error meaning
+- No additional context is needed beyond the status phrase
+- You want minimal error responses
+
+```json
+{
+  "type": "about:blank",
+  "title": "Not Found",
+  "status": 404
+}
+```
+
+## Handling Multiple Problems
+
+RFC 9457 provides clear guidance for handling multiple errors in a single response.
+
+### Same Problem Type (Recommended)
+
+When multiple errors share the same type (e.g., validation errors), use an `errors` array extension:
+
+```json
+{
+  "type": "https://example.com/problems/validation-error",
+  "title": "Validation Failed",
+  "status": 400,
+  "detail": "Multiple validation errors occurred",
+  "errors": [
+    {
+      "pointer": "#/email",
+      "detail": "Invalid email format"
+    },
+    {
+      "pointer": "#/age",
+      "detail": "Must be a positive integer"
+    },
+    {
+      "pointer": "#/profile/color",
+      "detail": "Must be 'red', 'green', or 'blue'"
+    }
+  ]
+}
+```
+
+### Using JSON Pointer for Error Location
+
+The `pointer` field uses JSON Pointer (RFC 6901) syntax to identify the exact location of each error:
+
+| Pointer | Meaning |
+|---------|---------|
+| `#/email` | The `email` field at the root |
+| `#/address/city` | The `city` field inside `address` |
+| `#/items/0/quantity` | The `quantity` field in the first item |
+
+### Different Problem Types
+
+When errors have different types, return the **most relevant or urgent** problem. Avoid mixing unrelated error types in a single response, as this doesn't map well to HTTP semantics.
+
+**Do this** (single most relevant error):
+```json
+{
+  "type": "https://example.com/problems/payment-failed",
+  "title": "Payment Failed",
+  "status": 402,
+  "detail": "Credit card was declined"
+}
+```
+
+**Avoid this** (mixing unrelated errors):
+```json
+{
+  "errors": [
+    {"type": "validation-error", "field": "email"},
+    {"type": "payment-failed", "reason": "declined"},
+    {"type": "inventory-warning", "item": "low-stock"}
+  ]
 }
 ```
 
@@ -269,7 +373,7 @@ See [Streaming APIs](streaming-apis.md) for more details on streaming error patt
 
 Always set the correct content type for error responses:
 
-- **RFC 7807**: Use `application/problem+json`
+- **RFC 9457**: Use `application/problem+json`
 - **Legacy format**: Use `application/json` with standard error structure
 
 ### Error Logging
@@ -318,5 +422,5 @@ These error standards work with any REST framework through standard HTTP respons
 - [Schema Testing](../testing/schema-testing.md) - Testing error response schemas
 
 ### Spring Implementation
-- [Schema Validation](../../../languages/spring/validation/schema-validation.md#integration-with-rfc-7807-error-responses) - RFC 7807 validation error handling
+- [Schema Validation](../../../languages/spring/validation/schema-validation.md#rfc-9457-error-responses) - RFC 9457 validation error handling
 - [Error Response Formats](../../../languages/spring/error-handling/error-response-formats.md) - Spring implementation details

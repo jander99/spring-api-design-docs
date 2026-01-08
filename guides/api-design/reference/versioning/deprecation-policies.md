@@ -413,7 +413,7 @@ Add the version to error identifiers:
 - Error logs show which version caused the problem
 - Clients can handle version-specific errors
 
-### Use RFC 7807 Problem Details
+### Use RFC 9457 Problem Details
 
 Include the API version in standard problem responses:
 ```json

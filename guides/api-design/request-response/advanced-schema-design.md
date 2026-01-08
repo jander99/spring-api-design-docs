@@ -1269,7 +1269,7 @@ See [Schema Conventions](schema-conventions.md) for naming standards.
 
 1. **Fail fast** - Validate early in request flow
 2. **Clear messages** - Return helpful error details
-3. **Consistent format** - Use RFC 7807 Problem Details
+3. **Consistent format** - Use RFC 9457 Problem Details
 4. **Standard formats** - Use JSON Schema formats
 5. **Security** - Validate inputs well
 
