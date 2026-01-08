@@ -422,5 +422,5 @@ These error standards work with any REST framework through standard HTTP respons
 - [Schema Testing](../testing/schema-testing.md) - Testing error response schemas
 
 ### Spring Implementation
-- [Schema Validation](../../../languages/spring/validation/schema-validation.md#integration-with-rfc-9457-error-responses) - RFC 9457 validation error handling
+- [Schema Validation](../../../languages/spring/validation/schema-validation.md#rfc-9457-error-responses) - RFC 9457 validation error handling
 - [Error Response Formats](../../../languages/spring/error-handling/error-response-formats.md) - Spring implementation details

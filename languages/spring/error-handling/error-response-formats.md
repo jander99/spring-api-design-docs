@@ -331,6 +331,7 @@ Spring provides `org.springframework.http.ProblemDetail` that implements RFC 945
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.ErrorResponse;
+import java.net.URI;
 
 @ExceptionHandler(ResourceNotFoundException.class)
 public ProblemDetail handleNotFound(ResourceNotFoundException ex) {
