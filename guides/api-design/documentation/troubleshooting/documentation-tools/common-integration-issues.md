@@ -90,7 +90,7 @@ securitySchemes:
 **Split large specs:**
 ```yaml
 # main.yaml
-openapi: 3.0.0
+openapi: 3.1.0
 info:
   title: Main API
   version: 1.0.0
