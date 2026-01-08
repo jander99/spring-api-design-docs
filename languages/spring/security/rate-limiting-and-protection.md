@@ -289,18 +289,16 @@ CSRF (Cross-Site Request Forgery) is an attack where malicious sites trick users
 ```java
 @Configuration
 @EnableWebSecurity
-public class CsrfConfig extends WebSecurityConfigurerAdapter {
+public class CsrfConfig {
     
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf()
+            .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .and()
-            // Turn off CSRF for public APIs and webhooks
-            .csrf()
-                .ignoringAntMatchers("/api/webhooks/**", "/api/public/**")
-                .and();
+                // Turn off CSRF for public APIs and webhooks
+                .ignoringRequestMatchers("/api/webhooks/**", "/api/public/**"));
+        return http.build();
     }
 }
 ```
