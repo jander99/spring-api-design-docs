@@ -38,7 +38,7 @@ software-design-docs/
 │       ├── architecture/           # DI patterns, component management
 │       ├── project-structure/      # DDD package organization, imperative/reactive examples
 │       ├── controllers/            # MVC/WebFlux patterns, request mapping
-│       ├── error-handling/         # Exception hierarchy, RFC 7807
+│       ├── error-handling/         # Exception hierarchy, RFC 9457
 │       ├── security/               # OAuth 2.1, authorization, CORS, rate limiting
 │       ├── configuration/          # Profiles, database, external services
 │       ├── observability/          # Logging, monitoring, metrics
@@ -112,7 +112,7 @@ Spring Boot-specific patterns organized into:
 - **architecture/**: Dependency injection and component management
 - **project-structure/**: DDD package organization and project layout
 - **controllers/**: Web layer patterns for MVC and WebFlux
-- **error-handling/**: Exception hierarchy and RFC 7807 implementation
+- **error-handling/**: Exception hierarchy and RFC 9457 implementation
 - **security/**: OAuth 2.1, authorization, CORS, rate limiting
 - **configuration/**: Application config, profiles, database, external services
 - **observability/**: Logging, monitoring, and operational patterns
@@ -211,7 +211,7 @@ When working with API design topics, consider the user's likely maturity level a
 
 ## Technology Stack
 
-**API Standards**: HTTP/REST, OpenAPI 3.1+, OAuth 2.1/OIDC, RFC 7807, JSON Schema
+**API Standards**: HTTP/REST, OpenAPI 3.1+, OAuth 2.1/OIDC, RFC 9457, JSON Schema
 
 **Spring**: Spring Boot 3.x, WebFlux, Spring Security, Micrometer, springdoc-openapi v2, Spring Cloud Contract
 

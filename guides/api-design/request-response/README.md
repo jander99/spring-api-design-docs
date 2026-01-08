@@ -45,7 +45,7 @@ Good formats make APIs easy. They help users. Structure data well. We cover cont
 **Handle errors**
 - Status codes
 - Error formats
-- RFC 7807
+- RFC 9457
 - Code names
 - Error patterns
 
@@ -86,7 +86,7 @@ Use with any REST framework. Based on HTTP and JSON.
 - Same pagination
 
 ### Modern Standards
-- RFC 7807 for errors
+- RFC 9457 for errors
 - JSON Schema
 - HTTP streaming
 - OAuth 2.1
@@ -172,7 +172,7 @@ Use with any REST framework. Based on HTTP and JSON.
 ## Implementation
 
 ### Validation
-Use validation with RFC 7807:
+Use validation with RFC 9457:
 - Use JSON Schema
 - Use standard patterns
 - Use same formats

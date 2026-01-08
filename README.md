@@ -55,7 +55,7 @@ Most modern APIs are at Level 2, and that's perfectly fine! Use our guide to und
 
 1. **Assess Your API**: [Richardson Maturity Model assessment](guides/api-design/maturity-model/assessment-guide.md) (5 minutes)
 2. **Learn Foundations**: [API versioning, resource naming, URL structure](guides/api-design/foundations/)
-3. **Request/Response Patterns**: [Content types, errors (RFC 7807), pagination, streaming](guides/api-design/request-response/)
+3. **Request/Response Patterns**: [Content types, errors (RFC 9457), pagination, streaming](guides/api-design/request-response/)
 4. **Security**: [Authentication and authorization standards](guides/api-design/security/)
 5. **Advanced Patterns**: [Event-driven, reactive, streaming](guides/api-design/advanced-patterns/)
 
@@ -65,7 +65,7 @@ Most modern APIs are at Level 2, and that's perfectly fine! Use our guide to und
 2. **Choose Your Style**: [Imperative (MVC)](languages/spring/project-structure/imperative-examples.md) or [Reactive (WebFlux)](languages/spring/project-structure/reactive-examples.md)
 3. **Architecture**: [Dependency injection and component management](languages/spring/architecture/)
 4. **Controllers**: [Implement request handling](languages/spring/controllers/)
-5. **Error Handling**: [Exception hierarchy and RFC 7807](languages/spring/error-handling/)
+5. **Error Handling**: [Exception hierarchy and RFC 9457](languages/spring/error-handling/)
 6. **Security**: [OAuth 2.1 and authorization](languages/spring/security/)
 7. **Testing**: [Unit, integration, and specialized tests](languages/spring/testing/)
 8. **Production Ready**: [Configuration, observability, monitoring](languages/spring/configuration/)
@@ -88,7 +88,7 @@ Most modern APIs are at Level 2, and that's perfectly fine! Use our guide to und
 
 - **[🎯 Maturity Assessment](guides/api-design/maturity-model/)** - Richardson Maturity Model framework
 - **[🏗️ Foundations](guides/api-design/foundations/)** - API versioning, resource naming, URL structure
-- **[🔄 Request/Response](guides/api-design/request-response/)** - Content types, errors (RFC 7807), pagination, streaming
+- **[🔄 Request/Response](guides/api-design/request-response/)** - Content types, errors (RFC 9457), pagination, streaming
 - **[🔐 Security](guides/api-design/security/)** - Authentication, authorization, API protection
 - **[🚀 Advanced Patterns](guides/api-design/advanced-patterns/)** - Event-driven, reactive, streaming architectures
 - **[📚 Documentation](guides/api-design/documentation/)** - OpenAPI standards, tools, testing
@@ -98,7 +98,7 @@ Most modern APIs are at Level 2, and that's perfectly fine! Use our guide to und
 - **[🏗️ Project Structure](languages/spring/project-structure/)** - DDD package organization, imperative/reactive examples
 - **[🎯 Architecture](languages/spring/architecture/)** - Dependency injection, component management
 - **[🎮 Controllers](languages/spring/controllers/)** - MVC/WebFlux patterns, request mapping, testing
-- **[⚠️ Error Handling](languages/spring/error-handling/)** - Exception hierarchy, RFC 7807, validation
+- **[⚠️ Error Handling](languages/spring/error-handling/)** - Exception hierarchy, RFC 9457, validation
 - **[🔐 Security](languages/spring/security/)** - OAuth 2.1, authorization, CORS, rate limiting
 - **[⚙️ Configuration](languages/spring/configuration/)** - Profiles, database, external services, observability
 - **[📊 Observability](languages/spring/observability/)** - Logging, monitoring, metrics
@@ -108,7 +108,7 @@ Most modern APIs are at Level 2, and that's perfectly fine! Use our guide to und
 
 ## Technology Stack
 
-**API Standards**: HTTP/REST, OpenAPI 3.1+, OAuth 2.1/OIDC, RFC 7807, JSON Schema
+**API Standards**: HTTP/REST, OpenAPI 3.1+, OAuth 2.1/OIDC, RFC 9457, JSON Schema
 
 **Spring**: Spring Boot 3.x, WebFlux, Spring Security, Micrometer, springdoc-openapi v2, Spring Cloud Contract
 
