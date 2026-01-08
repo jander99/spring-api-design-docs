@@ -3,18 +3,20 @@
 ## Overview
 
 API clients need consistent error responses. This document shows two error formats:
-1. RFC 7807 Problem Details (recommended)
+1. RFC 9457 Problem Details (recommended)
 2. Legacy format (for backward compatibility)
+
+> **Note**: RFC 9457 (July 2023) supersedes RFC 7807. The structure is identical, so existing implementations remain fully compatible.
 
 ## Error Response Principles
 
 1. **Consistent Structure**: Use the same format for all errors
-2. **RFC 7807 Compliance**: Use RFC 7807 as primary format
+2. **RFC 9457 Compliance**: Use RFC 9457 Problem Details as primary format
 3. **Legacy Support**: Support old formats for existing clients
 4. **Security First**: Hide sensitive information in production
 5. **Clear Messages**: Help clients understand and fix errors
 
-## RFC 7807 Problem Details
+## RFC 9457 Problem Details
 
 This is the recommended error format. Use it for all new APIs:
 
@@ -33,11 +35,11 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProblemDetail {
-    private URI type;           // RFC 7807: URI identifying the problem type
-    private String title;       // RFC 7807: Short, human-readable summary
-    private Integer status;     // RFC 7807: HTTP status code
-    private String detail;      // RFC 7807: Human-readable explanation
-    private URI instance;       // RFC 7807: URI identifying the specific occurrence
+    private URI type;           // RFC 9457: URI identifying the problem type
+    private String title;       // RFC 9457: Short, human-readable summary
+    private Integer status;     // RFC 9457: HTTP status code
+    private String detail;      // RFC 9457: Human-readable explanation
+    private URI instance;       // RFC 9457: URI identifying the specific occurrence
     
     // Extensions
     private OffsetDateTime timestamp;
@@ -54,7 +56,7 @@ public class ProblemDetail {
 }
 ```
 
-### Example RFC 7807 Response
+### Example RFC 9457 Response
 
 ```json
 {
@@ -115,7 +117,7 @@ public class LegacyErrorResponse {
 
 ## Error Response Builder
 
-Use a centralized builder to create both RFC 7807 and legacy error responses:
+Use a centralized builder to create both RFC 9457 and legacy error responses:
 
 ```java
 package com.example.common.api;
@@ -136,8 +138,8 @@ public class ErrorResponseBuilder {
     @Value("${app.environment:development}")
     private String environment;
     
-    @Value("${app.error.use-rfc7807:true}")
-    private boolean useRfc7807;
+    @Value("${app.error.use-rfc9457:true}")
+    private boolean useRfc9457;
     
     @Value("${app.error.problem-base-uri:https://api.example.com/problems}")
     private String problemBaseUri;
@@ -150,7 +152,7 @@ public class ErrorResponseBuilder {
             List<ProblemDetail.ValidationError> errors,
             String requestId) {
         
-        if (useRfc7807) {
+        if (useRfc9457) {
             return buildProblemDetail(problemType, title, status, detail, errors, requestId);
         } else {
             return buildLegacyErrorResponse(problemType, detail, errors, requestId);
@@ -233,7 +235,7 @@ public class ErrorResponseBuilder {
 
 ## Validation Error Response Examples
 
-### Single Validation Error (RFC 7807)
+### Single Validation Error (RFC 9457)
 
 ```json
 {
@@ -254,7 +256,7 @@ public class ErrorResponseBuilder {
 }
 ```
 
-### Multiple Validation Errors (RFC 7807)
+### Multiple Validation Errors (RFC 9457)
 
 ```json
 {
@@ -293,10 +295,84 @@ Configure error response behavior through application properties:
 app:
   environment: ${ENVIRONMENT:development}
   error:
-    use-rfc7807: ${USE_RFC7807:true}
+    use-rfc9457: ${USE_RFC9457:true}
     problem-base-uri: ${PROBLEM_BASE_URI:https://api.example.com/problems}
     include-stack-trace: ${INCLUDE_STACK_TRACE:false}
     sanitize-messages: ${SANITIZE_MESSAGES:true}
+```
+
+## Spring Framework Native Support
+
+Spring Framework 6.x and Spring Boot 3.x include native RFC 9457 Problem Details support.
+
+### Enable Problem Details (Spring MVC)
+
+```yaml
+spring:
+  mvc:
+    problemdetails:
+      enabled: true
+```
+
+### Enable Problem Details (Spring WebFlux)
+
+```yaml
+spring:
+  webflux:
+    problemdetails:
+      enabled: true
+```
+
+### Using Spring's Built-in ProblemDetail
+
+Spring provides `org.springframework.http.ProblemDetail` that implements RFC 9457:
+
+```java
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.web.ErrorResponse;
+
+@ExceptionHandler(ResourceNotFoundException.class)
+public ProblemDetail handleNotFound(ResourceNotFoundException ex) {
+    ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+        HttpStatus.NOT_FOUND,
+        ex.getMessage()
+    );
+    problem.setTitle("Resource Not Found");
+    problem.setType(URI.create("https://api.example.com/problems/resource-not-found"));
+    problem.setProperty("resourceType", ex.getResourceType());
+    problem.setProperty("resourceId", ex.getResourceId());
+    return problem;
+}
+```
+
+### ErrorResponse Interface
+
+Exceptions can implement `ErrorResponse` for automatic Problem Details conversion:
+
+```java
+public class ResourceNotFoundException extends RuntimeException implements ErrorResponse {
+    
+    private final String resourceType;
+    private final Object resourceId;
+    
+    @Override
+    public HttpStatusCode getStatusCode() {
+        return HttpStatus.NOT_FOUND;
+    }
+    
+    @Override
+    public ProblemDetail getBody() {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+            getStatusCode(),
+            getMessage()
+        );
+        problem.setTitle("Resource Not Found");
+        problem.setProperty("resourceType", resourceType);
+        problem.setProperty("resourceId", resourceId);
+        return problem;
+    }
+}
 ```
 
 ## Security Considerations
