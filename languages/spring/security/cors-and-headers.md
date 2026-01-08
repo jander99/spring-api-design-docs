@@ -252,7 +252,7 @@ public class SecurityHeadersConfig {
                 .contentTypeOptions(Customizer.withDefaults())
                 .frameOptions(frame -> frame.deny())
                 .referrerPolicy(referrer -> referrer
-                    .policy(ReferrerPolicy.STRICT_ORIGIN))
+                    .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN))
                 .permissionsPolicy(permissions -> permissions
                     .policy("camera=(), microphone=(), geolocation=()"))
                 .cacheControl(Customizer.withDefaults())

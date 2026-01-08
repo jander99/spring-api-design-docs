@@ -176,7 +176,7 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
             .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
+                .jwt(Customizer.withDefaults()));
         return http.build();
     }
 }
