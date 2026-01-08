@@ -220,7 +220,7 @@ public class ValidationExceptionHandler {
 }
 ```
 
-See [Error Response Formats](../error-handling/error-response-formats.md) for complete RFC 7807 examples.
+See [Error Response Formats](../error-handling/error-response-formats.md) for complete RFC 9457 examples.
 
 ## Custom Constraint Annotations
 
@@ -684,7 +684,7 @@ Pattern.zipCode=Invalid ZIP code format
 ValidOrderDate.deliveryDateTime=Order must ship {minHoursInFuture}+ hours ahead
 ```
 
-## RFC 7807 Error Responses
+## RFC 9457 Error Responses
 
 ### Problem Detail DTO
 
@@ -952,7 +952,7 @@ Validate as soon as the request arrives. Spring validates the `@Valid` request b
 
 ### 5. Consistent Error Response Format
 
-Always return errors in RFC 7807 format (Problem Details).
+Always return errors in RFC 9457 format (Problem Details).
 
 ### 6. Document Validation Rules
 

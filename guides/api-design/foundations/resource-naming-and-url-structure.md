@@ -279,6 +279,6 @@ When implementing these URL structures:
 
 - **REST framework compatibility**: These patterns work with any framework
 - **HTTP method semantics**: Follow standard HTTP method definitions
-- **Error handling**: Use HTTP status codes and RFC 7807 format
+- **Error handling**: Use HTTP status codes and RFC 9457 format
 
 These principles apply to any REST API. They follow HTTP standards and REST architecture.

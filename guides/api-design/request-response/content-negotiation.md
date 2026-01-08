@@ -656,5 +656,5 @@ Content-Type: application/problem+json
 ## Related Documentation
 
 - [Content Types and Structure](content-types-and-structure.md) - Standard content type patterns
-- [Error Response Standards](error-response-standards.md) - RFC 7807 error handling
+- [Error Response Standards](error-response-standards.md) - RFC 9457 error handling
 - [API Version Strategy](../foundations/api-version-strategy.md) - Versioning approaches

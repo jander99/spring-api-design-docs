@@ -348,7 +348,7 @@ To help users find this content, ensure these terms appear in:
 ### Testing Documentation Quality
 - Verify examples are correct and realistic
 - Ensure HTTP examples follow RFC standards
-- Check that error responses use RFC 7807 format
+- Check that error responses use RFC 9457 format
 - Validate that test patterns actually work (consider running examples)
 
 ---

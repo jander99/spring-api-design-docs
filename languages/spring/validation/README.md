@@ -22,7 +22,7 @@ Validation checks data quality at your API boundary and inside your app. This gu
 - [Custom Validators](custom-validators.md) - Build your own validators. Learn cross-field validation and validation groups.
 
 ### Advanced Topics
-- [Advanced Validation](advanced-validation.md) - Use JSON Schema validation. Apply method-level validation and RFC 7807 integration.
+- [Advanced Validation](advanced-validation.md) - Use JSON Schema validation. Apply method-level validation and RFC 9457 integration.
 - [Validation Testing](validation-testing.md) - Write unit tests and integration tests for your validation logic.
 
 ### Legacy Documentation
@@ -99,7 +99,7 @@ public class OrderController {
 ### Spring Implementation
 - [Error Handling - Validation Standards](../error-handling/validation-standards.md) - Learn service-level validation
 - [Error Handling - Imperative](../error-handling/imperative-error-handling.md) - Handle exceptions
-- [Error Handling - Error Response Formats](../error-handling/error-response-formats.md) - Use RFC 7807
+- [Error Handling - Error Response Formats](../error-handling/error-response-formats.md) - Use RFC 9457
 - [Controllers - Request Response Mapping](../controllers/request-response-mapping.md) - Work with DTOs and mappers
 
 ### Language-Agnostic Theory
@@ -113,6 +113,6 @@ public class OrderController {
 1. **Validate Early** - Check data at the API boundary and fail fast
 2. **Clear Messages** - Give users helpful error messages
 3. **Multiple Layers** - Validate at controller, service, and domain layers
-4. **Consistent Format** - Use RFC 7807 Problem Details for all errors
+4. **Consistent Format** - Use RFC 9457 Problem Details for all errors
 5. **Test Thoroughly** - Write tests that cover all validation rules
 6. **Document Rules** - Add validation constraints to your OpenAPI specs

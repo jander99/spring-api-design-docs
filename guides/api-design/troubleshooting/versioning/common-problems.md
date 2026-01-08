@@ -375,7 +375,7 @@ X-API-Version: 1.0
 }
 ```
 
-**v2 error format** (RFC 7807 Problem Details):
+**v2 error format** (RFC 9457 Problem Details):
 ```http
 POST /v2/customers HTTP/1.1
 Content-Type: application/json
@@ -408,7 +408,7 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorV1'
     ValidationError_v2:
-      description: Validation error (RFC 7807)
+      description: Validation error (RFC 9457)
       content:
         application/problem+json:
           schema:

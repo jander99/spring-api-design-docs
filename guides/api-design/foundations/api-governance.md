@@ -60,7 +60,7 @@ Team B returns errors like this:
 
 Clients must handle two different formats. That wastes developer time.
 
-With governance, all teams use RFC 7807:
+With governance, all teams use RFC 9457 Problem Details:
 
 ```json
 {
@@ -119,7 +119,7 @@ Use the same patterns everywhere.
 
 **Apply standards to:**
 - Resource naming (use plural nouns)
-- Error handling (use RFC 7807)
+- Error handling (use RFC 9457)
 - Security (use OAuth 2.0)
 - Versioning (use URI versioning)
 
@@ -134,7 +134,7 @@ Central teams set standards. Product teams own their APIs.
 - **Product teams**: Build APIs, write tests, deploy code
 - **Shared**: Review process, learning sessions, pattern library
 
-**Example:** Central team requires RFC 7807 errors. Product teams implement error handling in their services.
+**Example:** Central team requires RFC 9457 errors. Product teams implement error handling in their services.
 
 ### 4. Quality Gates
 
@@ -159,7 +159,7 @@ Organize standards into three levels.
 All APIs must follow these:
 
 - Security (OAuth 2.0 authentication)
-- Error formats (RFC 7807)
+- Error formats (RFC 9457)
 - Versioning (URI-based like `/v1/`)
 - Pagination (page-based or cursor-based)
 - HTTP status codes (200, 404, 500, etc.)
@@ -211,7 +211,7 @@ Rationale:
 Clients can parse errors the same way everywhere.
 
 Requirements:
-- Use RFC 7807 Problem Details format
+- Use RFC 9457 Problem Details format
 - Set Content-Type to application/problem+json
 - Include type, title, status, and detail fields
 - Add instance and custom fields if helpful
@@ -247,7 +247,7 @@ Tools check APIs automatically.
 - Contract testing (Pact verifies contracts)
 - Security scanning (OWASP checks vulnerabilities)
 
-**Example:** Spectral fails the build if error responses don't use RFC 7807.
+**Example:** Spectral fails the build if error responses don't use RFC 9457.
 
 #### Manual Review
 
@@ -292,7 +292,7 @@ Review APIs at four key points.
 **What to check:**
 - Resource naming (follows standards?)
 - Request/response formats (correct?)
-- Error handling (uses RFC 7807?)
+- Error handling (uses RFC 9457?)
 - Security (OAuth 2.0 configured?)
 - Pagination (which pattern?)
 - Versioning (URI-based?)
@@ -402,7 +402,7 @@ Use checklists for consistency.
 
 - [ ] OpenAPI spec complete and valid
 - [ ] Resource naming follows standards
-- [ ] Errors use RFC 7807
+- [ ] Errors use RFC 9457
 - [ ] Security defined
 - [ ] Pagination documented
 - [ ] Breaking change policy clear
@@ -837,11 +837,11 @@ Follow these steps to request an exception.
 
 **Example request:**
 ```
-Standard: RFC 7807 errors
+Standard: RFC 9457 errors
 Exception needed: Legacy XML errors
 Reason: Mainframe integration can't change
 Alternative: Document XML error format
-Mitigation: Convert XML to RFC 7807 at gateway
+Mitigation: Convert XML to RFC 9457 at gateway
 Duration: 12 months
 Remediation: Replace mainframe by Q4 2026
 ```

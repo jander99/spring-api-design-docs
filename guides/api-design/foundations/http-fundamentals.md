@@ -780,7 +780,7 @@ The client:
 
 ### Handle Errors Consistently
 
-Use RFC 7807 Problem Details format:
+Use RFC 9457 Problem Details format:
 ```json
 {
   "type": "https://example.com/problems/validation-error",

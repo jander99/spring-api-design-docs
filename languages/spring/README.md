@@ -49,7 +49,7 @@ Each guide shows you how to:
 - Design your error types
 - Handle blocking errors (@ExceptionHandler, @ControllerAdvice)
 - Handle streaming errors (WebFlux)
-- Format error responses (RFC 7807)
+- Format error responses (RFC 9457)
 - Validate input data
 
 ### ✅ [Validation](validation/)
@@ -58,7 +58,7 @@ Each guide shows you how to:
 - Use JSON Schema
 - Write custom validators
 - Group validations
-- Connect to RFC 7807
+- Connect to RFC 9457
 
 ### 🌐 [HTTP Clients](http-clients/)
 **Call other services**

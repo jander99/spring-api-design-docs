@@ -150,7 +150,7 @@ DELETE /orders/123/items/1  → Remove item (204)
 - [ ] Rate limit headers
 - [ ] CORS setup
 - [ ] Standard pagination
-- [ ] RFC 7807 errors
+- [ ] RFC 9457 errors
 
 ## 🚀 If You Want Level 3
 

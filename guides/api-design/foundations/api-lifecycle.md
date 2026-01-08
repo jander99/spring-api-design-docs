@@ -57,7 +57,7 @@ Before you publish any API endpoint, complete these review steps:
 
 - [ ] Resource names follow naming conventions
 - [ ] HTTP methods match semantic meaning
-- [ ] Error responses use RFC 7807 format
+- [ ] Error responses use RFC 9457 format
 - [ ] Field names are consistent across resources
 - [ ] Required vs optional fields are clearly marked
 - [ ] Breaking changes require new version number
