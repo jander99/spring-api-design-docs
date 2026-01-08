@@ -32,13 +32,13 @@ Use this pattern with traditional Spring MVC applications.
 ```java
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig {
     
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        // Other security configuration
-        
-        http.cors().configurationSource(corsConfigurationSource());
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()));
+        return http.build();
     }
     
     @Bean
@@ -150,21 +150,21 @@ Content Security Policy (CSP) tells browsers what resources your site can load. 
 
 ```java
 @Configuration
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableWebSecurity
+public class WebSecurityConfig {
     
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        // Other security configuration
-        
-        http.headers()
-            .contentSecurityPolicy("default-src 'self'; script-src 'self' https://trusted.cdn.com; " +
-                "style-src 'self' https://trusted.cdn.com; img-src 'self' data: https://trusted.cdn.com; " +
-                "connect-src 'self' https://api.example.com; frame-ancestors 'none'; form-action 'self'")
-            .and()
-            .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.SAME_ORIGIN)
-            .and()
-            .frameOptions().deny()
-            .contentSecurityPolicy("script-src 'self'");
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .headers(headers -> headers
+                .contentSecurityPolicy(csp -> csp
+                    .policyDirectives("default-src 'self'; script-src 'self' https://trusted.cdn.com; " +
+                        "style-src 'self' https://trusted.cdn.com; img-src 'self' data: https://trusted.cdn.com; " +
+                        "connect-src 'self' https://api.example.com; frame-ancestors 'none'; form-action 'self'"))
+                .referrerPolicy(referrer -> referrer
+                    .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.SAME_ORIGIN))
+                .frameOptions(frame -> frame.deny()));
+        return http.build();
     }
 }
 ```
@@ -241,28 +241,25 @@ This configuration adds all key security headers to every response.
 ```java
 @Configuration
 @EnableWebSecurity
-public class SecurityHeadersConfig extends WebSecurityConfigurerAdapter {
+public class SecurityHeadersConfig {
     
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .headers()
-                .contentSecurityPolicy("default-src 'self'")
-                .and()
-                .contentTypeOptions()
-                .and()
-                .frameOptions().deny()
-                .and()
-                .referrerPolicy(ReferrerPolicy.STRICT_ORIGIN)
-                .and()
+            .headers(headers -> headers
+                .contentSecurityPolicy(csp -> csp
+                    .policyDirectives("default-src 'self'"))
+                .contentTypeOptions(Customizer.withDefaults())
+                .frameOptions(frame -> frame.deny())
+                .referrerPolicy(referrer -> referrer
+                    .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN))
                 .permissionsPolicy(permissions -> permissions
                     .policy("camera=(), microphone=(), geolocation=()"))
-                .and()
-                .cacheControl()
-                .and()
-                .httpStrictTransportSecurity()
+                .cacheControl(Customizer.withDefaults())
+                .httpStrictTransportSecurity(hsts -> hsts
                     .includeSubDomains(true)
-                    .maxAgeInSeconds(31536000);
+                    .maxAgeInSeconds(31536000)));
+        return http.build();
     }
 }
 ```
@@ -311,8 +308,8 @@ public class SecurityHeadersFilter implements Filter {
         // Cross-Origin-Resource-Policy
         response.setHeader("Cross-Origin-Resource-Policy", "same-origin");
         
-        // Expect-CT header (deprecated but still useful for legacy browsers)
-        response.setHeader("Expect-CT", "max-age=86400, enforce");
+        // Note: Expect-CT header is deprecated and no longer needed
+        // Modern browsers enforce Certificate Transparency by default
         
         // Custom security headers
         response.setHeader("X-Permitted-Cross-Domain-Policies", "none");

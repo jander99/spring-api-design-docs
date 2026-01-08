@@ -23,21 +23,20 @@ Here's how to set up OAuth 2.0 security checks in your app:
 ```java
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableMethodSecurity
+public class SecurityConfig {
     
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf().disable()
-            .authorizeRequests()
-                .antMatchers("/actuator/health/**", "/actuator/info").permitAll()
-                .antMatchers("/api-docs/**", "/swagger-ui/**").permitAll()
-                .anyRequest().authenticated()
-            .and()
-            .oauth2ResourceServer()
-                .jwt()
-                .jwtAuthenticationConverter(jwtAuthenticationConverter());
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/actuator/health/**", "/actuator/info").permitAll()
+                .requestMatchers("/api-docs/**", "/swagger-ui/**").permitAll()
+                .anyRequest().authenticated())
+            .oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
+        return http.build();
     }
     
     @Bean
@@ -86,16 +85,13 @@ public class ReactiveSecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
-            .csrf().disable()
-            .authorizeExchange()
+            .csrf(csrf -> csrf.disable())
+            .authorizeExchange(exchange -> exchange
                 .pathMatchers("/actuator/health/**", "/actuator/info").permitAll()
                 .pathMatchers("/api-docs/**", "/swagger-ui/**").permitAll()
-                .anyExchange().authenticated()
-            .and()
-            .oauth2ResourceServer()
-                .jwt()
-                .jwtAuthenticationConverter(jwtAuthenticationConverter())
-            .and()
+                .anyExchange().authenticated())
+            .oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
             .build();
     }
     
