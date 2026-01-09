@@ -70,7 +70,7 @@ Format data and errors.
 ### [Security](security/README.md)
 Protect your APIs.
 
-- **[Security Standards](security/security-standards.md)** - Use OAuth 2.1, JWT, CORS, rate limiting
+- **[Security Standards](security/security-standards.md)** - Use OAuth 2.1 (draft), JWT, CORS, rate limiting
 
 ### [Advanced Patterns](advanced-patterns/README.md)
 Go beyond basic operations.
@@ -119,7 +119,7 @@ We follow these standards:
 - **Errors:** RFC 9457 - [Error Standards](request-response/error-response-standards.md)
 - **Deprecation:** RFC 8594 - [API Lifecycle](foundations/api-lifecycle.md)
 - **Caching:** RFC 7234 - [HTTP Caching](advanced-patterns/http-caching.md)
-- **Security:** OAuth 2.1, JWT - [Security Standards](security/security-standards.md)
+- **Security:** OAuth 2.1 (draft), JWT - [Security Standards](security/security-standards.md)
 - **Streaming:** SSE, NDJSON - [Streaming APIs](request-response/streaming-apis.md)
 
 ## Navigation

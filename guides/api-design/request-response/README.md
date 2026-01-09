@@ -89,7 +89,7 @@ Use with any REST framework. Based on HTTP and JSON.
 - RFC 9457 for errors
 - JSON Schema
 - HTTP streaming
-- OAuth 2.1
+- OAuth 2.1 (draft)
 
 ### Good Experience
 - Clear examples
