@@ -29,7 +29,7 @@ All security patterns in this guide follow current best practices. They help you
 ## Files
 
 ### [Security Standards.md](security-standards.md)
-This file shows you how to secure your API. You'll learn about OAuth 2.1 and OpenID Connect. These are industry standards for login and access control.
+This file shows you how to secure your API. You'll learn about OAuth 2.1 (draft) and OpenID Connect. These represent current best practices for login and access control.
 
 The guide covers:
 - How users prove their identity

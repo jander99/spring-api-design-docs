@@ -9,9 +9,9 @@
 > 
 > **📊 Complexity:** 9.4 grade level • 1.3% technical density • fairly easy
 
-## 📍 You Are Here - True REST!
+## 📍 You Are Here - Hypermedia Implementation!
 
-Congratulations! You have reached Level 3. This is the highest level of the Richardson Maturity Model. You have implemented true REST as Roy Fielding envisioned it.
+Congratulations! You have reached Level 3. This is the highest level of the Richardson Maturity Model. You have implemented hypermedia controls, a key aspect of RESTful architecture.
 
 ## What This Means
 
@@ -71,7 +71,7 @@ Your API now includes:
 
 ## 💡 What You've Mastered:
 
-- ✅ True REST implementation
+- ✅ Hypermedia controls (HATEOAS)
 - ✅ You can change your API without breaking clients
 - ✅ Responses explain themselves
 - ✅ Clients are flexible and simple
@@ -226,10 +226,10 @@ You can include related resources to save requests:
 Level 0 ████ Complete!
 Level 1 ████ Complete!
 Level 2 ████ Complete!
-Level 3 ████████████ You are here (True REST!)
+Level 3 ████████████ You are here (Hypermedia Controls!)
 ```
 
-**Less than 5% of APIs reach this level!** You have reached the top of REST maturity.
+You have reached the top of the Richardson Maturity Model - the highest level of HTTP API maturity.
 
 ## 🚀 Maintaining Excellence
 

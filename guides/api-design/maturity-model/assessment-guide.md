@@ -54,12 +54,12 @@ You're thinking in resources but not fully utilizing HTTP. Good progress!
 - [🚀 How to Reach Level 2](level-1/next-steps.md)
 
 ### Mostly C's → **Level 2: HTTP Verbs**
-Congratulations! You're at the industry standard. Consider if Level 3 benefits your use case.
+Congratulations! You're at a widely-adopted maturity level. Consider if Level 3 benefits your use case.
 - [📍 Your Current State](level-2/)
 - [🚀 How to Reach Level 3](level-2/next-steps.md)
 
 ### Mostly D's → **Level 3: Hypermedia Controls**
-You've achieved true REST! Focus on maintaining and optimizing.
+You've reached the highest RMM level! Focus on maintaining and optimizing.
 - [📍 Your Current State](level-3/)
 - [✨ Best Practices](level-3/best-practices.md)
 

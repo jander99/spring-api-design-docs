@@ -45,11 +45,13 @@ The server checks the token. If valid, the request proceeds. If invalid, the ser
 
 ### OAuth 2.1 and OpenID Connect
 
-OAuth 2.1 is the industry standard for API authentication. OpenID Connect (OIDC) adds user identity.
+> **Note**: OAuth 2.1 is currently in draft status (as of 2025). It consolidates OAuth 2.0 best practices including mandatory PKCE, removal of implicit flow, and improved security defaults. Many organizations are already implementing these patterns ahead of formal ratification.
+
+OAuth 2.1 represents the current best practice for API authentication. OpenID Connect (OIDC) adds user identity.
 
 **Simple analogy**: OAuth is like a hotel key card. The card proves you have permission. It expires after checkout. You can't copy it.
 
-All APIs must use OAuth 2.1 with OIDC. This provides:
+Modern APIs should use OAuth 2.1 patterns with OIDC. This provides:
 - Secure token generation
 - Automatic expiration
 - Protection against replay attacks

@@ -41,7 +41,7 @@ Assess your API's maturity and get a personalized improvement roadmap:
 | [**Level 0** - Single endpoint, RPC-style](guides/api-design/maturity-model/level-0/) | [Take 5-minute assessment](guides/api-design/maturity-model/assessment-guide.md) |
 | [**Level 1** - Multiple resources](guides/api-design/maturity-model/level-1/) | [View maturity levels](guides/api-design/maturity-model/) |
 | [**Level 2** - HTTP verbs (Industry Standard)](guides/api-design/maturity-model/level-2/) | [See improvement paths](guides/api-design/maturity-model/#quick-assessment) |
-| [**Level 3** - HATEOAS (True REST)](guides/api-design/maturity-model/level-3/) | [Check best practices](guides/api-design/maturity-model/level-3/best-practices.md) |
+| [**Level 3** - HATEOAS/Hypermedia](guides/api-design/maturity-model/level-3/) | [Check best practices](guides/api-design/maturity-model/level-3/best-practices.md) |
 
 </div>
 
@@ -66,7 +66,7 @@ Most modern APIs are at Level 2, and that's perfectly fine! Use our guide to und
 3. **Architecture**: [Dependency injection and component management](languages/spring/architecture/)
 4. **Controllers**: [Implement request handling](languages/spring/controllers/)
 5. **Error Handling**: [Exception hierarchy and RFC 9457](languages/spring/error-handling/)
-6. **Security**: [OAuth 2.1 and authorization](languages/spring/security/)
+6. **Security**: [OAuth 2.1 (draft) and authorization](languages/spring/security/)
 7. **Testing**: [Unit, integration, and specialized tests](languages/spring/testing/)
 8. **Production Ready**: [Configuration, observability, monitoring](languages/spring/configuration/)
 
@@ -99,7 +99,7 @@ Most modern APIs are at Level 2, and that's perfectly fine! Use our guide to und
 - **[🎯 Architecture](languages/spring/architecture/)** - Dependency injection, component management
 - **[🎮 Controllers](languages/spring/controllers/)** - MVC/WebFlux patterns, request mapping, testing
 - **[⚠️ Error Handling](languages/spring/error-handling/)** - Exception hierarchy, RFC 9457, validation
-- **[🔐 Security](languages/spring/security/)** - OAuth 2.1, authorization, CORS, rate limiting
+- **[🔐 Security](languages/spring/security/)** - OAuth 2.1 (draft), authorization, CORS, rate limiting
 - **[⚙️ Configuration](languages/spring/configuration/)** - Profiles, database, external services, observability
 - **[📊 Observability](languages/spring/observability/)** - Logging, monitoring, metrics
 - **[🧪 Testing](languages/spring/testing/)** - Unit, integration, and specialized testing patterns
@@ -108,7 +108,7 @@ Most modern APIs are at Level 2, and that's perfectly fine! Use our guide to und
 
 ## Technology Stack
 
-**API Standards**: HTTP/REST, OpenAPI 3.1+, OAuth 2.1/OIDC, RFC 9457, JSON Schema
+**API Standards**: HTTP/REST, OpenAPI 3.1+, OAuth 2.1 (draft)/OIDC, RFC 9457, JSON Schema
 
 **Spring**: Spring Boot 3.x, WebFlux, Spring Security, Micrometer, springdoc-openapi v2, Spring Cloud Contract
 

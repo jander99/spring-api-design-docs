@@ -158,7 +158,7 @@ Level 3 adds hypermedia controls. This is called HATEOAS. HATEOAS means "Hyperme
 - Responses include action links
 - Clients discover available actions
 - API documents itself
-- You get true REST as Roy Fielding defined it
+- You implement the hypermedia constraint of RESTful architecture
 
 [→ **Explore Level 3 Benefits**](next-steps.md)
 
@@ -171,7 +171,7 @@ Level 2 ████████████ You are here (Industry Standard!)
 Level 3 ░░░░ Optional enhancement
 ```
 
-**You achieved what 80% of successful APIs use!** Level 2 balances complexity and features well.
+Level 2 is widely adopted by production APIs and balances complexity with features well.
 
 ## 🔍 Validate Your Implementation
 

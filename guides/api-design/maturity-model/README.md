@@ -64,7 +64,7 @@ The Richardson Maturity Model (RMM) provides a way to grade your REST API's matu
 - Responses include links to related resources
 - Self-documenting API
 - Clients can discover capabilities
-- True REST as defined by Roy Fielding
+- Implements the hypermedia constraint of RESTful architecture
 
 **Example:** Response includes `"_links": {"self": "/users/123", "orders": "/users/123/orders"}`
 
@@ -105,6 +105,56 @@ Take our [5-minute assessment](assessment-guide.md) to determine your API's matu
 2. [Review best practices](level-3/best-practices.md)
 3. Help others improve by sharing your experience
 
-## 🎯 Most Common Starting Point
+## 🎯 Most Common Pattern
 
-**80% of modern APIs are at Level 2** - and that's perfectly fine! Level 2 provides excellent balance between complexity and functionality. Level 3 is ideal for public APIs and long-lived systems where discoverability is crucial.
+Level 2 is widely adopted in production and provides excellent balance between complexity and functionality. Level 3 is ideal for public APIs and long-lived systems where discoverability is crucial.
+
+## 📚 Understanding REST vs Richardson Maturity Model
+
+The Richardson Maturity Model is a **pedagogical tool** for understanding API design progression. It is not the same as Roy Fielding's REST architectural style.
+
+### Roy Fielding's REST Constraints
+
+REST (Representational State Transfer) is defined by **six architectural constraints** in Roy Fielding's 2000 dissertation:
+
+1. **Client-Server**: Separation of concerns between UI and data storage
+2. **Stateless**: Each request contains all information needed; no session state on server
+3. **Cacheable**: Responses must define themselves as cacheable or not
+4. **Layered System**: Client cannot tell if connected directly to end server
+5. **Uniform Interface**: Standardized way to interact with resources (includes 4 sub-constraints)
+6. **Code-on-Demand** (optional): Servers can extend client functionality
+
+### The Uniform Interface Constraint
+
+The Uniform Interface consists of four sub-constraints:
+
+1. **Resource Identification**: Resources identified by URIs
+2. **Manipulation Through Representations**: Clients modify resources through representations
+3. **Self-Descriptive Messages**: Each message includes enough information to process it
+4. **Hypermedia as the Engine of Application State (HATEOAS)**: Clients navigate through hypermedia links
+
+### RMM vs REST
+
+The Richardson Maturity Model focuses primarily on:
+- **Level 1**: Resource identification (RMM addresses 1 of 4 Uniform Interface sub-constraints)
+- **Level 2**: HTTP verbs and status codes (helps with self-descriptive messages)
+- **Level 3**: Hypermedia controls (addresses HATEOAS sub-constraint)
+
+**Important**: An API at Level 3 is not automatically "RESTful" if it violates:
+- Statelessness (e.g., server-side sessions)
+- Cacheability (e.g., missing cache headers)
+- Layered system principles
+
+### Practical Implications
+
+Most production APIs are "HTTP APIs" or "REST-like" rather than fully RESTful:
+- They use HTTP conventions (RMM Level 2)
+- They may violate some REST constraints (statelessness, caching)
+- This is often acceptable for their use case
+
+Use the RMM to improve HTTP API design. Use Fielding's constraints to understand full REST architecture.
+
+### Further Reading
+
+- [Roy Fielding's Dissertation](https://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm) - Original REST definition (2000)
+- [Martin Fowler's RMM Article](https://martinfowler.com/articles/richardsonMaturityModel.html) - Richardson Maturity Model explanation
