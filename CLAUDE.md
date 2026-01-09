@@ -4,20 +4,22 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## Repository Overview
 
-This is a **documentation repository** organized as a multi-layered design system:
+**API Design Guide** - A comprehensive, language-agnostic guide to designing REST APIs.
+
+This documentation repository follows a multi-layered architecture:
 
 1. **Guides** (`/guides/`) - Language-agnostic theory and design principles
-2. **Languages** (`/languages/`) - Technology-specific implementations (Spring, Java, etc.)
-3. **Examples** (`/examples/`) - Format-agnostic examples (JSON, YAML, HTTP, etc.)
+2. **Languages** (`/languages/`) - Technology-specific implementations (Spring complete, others planned)
+3. **Examples** (`/examples/`) - Format-agnostic examples (JSON, YAML, HTTP)
 
-The repository contains only documentation files (`.md` format) and serves as an architectural reference for building well-designed software systems and APIs.
+The repository contains only documentation files (`.md` format) and serves as an architectural reference for building well-designed APIs.
 
-**Core Principle**: Each concrete implementation in a language should have a corresponding abstract theory in guides. Conversely, abstract theory should have concrete implementations in language-specific sections.
+**Core Principle**: Theory and implementation are separated. Each language implementation should have corresponding abstract theory in guides. Abstract theory should eventually have implementations across multiple languages.
 
 ## Repository Structure
 
 ```
-software-design-docs/
+api-design-guide/
 ├── guides/                         # Language-agnostic design theory
 │   ├── api-design/                 # REST/HTTP design principles and standards
 │   │   ├── maturity-model/         # Richardson Maturity Model framework
@@ -73,10 +75,10 @@ software-design-docs/
 
 ### Content Relationship Rules
 
-- **Every Spring pattern** should have an abstract analog in API design guides
-- **Every API design theory** should have a Spring implementation example
-- **If a topic exists only in Spring**, create the abstract theory version in guides
-- **If a theory exists without implementation**, create the Spring-specific version
+- **Every language implementation** should have an abstract analog in API design guides
+- **Every API design theory** should eventually have implementation examples
+- **If a topic exists only in one language**, create the abstract theory version in guides
+- **If a theory exists without implementation**, implementations can be added to any language
 
 ## Guide Standards
 
@@ -263,5 +265,5 @@ When creating or editing documentation:
 - NEVER create files unless absolutely necessary for the task
 - ALWAYS prefer editing existing files over creating new ones  
 - NEVER proactively create documentation files unless explicitly requested
-- Maintain language-agnostic approach in `/api-design/` (no programming code)
-- Ensure Spring-specific content stays in `/spring-design/`
+- Maintain language-agnostic approach in `/guides/api-design/` (no programming code)
+- Ensure language-specific content stays in `/languages/[framework]/`

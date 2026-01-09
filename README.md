@@ -1,32 +1,45 @@
-# Software Design Documentation
+# API Design Guide
 
-Comprehensive guides for designing software systems and APIs. This repository contains both abstract design theory and language-specific implementations.
+A comprehensive, language-agnostic guide to designing REST APIs. Learn the theory once, implement in any language.
 
-## 📚 Table of Contents
+## Why This Guide?
 
-### **Design Guides** (Theory & Principles)
+Most API documentation mixes theory with framework-specific code. This makes it hard to:
+- Learn principles that transfer across technologies
+- Find the right pattern for your stack
+- Onboard teams using different languages
 
-The `guides/` directory contains language-agnostic design theory and standards:
+**This guide separates concerns:**
+- **Theory** → Universal HTTP/REST principles (works everywhere)
+- **Implementation** → Language-specific examples (currently Spring, more coming)
 
-- **[API Design](guides/api-design/)** - REST/HTTP design principles, standards, and patterns
+## 📚 What's Inside
+
+### **Design Guides** (Language-Agnostic Theory)
+
+The `guides/` directory contains principles that apply to any technology:
+
+- **[API Design](guides/api-design/)** - REST/HTTP design principles and standards
   - Maturity Model assessment, foundations, request/response, security, advanced patterns, documentation
-- **[Architecture](guides/architecture/)** - System architecture patterns beyond REST APIs
+- **[Architecture](guides/architecture/)** - System architecture patterns
   - Event-driven architecture, CQRS, event sourcing, saga patterns
-- **[Observability](guides/observability/)** - Monitoring, metrics, logging, and tracing standards
-  - Three pillars of observability, distributed tracing, correlation IDs, SLOs
-- **Domain-Driven Design** *(coming soon)* - Business logic modeling and bounded contexts
-- **Hexagonal Architecture** *(coming soon)* - Separating domain logic from external systems
+- **[Observability](guides/observability/)** - Monitoring and operational standards
+  - Metrics, logging, tracing, correlation IDs, SLOs
 
-### **Language-Specific Implementations**
+### **Language Implementations**
 
-The `languages/` directory contains practical implementations for specific technologies:
+The `languages/` directory contains framework-specific implementations:
 
-- **[Spring](languages/spring/)** - Spring Boot microservices with DDD, MVC/WebFlux, testing, and observability
-  - Architecture, project structure, controllers, security, configuration, testing, error handling
+| Language | Framework | Status |
+|----------|-----------|--------|
+| Java | [Spring Boot](languages/spring/) | ✅ Complete |
+| Node.js | Express/Fastify | 🔜 Planned |
+| Python | FastAPI/Flask | 🔜 Planned |
+| Go | Standard library | 🔜 Planned |
 
 ### **Examples** (Format-Agnostic)
 
-The `examples/` directory contains practical examples using standard formats (JSON, YAML, etc.) that apply across languages and frameworks.
+The `examples/` directory contains HTTP, JSON, and YAML examples that work with any stack.
 
 ---
 
@@ -49,9 +62,9 @@ Most modern APIs are at Level 2, and that's perfectly fine! Use our guide to und
 
 ---
 
-## 🚀 Quick Start Paths
+## 🚀 Quick Start
 
-### For API Design
+### Learn API Design (Any Language)
 
 1. **Assess Your API**: [Richardson Maturity Model assessment](guides/api-design/maturity-model/assessment-guide.md) (5 minutes)
 2. **Learn Foundations**: [API versioning, resource naming, URL structure](guides/api-design/foundations/)
@@ -59,16 +72,31 @@ Most modern APIs are at Level 2, and that's perfectly fine! Use our guide to und
 4. **Security**: [Authentication and authorization standards](guides/api-design/security/)
 5. **Advanced Patterns**: [Event-driven, reactive, streaming](guides/api-design/advanced-patterns/)
 
-### For Spring Implementation
+### Implement in Your Stack
 
-1. **Project Setup**: [DDD package organization](languages/spring/project-structure/)
-2. **Choose Your Style**: [Imperative (MVC)](languages/spring/project-structure/imperative-examples.md) or [Reactive (WebFlux)](languages/spring/project-structure/reactive-examples.md)
-3. **Architecture**: [Dependency injection and component management](languages/spring/architecture/)
-4. **Controllers**: [Implement request handling](languages/spring/controllers/)
-5. **Error Handling**: [Exception hierarchy and RFC 9457](languages/spring/error-handling/)
-6. **Security**: [OAuth 2.1 (draft) and authorization](languages/spring/security/)
-7. **Testing**: [Unit, integration, and specialized tests](languages/spring/testing/)
-8. **Production Ready**: [Configuration, observability, monitoring](languages/spring/configuration/)
+<details>
+<summary><strong>Spring Boot (Java)</strong></summary>
+
+1. [Project Structure](languages/spring/project-structure/) - DDD package organization
+2. [Controllers](languages/spring/controllers/) - MVC/WebFlux patterns
+3. [Error Handling](languages/spring/error-handling/) - RFC 9457 implementation
+4. [Security](languages/spring/security/) - OAuth 2.1, authorization
+5. [Testing](languages/spring/testing/) - Unit, integration, specialized tests
+6. [Configuration](languages/spring/configuration/) - Profiles, observability
+
+</details>
+
+<details>
+<summary><strong>Other Languages</strong> (Coming Soon)</summary>
+
+We're working on implementations for:
+- **Node.js** - Express, Fastify
+- **Python** - FastAPI, Flask
+- **Go** - Standard library, Gin
+
+Want to contribute? See [Contributing](#contributing).
+
+</details>
 
 ---
 
@@ -82,58 +110,67 @@ Most modern APIs are at Level 2, and that's perfectly fine! Use our guide to und
 
 ---
 
-## 📖 Complete Navigation
+## 📖 Full Navigation
 
-### API Design Standards
+### API Design (Theory)
 
-- **[🎯 Maturity Assessment](guides/api-design/maturity-model/)** - Richardson Maturity Model framework
-- **[🏗️ Foundations](guides/api-design/foundations/)** - API versioning, resource naming, URL structure
-- **[🔄 Request/Response](guides/api-design/request-response/)** - Content types, errors (RFC 9457), pagination, streaming
-- **[🔐 Security](guides/api-design/security/)** - Authentication, authorization, API protection
-- **[🚀 Advanced Patterns](guides/api-design/advanced-patterns/)** - Event-driven, reactive, streaming architectures
-- **[📚 Documentation](guides/api-design/documentation/)** - OpenAPI standards, tools, testing
+| Section | What You'll Learn |
+|---------|-------------------|
+| [🎯 Maturity Model](guides/api-design/maturity-model/) | Assess your API's REST maturity level |
+| [🏗️ Foundations](guides/api-design/foundations/) | HTTP fundamentals, versioning, resource naming |
+| [🔄 Request/Response](guides/api-design/request-response/) | Content types, errors (RFC 9457), pagination |
+| [🔐 Security](guides/api-design/security/) | OAuth 2.1, JWT, authorization patterns |
+| [🚀 Advanced Patterns](guides/api-design/advanced-patterns/) | Caching, rate limiting, async, streaming |
+| [📚 Documentation](guides/api-design/documentation/) | OpenAPI standards, testing |
+| [🧪 Testing](guides/api-design/testing/) | Schema testing, client testing |
 
 ### Spring Implementation
 
-- **[🏗️ Project Structure](languages/spring/project-structure/)** - DDD package organization, imperative/reactive examples
-- **[🎯 Architecture](languages/spring/architecture/)** - Dependency injection, component management
-- **[🎮 Controllers](languages/spring/controllers/)** - MVC/WebFlux patterns, request mapping, testing
-- **[⚠️ Error Handling](languages/spring/error-handling/)** - Exception hierarchy, RFC 9457, validation
-- **[🔐 Security](languages/spring/security/)** - OAuth 2.1 (draft), authorization, CORS, rate limiting
-- **[⚙️ Configuration](languages/spring/configuration/)** - Profiles, database, external services, observability
-- **[📊 Observability](languages/spring/observability/)** - Logging, monitoring, metrics
-- **[🧪 Testing](languages/spring/testing/)** - Unit, integration, and specialized testing patterns
+| Section | What You'll Learn |
+|---------|-------------------|
+| [🏗️ Project Structure](languages/spring/project-structure/) | DDD packages, MVC vs WebFlux |
+| [🎮 Controllers](languages/spring/controllers/) | Request mapping, validation |
+| [⚠️ Error Handling](languages/spring/error-handling/) | Exception hierarchy, RFC 9457 |
+| [🔐 Security](languages/spring/security/) | OAuth 2.1, CORS, rate limiting |
+| [🧪 Testing](languages/spring/testing/) | Unit, integration, contract tests |
+| [⚙️ Configuration](languages/spring/configuration/) | Profiles, observability |
 
 ---
 
-## Technology Stack
+## Standards Used
 
 **API Standards**: HTTP/REST, OpenAPI 3.1+, OAuth 2.1 (draft)/OIDC, RFC 9457, JSON Schema
-
-**Spring**: Spring Boot 3.x, WebFlux, Spring Security, Micrometer, springdoc-openapi v2, Spring Cloud Contract
 
 ---
 
 ## Repository Structure
 
 ```
-software-design-docs/
+api-design-guide/
 ├── guides/                    # Language-agnostic design theory
-│   └── api-design/            # REST/HTTP design standards and patterns
-├── languages/                 # Language-specific implementations
-│   └── spring/                # Spring Boot reference implementation
-├── examples/                  # Format-agnostic examples (JSON, YAML, etc.)
-├── _reference/                # Work-in-progress and reference materials
-└── scripts/                   # Utility scripts for documentation maintenance
+│   ├── api-design/            # REST/HTTP standards (71 documents)
+│   ├── architecture/          # System architecture patterns
+│   └── observability/         # Monitoring standards
+├── languages/                 # Framework-specific implementations
+│   └── spring/                # Spring Boot (complete)
+├── examples/                  # HTTP, JSON, YAML examples
+└── scripts/                   # Documentation utilities
 ```
 
 ---
 
 ## Contributing
 
-When adding new content:
-- **Theory**: Add to `guides/` with language-agnostic principles
-- **Implementation**: Add to `languages/[framework]/` with specific technology details
-- **Examples**: Use standard formats (JSON, YAML) in the `examples/` directory
-- **Readability**: Follow reading level guidelines (see `scripts/READING_LEVEL_GUIDELINES.md`)
+We welcome contributions! Here's how:
+
+### Add API Design Theory
+Add to `guides/` using only HTTP, JSON, and YAML examples. No programming code.
+
+### Add Language Implementation
+Create `languages/[your-framework]/` following the Spring structure as a template.
+
+### Guidelines
+- **Readability**: Max Grade 14 reading level (run `node scripts/reading-level-analyzer.js`)
+- **Cross-references**: Link theory ↔ implementation where applicable
+- **Examples**: Use real-world scenarios, not foo/bar
 
