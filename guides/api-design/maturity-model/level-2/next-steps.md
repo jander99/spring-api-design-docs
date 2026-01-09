@@ -463,8 +463,8 @@ The client never hardcodes URLs—it discovers them at runtime.
 - **Flexibility**: Change without breaking
 - **Discovery**: Self-documenting API
 - **Longevity**: API can evolve
-- **Standards**: True REST compliance
+- **Standards**: Implements the hypermedia constraint
 
 ## Next Steps
 
-If you implement HATEOAS, you'll have achieved true REST as defined by Roy Fielding. Check the [Level 3 Guide](../level-3/) for best practices and examples!
+If you implement HATEOAS, you'll have reached the highest level of the Richardson Maturity Model. Check the [Level 3 Guide](../level-3/) for best practices and examples!
