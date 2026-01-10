@@ -26,6 +26,7 @@ This guide shows you how to monitor Spring Boot apps. You'll learn to:
 
 ### Core Documentation
 
+- **[Structured Logging](structured-logging.md)**: **NEW (Spring Boot 3.4+)** - Native JSON logging with ECS, GELF, and Logstash formats. No external dependencies.
 - **[Logging Standards](logging-standards.md)**: Write structured logs. Track requests with correlation IDs. Works with both imperative and reactive apps.
 - **[Metrics and Tracing](metrics-and-tracing.md)**: Count events and time operations. Follow requests across services.
 - **[Health and Monitoring](health-and-monitoring.md)**: Check if your app is healthy. Set up alerts. Integrate with Kubernetes.
@@ -240,6 +241,7 @@ management:
 - [API Observability Standards](../../../guides/api-design/advanced-patterns/api-observability-standards.md) - Protocol-level observability patterns
 
 ### Spring Implementation
+- [Structured Logging](structured-logging.md) - **NEW** Spring Boot 3.4+ native JSON logging
 - [Logging Standards](logging-standards.md) - Structured logging and correlation IDs
 - [Metrics and Tracing](metrics-and-tracing.md) - Metrics collection and distributed tracing
 - [Health and Monitoring](health-and-monitoring.md) - Health checks, alerting, and dashboards
