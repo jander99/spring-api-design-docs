@@ -89,6 +89,16 @@ Write and test your docs.
 - **[Documentation Testing](documentation/documentation-testing.md)** - Validate docs
 - **[Tools & Integration](documentation/documentation-tools-and-integration.md)** - Use Swagger UI, Redoc
 
+### [gRPC](grpc/README.md)
+Build high-performance internal microservices.
+
+- **[gRPC vs REST](grpc/grpc-vs-rest.md)** - When to use gRPC
+- **[Protobuf Schema Design](grpc/protobuf-schema-design.md)** - Design schemas and services
+- **[Error Handling](grpc/error-handling.md)** - Use 16 canonical status codes
+- **[Streaming Patterns](grpc/streaming-patterns.md)** - Server, client, bidirectional streaming
+- **[Security](grpc/security.md)** - TLS, authentication, authorization
+- **[Load Balancing](grpc/load-balancing.md)** - Client-side load balancing
+
 ### [Maturity Model](maturity-model/README.md)
 Check and improve API quality.
 
