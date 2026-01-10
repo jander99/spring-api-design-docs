@@ -125,6 +125,20 @@ This guide covers:
 - Custom health checks
 - Structured logging
 
+### 7. [Virtual Threads](virtual-threads.md)
+
+**Scale with lightweight threads (Java 21+)**
+
+Use virtual threads to handle massive concurrency without reactive programming.
+
+This guide covers:
+- Enabling virtual threads in Spring Boot 3.2+
+- What gets virtualized (servlets, @Async, @Scheduled)
+- Custom executors and structured concurrency
+- Performance considerations and pitfalls
+- Migration from thread pools
+- Monitoring and debugging
+
 ## Common Configuration Patterns
 
 ### Basic Configuration File
