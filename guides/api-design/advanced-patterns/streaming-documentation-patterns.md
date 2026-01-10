@@ -358,7 +358,7 @@ components:
           "status": 500,
           "detail": "Unable to process order update",
           "instance": "/orders/stream",
-          "timestamp": "2023-12-01T10:30:00Z",
+          "timestamp": "2025-12-01T10:30:00Z",
           "recoverable": true
         }
     

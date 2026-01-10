@@ -71,7 +71,7 @@ class PaymentServiceClientIntegrationTest {
                         "status": "COMPLETED",
                         "amount": 100.00,
                         "currency": "USD",
-                        "processedAt": "2023-12-01T10:00:00Z"
+                        "processedAt": "2025-12-01T10:00:00Z"
                     }
                     """)));
 

@@ -148,7 +148,7 @@ For collection endpoints (returning multiple resources):
       "totalElements": 54,
       "totalPages": 3
     },
-    "timestamp": "2023-04-15T14:32:22Z"
+    "timestamp": "2025-04-15T14:32:22Z"
   }
 }
 ```

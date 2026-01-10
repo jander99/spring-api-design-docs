@@ -65,7 +65,7 @@ public class ProblemDetail {
   "status": 404,
   "detail": "Order with identifier 123e4567-e89b-12d3-a456-426614174000 not found",
   "instance": "/v1/orders/123e4567-e89b-12d3-a456-426614174000",
-  "timestamp": "2023-10-15T10:30:00Z",
+  "timestamp": "2025-10-15T10:30:00Z",
   "requestId": "req-123-456"
 }
 ```
@@ -110,7 +110,7 @@ public class LegacyErrorResponse {
 {
   "code": "RESOURCE_NOT_FOUND",
   "message": "Order with identifier 123e4567-e89b-12d3-a456-426614174000 not found",
-  "timestamp": "2023-10-15T10:30:00Z",
+  "timestamp": "2025-10-15T10:30:00Z",
   "requestId": "req-123-456"
 }
 ```
@@ -244,7 +244,7 @@ public class ErrorResponseBuilder {
   "status": 400,
   "detail": "One or more request parameters failed validation",
   "instance": "/v1/orders",
-  "timestamp": "2023-10-15T10:30:00Z",
+  "timestamp": "2025-10-15T10:30:00Z",
   "requestId": "req-123-456",
   "errors": [
     {
@@ -265,7 +265,7 @@ public class ErrorResponseBuilder {
   "status": 400,
   "detail": "One or more request parameters failed validation",
   "instance": "/v1/orders",
-  "timestamp": "2023-10-15T10:30:00Z",
+  "timestamp": "2025-10-15T10:30:00Z",
   "requestId": "req-123-456",
   "errors": [
     {

@@ -126,7 +126,7 @@ public class TestConfig {
      public Clock testClock() {
          // Fixed clock for consistent test dates
          return Clock.fixed(
-             Instant.parse("2023-01-01T12:00:00Z"),
+             Instant.parse("2025-01-01T12:00:00Z"),
              ZoneOffset.UTC
          );
      }

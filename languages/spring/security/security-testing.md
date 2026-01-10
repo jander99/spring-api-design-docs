@@ -597,7 +597,7 @@ public class SecurityTestConfig {
     @Primary
     public Clock testClock() {
         // Use fixed clock for predictable testing
-        return Clock.fixed(Instant.parse("2023-01-01T00:00:00Z"), ZoneOffset.UTC);
+        return Clock.fixed(Instant.parse("2025-01-01T00:00:00Z"), ZoneOffset.UTC);
     }
     
     @Bean
