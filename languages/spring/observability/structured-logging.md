@@ -215,6 +215,9 @@ logger.atInfo()
 If the built-in formats do not meet your needs, you can implement the `StructuredLogFormatter` interface to define your own JSON structure.
 
 ```java
+import org.springframework.boot.logging.structured.StructuredLogFormatter;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+
 public class MyCompanyFormatter implements StructuredLogFormatter<ILoggingEvent> {
     @Override
     public String format(ILoggingEvent event) {
@@ -385,72 +388,3 @@ Structured logs are significantly larger (2x to 5x) than plain text logs because
 - [Logging and Monitoring](./logging-and-monitoring.md) - General logging and observability principles.
 - [Configuration Principles](../configuration/configuration-principles.md) - How to manage environment-specific properties.
 - [Observability Standards](../../../guides/observability/observability-standards.md) - The high-level goals of system visibility.
-
-## Security Best Practices
-
-Logs often accidentally contain sensitive information like passwords or PII (Personally Identifiable Information).
-
-### Field Exclusion
-
-Avoid adding sensitive data to MDC. If you must use a third-party library that adds unwanted fields, use a customizer to remove them.
-
-```java
-@Component
-class SecurityCustomizer implements StructuredLoggingJsonMembersCustomizer<Object> {
-    @Override
-    public void customize(Map<String, Object> members) {
-        members.remove("password");
-        members.remove("secret_key");
-    }
-}
-```
-
-### PII Handling
-
-Never log emails, phone numbers, or credit card numbers in plain text. Use masking or hashing if the data is required for debugging.
-
-## Performance Considerations
-
-### Async Logging
-
-Structured logging involves JSON serialization, which adds overhead. Use asynchronous appenders to prevent logging from blocking your application's main threads.
-
-```yaml
-logging:
-  logback:
-    rollingpolicy:
-      clean-history-on-start: true
-```
-
-### Volume Management
-
-Structured logs are larger than plain text logs because they include field names in every entry.
-- Use `INFO` level as the default in production.
-- Use sampling for trace-level logs.
-- Monitor disk space and set up log rotation.
-
-## Troubleshooting
-
-### Logs are still plain text
-- Ensure you are using Spring Boot 3.4.0 or higher.
-- Check if a custom `logback-spring.xml` is overriding Spring's default configuration.
-- Verify that the profile activating structured logging is actually active.
-
-### Missing Trace IDs
-- Ensure the `micrometer-tracing` dependency is present.
-- Verify that an `ObservationRegistry` or `Tracer` is bean-managed.
-- Check if the request is being sampled.
-
-## Best Practices
-
-1. **Use ECS**: It is the most standardized format and works best with modern tools.
-2. **Standardize Keys**: Use consistent MDC keys (e.g., `user_id` vs `userId`) across all services.
-3. **Use Profiles**: Keep logs human-readable in development for better productivity.
-4. **Leverage MDC**: Use MDC for cross-cutting concerns like request context.
-5. **Use Fluent API**: Use `addKeyValue` for event-specific attributes.
-
-## Related Documentation
-
-- [Logging and Monitoring](./logging-and-monitoring.md) - General logging principles
-- [Configuration Principles](../configuration/configuration-principles.md) - Managing application properties
-- [Observability Standards](../../../guides/observability/Observability-Standards.md) - Global observability goals
