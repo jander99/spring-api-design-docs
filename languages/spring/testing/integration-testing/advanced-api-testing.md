@@ -480,7 +480,7 @@ void shouldAcceptApiVersionHeader() {
     // Given
     UUID orderId = createPersistedOrder().getId();
     HttpHeaders headers = new HttpHeaders();
-    headers.set("X-API-Version", "2023-10-01");
+    headers.set("X-API-Version", "2025-10-01");
     HttpEntity<Void> entity = new HttpEntity<>(headers);
 
     // When
@@ -489,7 +489,7 @@ void shouldAcceptApiVersionHeader() {
 
     // Then
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(response.getHeaders().get("X-API-Version")).contains("2023-10-01");
+    assertThat(response.getHeaders().get("X-API-Version")).contains("2025-10-01");
 }
 ```
 

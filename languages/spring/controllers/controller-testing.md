@@ -801,7 +801,7 @@ public class ControllerTestConfig {
     @Bean
     @Primary
     public Clock testClock() {
-        return Clock.fixed(Instant.parse("2023-01-01T00:00:00Z"), ZoneOffset.UTC);
+        return Clock.fixed(Instant.parse("2025-01-01T00:00:00Z"), ZoneOffset.UTC);
     }
     
     @Bean
