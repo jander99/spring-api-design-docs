@@ -99,9 +99,9 @@ When enabled, Spring Boot automatically uses virtual threads for:
 |--------|----------------------|
 | **Tomcat** | Full support |
 | **Jetty** | Full support |
-| **Undertow** | Not supported |
+| **Undertow** | Not supported in Spring Boot |
 
-If you use Undertow, switch to Tomcat or Jetty to benefit from virtual threads.
+**Note**: While Undertow 2.3.10+ has virtual thread support, Spring Boot does not auto-configure virtual threads for Undertow. If you use Undertow, switch to Tomcat or Jetty to benefit from automatic virtual thread integration in Spring Boot.
 
 ## What Gets Virtualized
 
@@ -521,14 +521,23 @@ public class DatabaseAccessor {
     private final JdbcTemplate jdbcTemplate;
     
     public List<Data> queryWithLimit(String sql) {
+        boolean acquired = false;
         try {
             dbSemaphore.acquire();
-            return jdbcTemplate.query(sql, rowMapper);
+            acquired = true;
+            return jdbcTemplate.query(sql, (rs, rowNum) -> {
+                Data data = new Data();
+                data.setId(rs.getLong("id"));
+                data.setValue(rs.getString("value"));
+                return data;
+            });
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Interrupted waiting for DB", e);
         } finally {
-            dbSemaphore.release();
+            if (acquired) {
+                dbSemaphore.release();
+            }
         }
     }
 }
@@ -798,14 +807,18 @@ public class DataService {
     private final DataRepository repository;
     
     public Data fetchData(Long id) {
+        boolean acquired = false;
         try {
             dbSemaphore.acquire();
+            acquired = true;
             return repository.findById(id).orElseThrow();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new ServiceException("Interrupted", e);
         } finally {
-            dbSemaphore.release();
+            if (acquired) {
+                dbSemaphore.release();
+            }
         }
     }
 }
