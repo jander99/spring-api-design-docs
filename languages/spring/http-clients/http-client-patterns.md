@@ -2,30 +2,110 @@
 
 > **📖 Reading Guide**
 > 
-> **⏱️ Reading Time:** 33 minutes | **🔴 Level:** Advanced
+> **⏱️ Reading Time:** 35 minutes | **🔴 Level:** Advanced
 > 
 > **📋 Prerequisites:** Spring Boot basics, HTTP fundamentals, reactive programming concepts  
-> **🎯 Key Topics:** RestTemplate, WebClient, Resilience4j, connection pooling
+> **🎯 Key Topics:** RestClient, RestTemplate, WebClient, Resilience4j, connection pooling
 > 
 > **📊 Complexity:** Grade 14 • 1.2% technical density • Difficult
 
 ## Overview
 
-Spring provides two HTTP client options:
+Spring provides three HTTP client options:
 
-- **RestTemplate**: Blocking HTTP client for Spring MVC
-- **WebClient**: Non-blocking HTTP client for Spring WebFlux
+- **RestClient** (Recommended): Modern synchronous client with fluent API (Spring Boot 3.2+)
+- **WebClient**: Non-blocking reactive client for high-concurrency apps
+- **RestTemplate** (Deprecated): Legacy synchronous client in maintenance mode
 
-This guide shows both approaches. You'll learn about resilience, error handling, timeouts, and connection pooling.
+This guide shows all three approaches. You'll learn about resilience, error handling, timeouts, and connection pooling.
 
 ### When to Use Each Client
 
 | Client | Use When | Advantages | Disadvantages |
 |--------|----------|------------|---------------|
-| **RestTemplate** | Spring MVC apps | Simple, familiar | Blocking, deprecated |
-| **WebClient** | Spring WebFlux apps | Non-blocking, modern | Steeper learning curve |
+| **RestClient** | New Spring Boot 3.2+ sync apps | Fluent API, native observability, modern | Requires Spring Boot 3.2+ |
+| **WebClient** | Spring WebFlux apps, high concurrency | Non-blocking, backpressure support | Steeper learning curve |
+| **RestTemplate** | Legacy codebases only | Familiar to existing teams | Deprecated (Nov 2025), no new features |
 
-**Note**: RestTemplate still works in Spring MVC. For new projects, choose WebClient.
+**Note**: For new synchronous projects, use RestClient. For reactive apps, use WebClient. RestTemplate should only be used for maintaining existing code.
+
+## RestClient Patterns (Recommended for Spring Boot 3.2+)
+
+RestClient is the modern synchronous HTTP client introduced in Spring Framework 6.1. It provides a fluent API similar to WebClient but for blocking execution. See the [RestClient Guide](./restclient-guide.md) for comprehensive documentation.
+
+### Basic RestClient Setup
+
+```java
+@Service
+public class UserService {
+    private final RestClient restClient;
+
+    public UserService(RestClient.Builder restClientBuilder) {
+        this.restClient = restClientBuilder
+            .baseUrl("https://api.example.com")
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .build();
+    }
+
+    public User getUser(Long id) {
+        return restClient.get()
+            .uri("/users/{id}", id)
+            .retrieve()
+            .body(User.class);
+    }
+
+    public User createUser(User user) {
+        return restClient.post()
+            .uri("/users")
+            .body(user)
+            .retrieve()
+            .body(User.class);
+    }
+}
+```
+
+### RestClient Error Handling
+
+```java
+public User getUser(Long id) {
+    return restClient.get()
+        .uri("/users/{id}", id)
+        .retrieve()
+        .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+            throw new UserNotFoundException("User not found: " + id);
+        })
+        .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
+            throw new ServiceUnavailableException("Service temporarily unavailable");
+        })
+        .body(User.class);
+}
+```
+
+### RestClient with Resilience4j
+
+```java
+@Service
+@RequiredArgsConstructor
+public class ResilientUserService {
+    private final RestClient restClient;
+    private final CircuitBreaker circuitBreaker;
+    private final Retry retry;
+
+    public User getUser(Long id) {
+        Supplier<User> supplier = () -> restClient.get()
+            .uri("/users/{id}", id)
+            .retrieve()
+            .body(User.class);
+
+        return Decorators.ofSupplier(supplier)
+            .withCircuitBreaker(circuitBreaker)
+            .withRetry(retry)
+            .get();
+    }
+}
+```
+
+For complete RestClient documentation, see the [RestClient Guide](./restclient-guide.md).
 
 ## RestTemplate Configuration
 

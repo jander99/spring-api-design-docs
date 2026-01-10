@@ -2,10 +2,10 @@
 
 > **📖 Reading Guide**
 > 
-> **⏱️ Reading Time:** 2 minutes | **🟢 Level:** Beginner
+> **⏱️ Reading Time:** 3 minutes | **🟢 Level:** Beginner
 > 
 > **📋 Prerequisites:** HTTP fundamentals, basic API experience  
-> **🎯 Key Topics:** Architecture
+> **🎯 Key Topics:** RestClient, WebClient, HTTP operations
 > 
 > **📊 Complexity:** 8.6 grade level • 2.4% technical density • fairly difficult
 
@@ -14,35 +14,44 @@ Spring offers tools to call external APIs from your application. This section sh
 ## Contents
 
 ### Core Guides
-- [RestClient Guide](./restclient-guide.md) - How to set up and use RestTemplate
-- [WebClient Guide](./webclient-guide.md) - How to use reactive WebClient
+- [RestClient Guide](./restclient-guide.md) - **Recommended** for new synchronous projects (Spring Boot 3.2+)
+- [WebClient Guide](./webclient-guide.md) - Reactive and non-blocking HTTP client
 - [HTTP Client Resilience](./http-client-resilience.md) - Add retry logic and circuit breakers
 
 ### Legacy Documentation
+- [RestTemplate Guide](./resttemplate-guide.md) - Legacy synchronous client (deprecated Nov 2025)
 - [HTTP Client Patterns](./http-client-patterns.md) - Original guide (33 minutes)
 
 ## Overview
 
-Spring gives you two ways to call external APIs:
+Spring gives you three ways to call external APIs:
 
-- **RestTemplate**: Simple blocking calls for traditional Spring MVC apps
-- **WebClient**: Non-blocking reactive calls for modern apps
+- **RestClient** (Recommended): Modern synchronous client with fluent API (Spring Boot 3.2+)
+- **WebClient**: Non-blocking reactive calls for high-concurrency apps
+- **RestTemplate** (Deprecated): Legacy synchronous client in maintenance mode
 
 ## Quick Start
 
-### RestTemplate (Traditional)
+### RestClient (Recommended for New Projects)
 
-Use RestTemplate for simple blocking HTTP calls:
+Use RestClient for synchronous HTTP calls in Spring Boot 3.2+:
 
 ```java
-@Configuration
-public class RestTemplateConfig {
-    @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder builder) {
-        return builder
-            .setConnectTimeout(Duration.ofSeconds(5))
-            .setReadTimeout(Duration.ofSeconds(30))
+@Service
+public class UserService {
+    private final RestClient restClient;
+
+    public UserService(RestClient.Builder restClientBuilder) {
+        this.restClient = restClientBuilder
+            .baseUrl("https://api.example.com")
             .build();
+    }
+
+    public User getUser(Long id) {
+        return restClient.get()
+            .uri("/users/{id}", id)
+            .retrieve()
+            .body(User.class);
     }
 }
 ```
@@ -70,11 +79,12 @@ Read the [WebClient Guide](./webclient-guide.md) for more details.
 ## Key Topics
 
 ### HTTP Client Basics
-- How to set up RestTemplate ([RestClient Guide](./restclient-guide.md))
+- How to set up RestClient ([RestClient Guide](./restclient-guide.md)) - **Start here for new projects**
 - How to set up WebClient ([WebClient Guide](./webclient-guide.md))
-- Connection pooling (both guides)
-- Timeout settings (both guides)
-- Error handling (both guides)
+- How to set up RestTemplate ([RestTemplate Guide](./resttemplate-guide.md)) - Legacy only
+- Connection pooling (all guides)
+- Timeout settings (all guides)
+- Error handling (all guides)
 
 ### Resilience Patterns
 See [HTTP Client Resilience](./http-client-resilience.md) to learn:
@@ -85,7 +95,7 @@ See [HTTP Client Resilience](./http-client-resilience.md) to learn:
 - Combining multiple strategies
 
 ### Testing
-- MockRestServiceServer for RestTemplate ([RestClient Guide](./restclient-guide.md))
+- MockRestServiceServer for RestClient and RestTemplate
 - WireMock for integration tests ([WebClient Guide](./webclient-guide.md))
 - Reactive testing with StepVerifier ([WebClient Guide](./webclient-guide.md))
 
@@ -93,11 +103,22 @@ See [HTTP Client Resilience](./http-client-resilience.md) to learn:
 
 | Your Situation | Best Choice | Why |
 |----------|-------------------|--------|
-| New Spring Boot project | WebClient | Modern and non-blocking |
-| Spring MVC app | RestTemplate or WebClient | RestTemplate is simpler, WebClient is more powerful |
+| New Spring Boot 3.2+ project (sync) | RestClient | Modern fluent API, native observability |
 | Spring WebFlux app | WebClient | Built for reactive apps |
-| High traffic app | WebClient | Handles more requests at once |
-| Simple API calls | RestTemplate | Easier to learn |
+| High concurrency / streaming | WebClient | Non-blocking, handles backpressure |
+| Existing Spring MVC app | RestClient or WebClient | Migrate from RestTemplate |
+| Legacy codebase | RestTemplate | Only for maintaining existing code |
+
+## Client Comparison
+
+| Feature | RestClient | WebClient | RestTemplate |
+|---------|------------|-----------|--------------|
+| Programming Model | Synchronous | Reactive/Async | Synchronous |
+| Recommended For | New sync code | Reactive apps | Legacy only |
+| Spring Boot Support | 3.2+ | 2.0+ | All (maintenance) |
+| Fluent API | ✅ Modern | ✅ Modern | ❌ Template methods |
+| Observability | ✅ Native | ✅ Native | ⚠️ Manual |
+| Status | Active development | Active | Deprecated (Nov 2025) |
 
 ## Related Documentation
 
