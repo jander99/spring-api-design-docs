@@ -434,3 +434,7 @@ public class ContentNegotiatingErrorResponseBuilder {
 - [Reactive Error Handling](./reactive-error-handling.md) - WebFlux error handling patterns
 - [Validation Standards](./validation-standards.md) - Bean validation and custom validators
 - [Schema Validation](../validation/schema-validation.md) - Complete validation error handling examples
+
+### API Design Theory
+
+**[Error Response Standards](../../../guides/api-design/request-response/error-response-standards.md)** - Language-agnostic error handling principles covering RFC 9457 Problem Details standard, HTTP status codes, and structured error formats.

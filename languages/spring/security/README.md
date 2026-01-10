@@ -360,6 +360,14 @@ spec:
 - [Logging and Monitoring](../observability/logging-and-monitoring.md)
 - [Integration Testing Fundamentals](../testing/integration-testing/integration-testing-fundamentals.md)
 
+### gRPC Security
+
+**[Spring gRPC Security](../grpc/security.md)** - For internal microservices using gRPC, learn how to implement TLS, JWT authentication, and authorization with Spring gRPC.
+
+### API Design Theory
+
+**[Security Standards](../../../guides/api-design/security/security-standards.md)** - Language-agnostic security principles covering OAuth 2.1, authentication patterns, and authorization standards.
+
 ---
 
 Each guide has code for blocking and async styles. Start with OAuth2 to set up login. Then read authorization to control access.

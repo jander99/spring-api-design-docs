@@ -84,6 +84,15 @@ Each guide shows you how to:
 - Trace requests across services
 - Add health checks
 
+### 🚀 [gRPC](grpc/)
+**Build high-performance internal APIs**
+- Get started with Spring gRPC
+- Configure servers and clients
+- Handle errors with status codes
+- Implement unary and streaming services
+- Add security and observability
+- Test gRPC services
+
 ### 📦 [Project Structure](project-structure/)
 **Organize your files**
 - Use domain-driven design
@@ -106,7 +115,7 @@ Most guides show both styles:
 | Style | What It Does | Tools |
 |---------|-------------|------------|
 | **Blocking** | Waits for each request to finish | Spring MVC, RestTemplate |
-| **Streaming** | Handles many requests at once | Spring WebFlux, WebClient |
+| **Reactive** | Non-blocking, handles many concurrent requests | Spring WebFlux, WebClient |
 
 ### Pick the Right Style
 
@@ -116,11 +125,11 @@ Most guides show both styles:
 - Your team knows blocking code
 - Other libraries use blocking
 
-**Use Streaming (WebFlux) when:**
+**Use Reactive (WebFlux) when:**
 - Many users connect at once
-- You send data in chunks
-- You need to control data flow
-- Speed matters a lot
+- High concurrency is required
+- You need non-blocking I/O
+- Backpressure and flow control matter
 
 ## 🚀 Quick Start
 
@@ -131,12 +140,12 @@ Most guides show both styles:
 3. Read **[Validation](validation/schema-validation.md)**
 4. Try **[Testing](testing/README.md)**
 
-### Building Streaming APIs?
+### Building Reactive APIs?
 
-1. Read **[Streaming Controllers](controllers/reactive-controllers.md)**
-2. Learn **[Streaming Errors](error-handling/reactive-error-handling.md)**
+1. Read **[Reactive Controllers](controllers/reactive-controllers.md)**
+2. Learn **[Reactive Error Handling](error-handling/reactive-error-handling.md)**
 3. Use **[WebClient](http-clients/http-client-patterns.md#webclient-patterns)**
-4. Practice **[Streaming Tests](testing/specialized-testing/reactive-testing.md)**
+4. Practice **[Reactive Testing](testing/specialized-testing/reactive-testing.md)**
 
 ### Calling Other Services?
 

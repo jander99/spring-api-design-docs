@@ -1,0 +1,362 @@
+// Copyright 2024 Example Corp
+// Order service protobuf definitions for e-commerce platform
+
+syntax = "proto3";
+
+package orders.v1;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_package = "com.example.orders.v1";
+option go_package = "example.com/orders/v1;ordersv1";
+
+// Order management service.
+//
+// Provides CRUD operations for orders plus custom workflows
+// like cancellation and refunds.
+service OrderService {
+  // Retrieves a single order by ID.
+  //
+  // Returns NOT_FOUND if order doesn't exist.
+  // Returns PERMISSION_DENIED if user lacks access.
+  rpc GetOrder(GetOrderRequest) returns (Order);
+  
+  // Lists orders with pagination.
+  //
+  // Results are sorted by creation time (newest first).
+  // Use page_token for subsequent pages.
+  rpc ListOrders(ListOrdersRequest) returns (ListOrdersResponse);
+  
+  // Creates a new order.
+  //
+  // Returns INVALID_ARGUMENT for validation errors.
+  // Returns FAILED_PRECONDITION if inventory unavailable.
+  rpc CreateOrder(CreateOrderRequest) returns (Order);
+  
+  // Updates an existing order.
+  //
+  // Supports partial updates via field mask.
+  // Returns NOT_FOUND if order doesn't exist.
+  rpc UpdateOrder(UpdateOrderRequest) returns (Order);
+  
+  // Deletes an order (soft delete).
+  //
+  // Returns FAILED_PRECONDITION if order cannot be deleted.
+  rpc DeleteOrder(DeleteOrderRequest) returns (google.protobuf.Empty);
+  
+  // Custom Methods
+  
+  // Cancels an order.
+  //
+  // Refunds payment and restores inventory.
+  // Returns FAILED_PRECONDITION if order already shipped.
+  rpc CancelOrder(CancelOrderRequest) returns (Order);
+  
+  // Processes a refund for an order.
+  //
+  // Partial or full refund supported.
+  rpc RefundOrder(RefundOrderRequest) returns (RefundResponse);
+  
+  // Streams order updates for tracking.
+  //
+  // Server streaming of order status changes.
+  rpc WatchOrderStatus(WatchOrderStatusRequest) returns (stream OrderStatusEvent);
+}
+
+// Customer order.
+message Order {
+  // Unique order identifier.
+  // Format: "orders/{uuid}"
+  string id = 1;
+  
+  // Customer who placed this order.
+  // Format: "customers/{uuid}"
+  string customer_id = 2;
+  
+  // Order line items.
+  repeated OrderItem items = 3;
+  
+  // Order total (sum of items + shipping + tax).
+  Money total = 4;
+  
+  // Subtotal (sum of items before shipping and tax).
+  Money subtotal = 5;
+  
+  // Shipping cost.
+  Money shipping_cost = 6;
+  
+  // Tax amount.
+  Money tax_amount = 7;
+  
+  // Current order status.
+  OrderStatus status = 8;
+  
+  // Payment status.
+  PaymentStatus payment_status = 9;
+  
+  // Shipping address.
+  Address shipping_address = 10;
+  
+  // Billing address.
+  Address billing_address = 11;
+  
+  // Customer notes or special instructions.
+  string notes = 12;
+  
+  // Order creation timestamp.
+  google.protobuf.Timestamp created_at = 13;
+  
+  // Last update timestamp.
+  google.protobuf.Timestamp updated_at = 14;
+  
+  // Estimated delivery date.
+  google.protobuf.Timestamp estimated_delivery = 15;
+  
+  // Tracking number (if shipped).
+  string tracking_number = 16;
+}
+
+// Individual item in an order.
+message OrderItem {
+  // Product identifier.
+  // Format: "products/{uuid}"
+  string product_id = 1;
+  
+  // Product name (snapshot at order time).
+  string product_name = 2;
+  
+  // Quantity ordered.
+  int32 quantity = 3;
+  
+  // Unit price at order time.
+  Money unit_price = 4;
+  
+  // Line total (quantity × unit_price).
+  Money line_total = 5;
+  
+  // Optional SKU or variant ID.
+  string sku = 6;
+}
+
+// Monetary amount with currency.
+message Money {
+  // ISO 4217 currency code (USD, EUR, JPY, etc.).
+  string currency_code = 1;
+  
+  // Whole units of the amount.
+  // For example, if currency_code is "USD", units = 10 means $10.00.
+  int64 units = 2;
+  
+  // Fractional units in nano (10^-9) of currency unit.
+  // For example, nanos = 500000000 means $0.50.
+  // Range: 0 to 999,999,999.
+  int32 nanos = 3;
+}
+
+// Physical address.
+message Address {
+  // Street address line 1.
+  string street1 = 1;
+  
+  // Street address line 2 (optional).
+  string street2 = 2;
+  
+  // City name.
+  string city = 3;
+  
+  // State or province code.
+  string state = 4;
+  
+  // Postal or ZIP code.
+  string postal_code = 5;
+  
+  // ISO 3166-1 alpha-2 country code.
+  string country = 6;
+}
+
+// Order lifecycle states.
+enum OrderStatus {
+  // Default value. Do not use explicitly.
+  ORDER_STATUS_UNSPECIFIED = 0;
+  
+  // Order created, awaiting payment.
+  ORDER_STATUS_PENDING = 1;
+  
+  // Payment confirmed, ready to fulfill.
+  ORDER_STATUS_CONFIRMED = 2;
+  
+  // Order is being prepared.
+  ORDER_STATUS_PROCESSING = 3;
+  
+  // Order shipped to customer.
+  ORDER_STATUS_SHIPPED = 4;
+  
+  // Order delivered successfully.
+  ORDER_STATUS_DELIVERED = 5;
+  
+  // Order cancelled by customer or system.
+  ORDER_STATUS_CANCELLED = 6;
+  
+  // Order refunded.
+  ORDER_STATUS_REFUNDED = 7;
+}
+
+// Payment status.
+enum PaymentStatus {
+  PAYMENT_STATUS_UNSPECIFIED = 0;
+  PAYMENT_STATUS_PENDING = 1;
+  PAYMENT_STATUS_AUTHORIZED = 2;
+  PAYMENT_STATUS_CAPTURED = 3;
+  PAYMENT_STATUS_FAILED = 4;
+  PAYMENT_STATUS_REFUNDED = 5;
+}
+
+// Standard Methods - Request/Response Messages
+
+message GetOrderRequest {
+  // Order ID to retrieve.
+  string order_id = 1;
+}
+
+message ListOrdersRequest {
+  // Maximum number of orders to return.
+  // Default: 20, Max: 100.
+  int32 page_size = 1;
+  
+  // Token from previous ListOrdersResponse.
+  // Empty for first page.
+  string page_token = 2;
+  
+  // Optional filters
+  
+  // Filter by customer ID.
+  string customer_id = 3;
+  
+  // Filter by status.
+  OrderStatus status = 4;
+  
+  // Filter by date range (orders created after this time).
+  google.protobuf.Timestamp created_after = 5;
+  
+  // Filter by date range (orders created before this time).
+  google.protobuf.Timestamp created_before = 6;
+}
+
+message ListOrdersResponse {
+  // Orders matching the request.
+  repeated Order orders = 1;
+  
+  // Token for next page.
+  // Empty if no more results.
+  string next_page_token = 2;
+  
+  // Total count of matching orders (optional).
+  // May be expensive to compute for large datasets.
+  int32 total_count = 3;
+}
+
+message CreateOrderRequest {
+  // Customer placing the order.
+  string customer_id = 1;
+  
+  // Order items.
+  repeated OrderItemInput items = 2;
+  
+  // Shipping address.
+  Address shipping_address = 3;
+  
+  // Billing address (defaults to shipping address if not provided).
+  Address billing_address = 4;
+  
+  // Customer notes.
+  string notes = 5;
+}
+
+message OrderItemInput {
+  // Product to order.
+  string product_id = 1;
+  
+  // Quantity (must be positive).
+  int32 quantity = 2;
+}
+
+message UpdateOrderRequest {
+  // Order ID to update.
+  string order_id = 1;
+  
+  // Fields to update.
+  // Only specified fields are updated (partial update).
+  
+  // Update shipping address.
+  optional Address shipping_address = 2;
+  
+  // Update customer notes.
+  optional string notes = 3;
+  
+  // Update status (admin only).
+  optional OrderStatus status = 4;
+}
+
+message DeleteOrderRequest {
+  // Order ID to delete.
+  string order_id = 1;
+}
+
+// Custom Methods - Request/Response Messages
+
+message CancelOrderRequest {
+  // Order ID to cancel.
+  string order_id = 1;
+  
+  // Reason for cancellation.
+  string reason = 2;
+}
+
+message RefundOrderRequest {
+  // Order ID to refund.
+  string order_id = 1;
+  
+  // Refund amount (partial refund supported).
+  // If not specified, full order amount refunded.
+  optional Money amount = 2;
+  
+  // Reason for refund.
+  string reason = 3;
+}
+
+message RefundResponse {
+  // Updated order after refund.
+  Order order = 1;
+  
+  // Refund transaction ID.
+  string refund_id = 2;
+  
+  // Amount refunded.
+  Money refund_amount = 3;
+  
+  // Refund timestamp.
+  google.protobuf.Timestamp refunded_at = 4;
+}
+
+// Streaming
+
+message WatchOrderStatusRequest {
+  // Order ID to watch.
+  string order_id = 1;
+}
+
+message OrderStatusEvent {
+  // Order ID.
+  string order_id = 1;
+  
+  // New status.
+  OrderStatus status = 2;
+  
+  // Status change timestamp.
+  google.protobuf.Timestamp timestamp = 3;
+  
+  // Optional status message.
+  string message = 4;
+}

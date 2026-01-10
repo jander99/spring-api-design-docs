@@ -1787,3 +1787,11 @@ For each schema change:
 - [Documentation Testing](../documentation/documentation-testing.md) - Overall documentation testing strategy
 - [API Version Strategy](../foundations/api-version-strategy.md) - API versioning approaches
 - [Error Response Standards](../request-response/error-response-standards.md) - Error handling patterns
+
+## Spring Implementation
+
+For Spring Boot implementations of schema testing:
+
+- **[Spring Testing Guide](../../../languages/spring/testing/README.md)** - Comprehensive testing guide for Spring Boot applications
+- **[Spring Validation](../../../languages/spring/validation/schema-validation.md)** - JSON Schema validation with Bean Validation
+- **[Spring Contract Testing](../../../languages/spring/testing/specialized-testing/contract-testing-standards.md)** - Consumer-driven contract testing with Spring Cloud Contract

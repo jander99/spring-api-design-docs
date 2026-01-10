@@ -658,3 +658,10 @@ Content-Type: application/problem+json
 - [Content Types and Structure](content-types-and-structure.md) - Standard content type patterns
 - [Error Response Standards](error-response-standards.md) - RFC 9457 error handling
 - [API Version Strategy](../foundations/api-version-strategy.md) - Versioning approaches
+
+## Spring Implementation
+
+For Spring Boot implementations of content negotiation:
+
+- **[Spring Controllers](../../../languages/spring/controllers/README.md)** - Implement content negotiation with `@RequestMapping` produces and consumes attributes
+- **[Spring Configuration](../../../languages/spring/configuration/README.md)** - Configure content negotiation strategies

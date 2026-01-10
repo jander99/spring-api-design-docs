@@ -27,6 +27,9 @@ Streaming APIs send data in real-time or in chunks instead of all at once. This 
 - Users need to jump to specific pages
 - Results can be cached effectively
 
+**For high-performance service-to-service streaming:**
+Consider [gRPC streaming](../grpc/streaming-patterns.md) for internal microservices. gRPC offers better performance, type safety, and native support for bidirectional streaming compared to HTTP-based SSE/NDJSON.
+
 ## Main Streaming Patterns
 
 ### 1. NDJSON - For Large Data Exports
@@ -143,3 +146,6 @@ data: {"type":"processing-error","message":"Failed to process item"}
 - [Error Response Standards](error-response-standards.md) - Error handling patterns
 - [Pagination and Filtering](pagination-and-filtering.md) - Alternative patterns for large datasets
 - [Performance Standards](../advanced-patterns/performance-standards.md): Payload size optimization and NDJSON performance benefits
+
+### gRPC Alternative
+- **[gRPC Streaming Patterns](../grpc/streaming-patterns.md)** - For high-performance internal services, gRPC provides native support for server, client, and bidirectional streaming with HTTP/2 multiplexing and built-in flow control

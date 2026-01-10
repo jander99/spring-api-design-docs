@@ -405,3 +405,11 @@ test:
 - [Project Structure and Package Organization](../project-structure/package-organization.md)
 - [Error Handling Standards](../error-handling/README.md)
 - [Security Testing](../security/security-testing.md)
+
+### gRPC Testing
+
+**[Spring gRPC Testing](../grpc/testing/)** - For internal microservices using gRPC, learn how to test gRPC services with InProcessServer, unit tests, integration tests, and Testcontainers.
+
+### API Design Theory
+
+**[Schema Testing](../../../guides/api-design/testing/schema-testing.md)** - Language-agnostic testing principles covering schema validation, contract testing, and API testing standards.

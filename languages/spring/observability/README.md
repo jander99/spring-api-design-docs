@@ -247,3 +247,7 @@ management:
 - [Error Logging and Monitoring](../error-handling/error-logging-and-monitoring.md)  
 - [Infrastructure Testing](../testing/specialized-testing/infrastructure-testing.md)
 - [Security Context Propagation](../security/security-context-propagation.md)
+
+### gRPC Observability
+
+**[Spring gRPC Observability](../grpc/observability/)** - For internal microservices using gRPC, learn how to implement metrics, tracing, and health checks for gRPC services.

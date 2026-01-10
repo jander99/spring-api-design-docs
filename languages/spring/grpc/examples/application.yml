@@ -1,0 +1,288 @@
+# Complete Spring Boot gRPC Configuration Reference
+# This file demonstrates all available configuration options
+# Use as a reference - uncomment and customize as needed
+
+# ============================================================================
+# SPRING BOOT CONFIGURATION
+# ============================================================================
+
+spring:
+  application:
+    name: order-service
+  
+  # Profile Configuration
+  profiles:
+    active: ${SPRING_PROFILE:dev}
+  
+  # Jackson Configuration (for logging, debugging)
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+# ============================================================================
+# GRPC CONFIGURATION
+# ============================================================================
+
+grpc:
+  # --------------------------------------------------------------------
+  # SERVER CONFIGURATION
+  # --------------------------------------------------------------------
+  server:
+    # Network Configuration
+    port: 9090                        # gRPC server port
+    address: 0.0.0.0                  # Bind address (0.0.0.0 = all interfaces)
+    
+    # Message Size Limits
+    max-inbound-message-size: 4MB     # Maximum request size
+    max-inbound-metadata-size: 8KB    # Maximum metadata (headers) size
+    
+    # Connection Management
+    max-connection-idle: 30m          # Close idle connections after this duration
+    max-connection-age: 30m           # Force client to reconnect (for load balancing)
+    max-connection-age-grace: 5m      # Grace period for in-flight RPCs
+    
+    # Keepalive Configuration (Server-Side)
+    keep-alive-time: 2h               # Send keepalive ping after this much idle time
+    keep-alive-timeout: 20s           # Wait for keepalive response before closing
+    permit-keep-alive-time: 5m        # Minimum time between client keepalive pings
+    permit-keep-alive-without-calls: false
+    
+    # TLS / Security Configuration
+    security:
+      enabled: false                  # Enable TLS
+      certificate-chain: classpath:certs/server-cert.pem
+      private-key: classpath:certs/server-key.pem
+      trust-cert-collection: classpath:certs/ca-cert.pem
+      client-auth: NONE               # Options: NONE, OPTIONAL, REQUIRE
+    
+    # Debugging & Development
+    reflection-service-enabled: true  # Enable for grpcurl (DISABLE IN PRODUCTION)
+  
+  # --------------------------------------------------------------------
+  # CLIENT CONFIGURATION
+  # --------------------------------------------------------------------
+  client:
+    # Example: Inventory Service (Internal, Plaintext)
+    inventory-service:
+      # Service address - Formats:
+      #   static://host:port          - Direct connection
+      #   dns:///service:port         - DNS-based discovery
+      #   discovery:///service-name   - Spring Cloud Discovery
+      address: 'static://inventory-service:9091'
+      negotiationType: PLAINTEXT      # Connection type: PLAINTEXT, TLS
+      deadline: 10s                   # Per-request deadline (timeout)
+      defaultLoadBalancingPolicy: round_robin
+      
+      # Keepalive configuration (client-side)
+      enableKeepAlive: true
+      keepAliveTime: 30s
+      keepAliveTimeout: 10s
+      keepAliveWithoutCalls: true
+      
+      # Message size limits
+      maxInboundMessageSize: 4MB
+      maxInboundMetadataSize: 8KB
+      
+      # Retry configuration
+      enableRetry: true
+      maxRetryAttempts: 3
+    
+    # Example: Payment Service (External, Mutual TLS)
+    payment-service:
+      address: 'static://payment-service.example.com:9092'
+      negotiationType: TLS
+      deadline: 30s
+      
+      # TLS configuration
+      security:
+        authorityOverride: payment-service.example.com
+        trustCertCollection: file:/etc/grpc/certs/ca-cert.pem
+        clientCertChain: file:/etc/grpc/certs/client-cert.pem
+        clientPrivateKey: file:/etc/grpc/certs/client-key.pem
+      
+      # Keepalive for external service
+      enableKeepAlive: true
+      keepAliveTime: 60s
+      keepAliveTimeout: 20s
+    
+    # Example: Order Service (Kubernetes DNS, Load Balanced)
+    order-service:
+      address: 'dns:///order-service.default.svc.cluster.local:9090'
+      negotiationType: PLAINTEXT
+      defaultLoadBalancingPolicy: round_robin
+      deadline: 15s
+      enableKeepAlive: true
+      keepAliveTime: 30s
+
+# ============================================================================
+# LOGGING CONFIGURATION
+# ============================================================================
+
+logging:
+  level:
+    com.example.order: DEBUG          # Application logging
+    net.devh.boot.grpc: INFO          # gRPC Spring Boot Starter
+    io.grpc: INFO                     # gRPC Core
+    io.grpc.netty: WARN
+    org.springframework: INFO         # Spring Framework
+    org.springframework.web: INFO
+  
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# ============================================================================
+# SPRING ACTUATOR (Optional - for monitoring)
+# ============================================================================
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# ============================================================================
+# PROFILE-SPECIFIC CONFIGURATIONS
+# ============================================================================
+
+---
+# Development Profile
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+grpc:
+  server:
+    port: 9090
+    reflection-service-enabled: true
+    security:
+      enabled: false
+
+logging:
+  level:
+    com.example.order: DEBUG
+    net.devh.boot.grpc: DEBUG
+    io.grpc: DEBUG
+
+---
+# Staging Profile
+spring:
+  config:
+    activate:
+      on-profile: staging
+
+grpc:
+  server:
+    port: 9090
+    reflection-service-enabled: false
+    security:
+      enabled: true
+      certificate-chain: file:/etc/grpc/certs/server-cert.pem
+      private-key: file:/etc/grpc/certs/server-key.pem
+      client-auth: OPTIONAL
+
+logging:
+  level:
+    com.example.order: INFO
+    net.devh.boot.grpc: INFO
+    io.grpc: WARN
+
+---
+# Production Profile
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+grpc:
+  server:
+    port: 50051                       # Standard gRPC port
+    address: 0.0.0.0
+    
+    # Message limits
+    max-inbound-message-size: 4MB
+    max-inbound-metadata-size: 8KB
+    
+    # Connection management
+    max-connection-idle: 30m
+    max-connection-age: 30m
+    max-connection-age-grace: 5m
+    
+    # Keepalive (tuned for AWS ALB)
+    keep-alive-time: 30s
+    keep-alive-timeout: 10s
+    permit-keep-alive-time: 10s
+    permit-keep-alive-without-calls: true
+    
+    # Security (Mutual TLS)
+    security:
+      enabled: true
+      certificate-chain: file:/etc/grpc/certs/server-cert.pem
+      private-key: file:/etc/grpc/certs/server-key.pem
+      trust-cert-collection: file:/etc/grpc/certs/ca-cert.pem
+      client-auth: REQUIRE
+    
+    reflection-service-enabled: false  # Disable in production
+
+logging:
+  level:
+    com.example.order: INFO
+    net.devh.boot.grpc: INFO
+    io.grpc: WARN
+  file:
+    name: /var/log/order-service/application.log
+    max-size: 100MB
+    max-history: 30
+
+---
+# Docker Profile (for containerized deployments)
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+grpc:
+  server:
+    port: 9090
+    address: 0.0.0.0
+  
+  client:
+    inventory-service:
+      address: 'static://inventory-service:9091'
+      negotiationType: PLAINTEXT
+    
+    payment-service:
+      address: 'static://payment-service:9092'
+      negotiationType: PLAINTEXT
+
+---
+# Kubernetes Profile
+spring:
+  config:
+    activate:
+      on-profile: kubernetes
+
+grpc:
+  server:
+    port: 9090
+  
+  client:
+    inventory-service:
+      # Use Kubernetes DNS for service discovery
+      address: 'dns:///inventory-service.default.svc.cluster.local:9090'
+      defaultLoadBalancingPolicy: round_robin
+      negotiationType: PLAINTEXT
+    
+    payment-service:
+      address: 'dns:///payment-service.default.svc.cluster.local:9090'
+      defaultLoadBalancingPolicy: round_robin
+      negotiationType: PLAINTEXT

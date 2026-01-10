@@ -272,6 +272,14 @@ void shouldReturnBadRequest_WhenValidationFails() throws Exception {
 - **[Security Implementation](../security/README.md)**: Handle authentication errors
 - **[Logging and Monitoring](../observability/logging-and-monitoring.md)**: Log and track errors
 
+### gRPC Error Handling
+
+**[Spring gRPC Error Handling](../grpc/error-handling.md)** - For internal microservices using gRPC, learn how to implement error handling with Status codes and metadata.
+
+### API Design Theory
+
+**[Error Response Standards](../../../guides/api-design/request-response/error-response-standards.md)** - Language-agnostic error handling principles covering RFC 9457 and HTTP status codes.
+
 ## Common Error Scenarios
 
 ### Resource Not Found

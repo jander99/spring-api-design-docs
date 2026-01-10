@@ -249,4 +249,19 @@ Content-Type: application/problem+json
 - [Security Standards](../security/security-standards.md) - Authentication and authorization
 - [Performance Standards](./performance-standards.md): Server-Timing headers, percentile tracking, and performance budgets
 
+## Spring Implementation
+
+For Spring Boot implementations of these observability patterns:
+
+- **[Spring Observability Guide](../../../languages/spring/observability/README.md)** - Complete implementation guide covering logging, metrics, tracing, and health checks
+- **[Logging Standards](../../../languages/spring/observability/logging-standards.md)** - Structured logging with correlation IDs
+- **[Metrics and Tracing](../../../languages/spring/observability/metrics-and-tracing.md)** - Micrometer metrics and distributed tracing
+- **[Health and Monitoring](../../../languages/spring/observability/health-and-monitoring.md)** - Spring Actuator health checks and monitoring
+
+## gRPC Health Checking
+
+For high-performance internal microservices using gRPC:
+
+- **[gRPC Health Checking](../grpc/health-checking.md)** - Standard gRPC health check protocol (`grpc.health.v1.Health`) used by Kubernetes and service meshes
+
 This guide provides HTTP endpoint patterns for exposing observability data. For detailed monitoring, logging, and tracing practices, refer to the comprehensive Observability Standards guide.

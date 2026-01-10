@@ -421,6 +421,9 @@ These error standards work with any REST framework through standard HTTP respons
 - [Streaming APIs](streaming-apis.md) - Streaming response formats
 - [Schema Testing](../testing/schema-testing.md) - Testing error response schemas
 
+### gRPC Error Handling
+**[gRPC Error Handling](../grpc/error-handling.md)** - gRPC uses 16 canonical status codes instead of HTTP status codes. This guide explains the mapping between RFC 9457 (REST) and gRPC error patterns for API gateways that translate between protocols.
+
 ### Spring Implementation
 - [Schema Validation](../../../languages/spring/validation/schema-validation.md#rfc-9457-error-responses) - RFC 9457 validation error handling
 - [Error Response Formats](../../../languages/spring/error-handling/error-response-formats.md) - Spring implementation details

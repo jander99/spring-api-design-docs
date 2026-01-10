@@ -974,6 +974,13 @@ RateLimit-Policy: 10;w=1, 500;w=3600, 5000;w=86400
 - [HTTP Client Best Practices](./http-client-best-practices.md) - Retry patterns for handling 429 responses
 - [Performance Standards](./performance-standards.md) - Maintaining performance under load
 
+## Spring Implementation
+
+For Spring Boot implementations of rate limiting:
+
+- **[Spring Security Rate Limiting](../../../languages/spring/security/rate-limiting-and-protection.md)** - Implement rate limiting with Spring Security and Redis
+- **[Spring Configuration](../../../languages/spring/configuration/README.md)** - Configure rate limiting in application properties
+
 ### Industry Examples
 - GitHub API: X-RateLimit headers with per-resource limits
 - Stripe API: Multiple time windows with detailed policies  

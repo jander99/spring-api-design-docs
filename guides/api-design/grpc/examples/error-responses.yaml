@@ -1,0 +1,243 @@
+# gRPC Error Response Examples
+# These show conceptual error structures using YAML for readability
+# Actual gRPC errors use binary protobuf encoding
+
+# Example 1: Resource Not Found
+not_found_error:
+  status:
+    code: NOT_FOUND  # gRPC code 5
+    message: "Order not found"
+    details:
+      - type: "type.googleapis.com/google.rpc.ResourceInfo"
+        resourceType: "Order"
+        resourceName: "orders/12345"
+        description: "Order with ID 12345 does not exist in the system"
+
+# Example 2: Invalid Argument (Validation Errors)
+validation_error:
+  status:
+    code: INVALID_ARGUMENT  # gRPC code 3
+    message: "Order creation failed: validation errors"
+    details:
+      - type: "type.googleapis.com/google.rpc.BadRequest"
+        fieldViolations:
+          - field: "items"
+            description: "Must contain at least one item"
+          - field: "customer_id"
+            description: "Customer ID must be non-empty"
+          - field: "items[0].quantity"
+            description: "Quantity must be positive (got -5)"
+          - field: "shipping_address.postal_code"
+            description: "Invalid postal code format"
+      
+      - type: "type.googleapis.com/google.rpc.ErrorInfo"
+        reason: "VALIDATION_FAILED"
+        domain: "orders.example.com"
+        metadata:
+          validationVersion: "1.2"
+          documentationUrl: "https://docs.example.com/api/orders/validation"
+
+# Example 3: Permission Denied
+permission_denied_error:
+  status:
+    code: PERMISSION_DENIED  # gRPC code 7
+    message: "Insufficient permissions to delete order"
+    details:
+      - type: "type.googleapis.com/google.rpc.ErrorInfo"
+        reason: "INSUFFICIENT_PERMISSIONS"
+        domain: "orders.example.com"
+        metadata:
+          requiredPermission: "orders.delete"
+          userRole: "viewer"
+          resourceId: "orders/12345"
+      
+      - type: "type.googleapis.com/google.rpc.Help"
+        links:
+          - description: "Request elevated permissions"
+            url: "https://example.com/request-access"
+          - description: "Permission documentation"
+            url: "https://docs.example.com/permissions"
+
+# Example 4: Resource Exhausted (Rate Limit)
+rate_limit_error:
+  status:
+    code: RESOURCE_EXHAUSTED  # gRPC code 8
+    message: "Rate limit exceeded"
+    details:
+      - type: "type.googleapis.com/google.rpc.QuotaFailure"
+        violations:
+          - subject: "user:12345"
+            description: "Exceeded 100 requests per minute limit"
+      
+      - type: "type.googleapis.com/google.rpc.RetryInfo"
+        retryDelay: "60s"  # Client should wait 60 seconds
+      
+      - type: "type.googleapis.com/google.rpc.ErrorInfo"
+        reason: "RATE_LIMIT_EXCEEDED"
+        domain: "orders.example.com"
+        metadata:
+          limitType: "per_minute"
+          limitValue: "100"
+          currentUsage: "102"
+          resetTime: "2024-01-09T12:35:00Z"
+
+# Example 5: Failed Precondition (State Conflict)
+state_conflict_error:
+  status:
+    code: FAILED_PRECONDITION  # gRPC code 9
+    message: "Cannot delete order in current state"
+    details:
+      - type: "type.googleapis.com/google.rpc.PreconditionFailure"
+        violations:
+          - type: "ORDER_STATE"
+            subject: "orders/12345"
+            description: "Order must be in CANCELLED state before deletion (current: SHIPPED)"
+          
+          - type: "HAS_PENDING_REFUND"
+            subject: "refunds/67890"
+            description: "Cannot delete order with pending refund"
+      
+      - type: "type.googleapis.com/google.rpc.ErrorInfo"
+        reason: "INVALID_STATE_TRANSITION"
+        domain: "orders.example.com"
+        metadata:
+          currentState: "SHIPPED"
+          requiredState: "CANCELLED"
+          orderId: "12345"
+
+# Example 6: Unavailable (Service Down)
+service_unavailable_error:
+  status:
+    code: UNAVAILABLE  # gRPC code 14
+    message: "Payment service temporarily unavailable"
+    details:
+      - type: "type.googleapis.com/google.rpc.RetryInfo"
+        retryDelay: "10s"
+      
+      - type: "type.googleapis.com/google.rpc.ErrorInfo"
+        reason: "SERVICE_UNAVAILABLE"
+        domain: "payments.example.com"
+        metadata:
+          downtime_start: "2024-01-09T12:30:00Z"
+          estimated_recovery: "2024-01-09T12:40:00Z"
+          incident_id: "inc-20240109-001"
+      
+      - type: "type.googleapis.com/google.rpc.Help"
+        links:
+          - description: "Service status page"
+            url: "https://status.example.com"
+
+# Example 7: Internal Error (Server Fault)
+internal_error:
+  status:
+    code: INTERNAL  # gRPC code 13
+    message: "Internal server error"
+    details:
+      - type: "type.googleapis.com/google.rpc.ErrorInfo"
+        reason: "INTERNAL_ERROR"
+        domain: "orders.example.com"
+        metadata:
+          errorId: "err-20240109-abc123"
+          timestamp: "2024-01-09T12:34:56Z"
+      
+      - type: "type.googleapis.com/google.rpc.Help"
+        links:
+          - description: "Contact support"
+            url: "https://support.example.com/new?ref=err-20240109-abc123"
+          - description: "Status page"
+            url: "https://status.example.com"
+  
+  # Note: Never expose stack traces or internal details in production
+
+# Example 8: Deadline Exceeded (Timeout)
+timeout_error:
+  status:
+    code: DEADLINE_EXCEEDED  # gRPC code 4
+    message: "Request timeout after 5 seconds"
+    details:
+      - type: "type.googleapis.com/google.rpc.ErrorInfo"
+        reason: "DEADLINE_EXCEEDED"
+        domain: "orders.example.com"
+        metadata:
+          timeoutSeconds: "5"
+          operationType: "database_query"
+      
+      - type: "type.googleapis.com/google.rpc.RetryInfo"
+        retryDelay: "1s"
+
+# Example 9: Already Exists (Duplicate Resource)
+already_exists_error:
+  status:
+    code: ALREADY_EXISTS  # gRPC code 6
+    message: "Order with this ID already exists"
+    details:
+      - type: "type.googleapis.com/google.rpc.ResourceInfo"
+        resourceType: "Order"
+        resourceName: "orders/12345"
+        description: "An order with ID 12345 already exists"
+      
+      - type: "type.googleapis.com/google.rpc.ErrorInfo"
+        reason: "DUPLICATE_RESOURCE"
+        domain: "orders.example.com"
+        metadata:
+          conflictingId: "orders/12345"
+          createdAt: "2024-01-08T10:00:00Z"
+
+# Example 10: Unauthenticated
+authentication_error:
+  status:
+    code: UNAUTHENTICATED  # gRPC code 16
+    message: "Authentication required"
+    details:
+      - type: "type.googleapis.com/google.rpc.ErrorInfo"
+        reason: "MISSING_AUTHENTICATION"
+        domain: "orders.example.com"
+        metadata:
+          authType: "JWT"
+          headerName: "authorization"
+      
+      - type: "type.googleapis.com/google.rpc.Help"
+        links:
+          - description: "Authentication guide"
+            url: "https://docs.example.com/authentication"
+
+# Example 11: Multiple Errors with Localization
+localized_error:
+  status:
+    code: INVALID_ARGUMENT
+    message: "Validation errors"
+    details:
+      - type: "type.googleapis.com/google.rpc.BadRequest"
+        fieldViolations:
+          - field: "email"
+            description: "Invalid email format"
+      
+      - type: "type.googleapis.com/google.rpc.LocalizedMessage"
+        locale: "en-US"
+        message: "The email address you entered is invalid. Please check and try again."
+      
+      - type: "type.googleapis.com/google.rpc.LocalizedMessage"
+        locale: "es-ES"
+        message: "La dirección de correo electrónico que ingresó no es válida. Por favor verifica e intenta nuevamente."
+
+# Example 12: Aborted (Concurrency Conflict)
+concurrency_conflict_error:
+  status:
+    code: ABORTED  # gRPC code 10
+    message: "Order was modified by another request"
+    details:
+      - type: "type.googleapis.com/google.rpc.ErrorInfo"
+        reason: "CONCURRENCY_CONFLICT"
+        domain: "orders.example.com"
+        metadata:
+          resourceVersion: "v1.23"
+          expectedVersion: "v1.22"
+          orderId: "12345"
+      
+      - type: "type.googleapis.com/google.rpc.RetryInfo"
+        retryDelay: "0s"  # Immediate retry OK (with fresh data)
+      
+      - type: "type.googleapis.com/google.rpc.Help"
+        links:
+          - description: "Optimistic concurrency control"
+            url: "https://docs.example.com/concurrency"
