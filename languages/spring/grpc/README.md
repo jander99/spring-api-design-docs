@@ -580,7 +580,7 @@ public class OrderServiceImpl extends OrderServiceGrpc.OrderServiceImplBase {
             .exceptionally(throwable -> {
                 responseObserver.onError(
                     Status.INTERNAL
-                        .withDescription(throwable.getMessage())
+                        .withDescription("Internal server error")
                         .asRuntimeException()
                 );
                 return null;

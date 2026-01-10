@@ -257,7 +257,7 @@ public class JwtAuthenticationInterceptor implements ServerInterceptor {
         } catch (JwtException e) {
             log.warn("Invalid JWT token: {}", e.getMessage());
             call.close(
-                Status.UNAUTHENTICATED.withDescription("Invalid token: " + e.getMessage()),
+                Status.UNAUTHENTICATED.withDescription("Invalid or expired token"),
                 new Metadata()
             );
             return new ServerCall.Listener<ReqT>() {};

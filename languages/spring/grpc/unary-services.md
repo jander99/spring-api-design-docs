@@ -439,7 +439,7 @@ public class OrderServiceImpl extends OrderServiceGrpc.OrderServiceImplBase {
                 log.error("Error creating order", throwable);
                 responseObserver.onError(
                     Status.INTERNAL
-                        .withDescription(throwable.getMessage())
+                        .withDescription("Internal server error")
                         .asRuntimeException()
                 );
                 return null;

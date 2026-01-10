@@ -677,7 +677,7 @@ public void streamOrders(StreamOrdersRequest request,
     } catch (Exception e) {
         responseObserver.onError(
             Status.INTERNAL
-                .withDescription(e.getMessage())
+                .withDescription("Internal server error")
                 .asRuntimeException()
         );
     }

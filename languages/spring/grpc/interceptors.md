@@ -166,7 +166,7 @@ public class AuthenticationInterceptor implements ServerInterceptor {
             
         } catch (Exception e) {
             call.close(
-                Status.UNAUTHENTICATED.withDescription("Invalid token: " + e.getMessage()),
+                Status.UNAUTHENTICATED.withDescription("Invalid or expired token"),
                 new Metadata()
             );
             return new ServerCall.Listener<ReqT>() {};
