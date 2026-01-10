@@ -26,11 +26,13 @@ GraphQL solves three key problems with traditional REST APIs:
 
 ## Industry Adoption (2025)
 
-| Technology | Adoption Rate | Use Case |
-|------------|---------------|----------|
-| REST | 83-93% | Public APIs, simple CRUD |
-| GraphQL | 33-45% | Complex queries, mobile apps |
-| Both (Hybrid) | 45%+ | REST for stable resources, GraphQL for aggregations |
+| Technology | Adoption (orgs using; multiple per org) | Use Case |
+|------------|------------------------------------------|----------|
+| REST | ~85% | Public APIs, simple CRUD |
+| GraphQL | ~40% | Complex queries, mobile apps |
+| Both (Hybrid) | ~45% | REST for stable resources, GraphQL for aggregations |
+
+_Percentages are per technology and can overlap (many organizations use both REST and GraphQL), so they do not sum to 100%._
 
 **Sources**: Postman State of API 2025, industry surveys
 
@@ -100,7 +102,7 @@ This guide is organized into:
 - **[Error Handling](foundations/error-handling.md)**: Errors as data vs extensions
 
 ### Performance
-- **[N+1 Problem](performance/n-plus-one-problem.md)**: DataLoader pattern for batching
+- **[N+1 Problem](performance/n-plus-one-problem.md)**: DataLoader pattern with up to 85% performance improvement ([Shopify case study](https://shopify.engineering/solving-the-n-1-problem-for-graphql-through-batching))
 
 ### Security
 - **[Query Security](security/query-security.md)**: Depth limiting, complexity analysis, authorization
@@ -114,8 +116,8 @@ This guide is organized into:
 - **[Tooling Ecosystem](documentation/tooling-ecosystem.md)**: GraphiQL, Apollo Studio, testing tools
 
 ### Examples
-- **[Schemas](examples/schemas/)**: Complete GraphQL schema examples
-- **[Queries](examples/queries/)**: Common query patterns
+- **Schemas** (planned, will live in `examples/schemas/`): Complete GraphQL schema examples
+- **Queries** (planned, will live in `examples/queries/`): Common query patterns
 
 ## Quick Decision Framework
 
@@ -180,6 +182,6 @@ Use this checklist to choose between GraphQL and REST:
 
 ## Contributing
 
-This guide follows the [API Design Guide standards](../../README.md). See [CLAUDE.md](../../../CLAUDE.md) for contribution guidelines.
+This guide follows the [API Design Guide standards](../README.md). See [CLAUDE.md](../../../CLAUDE.md) for contribution guidelines.
 
 **Readability Target**: Grade 12-14 for technical accuracy while remaining accessible.

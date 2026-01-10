@@ -51,7 +51,7 @@ type User {
 1. Add replacement field
 2. Mark old field deprecated
 3. Monitor usage for 6-12 months
-4. Remove when usage < 1%
+4. Remove when usage is minimal (consistently < 5%)
 
 ## Breaking Changes
 

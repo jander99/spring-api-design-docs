@@ -30,7 +30,7 @@ type Order @key(fields: "id") {
 ### Federation Directives
 
 - `@key`: Defines entity that can be referenced
-- `@extends`: Adds fields to entity from another service
+- `extend type`: Adds fields to entity from another service (schema keyword, not a directive)
 - `@external`: Marks field from owning service
 - `@requires`: Dependencies on other service fields
 - `@provides`: Optimization hint for field inclusion
