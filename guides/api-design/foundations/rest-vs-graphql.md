@@ -514,3 +514,12 @@ Use these questions to drive a decision in an architecture review.
 - GraphQL Official Documentation: https://graphql.org/
 - GraphQL Security: https://graphql.org/learn/security/
 - GraphQL Performance: https://graphql.org/learn/performance/
+
+## Related Documentation
+
+### gRPC Alternative
+
+For internal service-to-service communication, consider gRPC as described in this guide's decision criteria. Learn more:
+
+- **[gRPC Overview](../grpc/README.md)** - Complete gRPC documentation for high-performance internal APIs
+- **[gRPC vs REST](../grpc/grpc-vs-rest.md)** - Detailed comparison and when to use gRPC instead of REST or GraphQL

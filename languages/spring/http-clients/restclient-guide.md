@@ -11,7 +11,7 @@
 
 ## Overview
 
-RestTemplate is Spring's traditional blocking (imperative) HTTP client for making requests to external services. While in maintenance mode, it remains widely used in existing Spring MVC applications.
+RestTemplate is Spring's traditional imperative (blocking) HTTP client for making requests to external services. While in maintenance mode, it remains widely used in existing Spring MVC applications.
 
 **Note**: For new projects, prefer WebClient even in non-reactive applications. See [WebClient Guide](./webclient-guide.md) for the modern alternative.
 

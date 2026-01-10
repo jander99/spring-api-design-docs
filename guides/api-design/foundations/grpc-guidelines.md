@@ -639,3 +639,7 @@ gRPC is a powerful choice for high-performance internal APIs with strong typing 
 - You're building public APIs
 
 For most organizations, the answer is both: gRPC internally, REST externally.
+
+## Related Documentation
+
+**[gRPC Quick Start Guide](../grpc/README.md)** - Beginner-friendly introduction to gRPC with quick examples and topic-based learning paths (3-minute read per topic, practical implementation focus)

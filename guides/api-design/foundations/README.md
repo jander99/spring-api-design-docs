@@ -21,6 +21,9 @@ Learn HTTP methods, status codes, headers, and request flow. This foundation sup
 ### [Resource Naming and URL Structure.md](resource-naming-and-url-structure.md)
 Design clean, predictable API endpoints. Learn naming rules and URL patterns for RESTful APIs.
 
+### Alternative Protocols
+**[gRPC](../grpc/README.md)** - For high-performance internal microservices, consider gRPC as an alternative to REST. See [gRPC vs REST](../grpc/grpc-vs-rest.md) to understand when each protocol makes sense.
+
 ### [API Version Strategy.md](api-version-strategy.md)
 Evolve APIs while keeping backward compatibility. Learn URI versioning and migration paths.
 

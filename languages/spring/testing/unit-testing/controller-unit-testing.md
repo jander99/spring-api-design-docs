@@ -590,7 +590,7 @@ void shouldSerializeOrderResponse() throws Exception {
 
 ```java
 @Test
-void shouldReturnRfc7807ErrorFormat() throws Exception {
+void shouldReturnRfc9457ErrorFormat() throws Exception {
     UUID orderId = UUID.randomUUID();
     when(orderService.getOrder(orderId))
         .thenThrow(new ResourceNotFoundException("Order", orderId));

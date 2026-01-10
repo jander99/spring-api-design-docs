@@ -798,4 +798,11 @@ Use RFC 9457 Problem Details format:
 - [Content Types and Structure](../request-response/content-types-and-structure.md) - Request/response body formats
 - [Performance Standards](../advanced-patterns/performance-standards.md) - HTTP/2 and HTTP/3 performance benefits
 
+## Spring Implementation
+
+For Spring Boot implementations of HTTP fundamentals:
+
+- **[Spring Controllers](../../../languages/spring/controllers/README.md)** - Implement HTTP endpoints with Spring MVC and WebFlux
+- **[Spring Testing](../../../languages/spring/testing/integration-testing/advanced-api-testing.md)** - Test HTTP fundamentals with MockMvc and WebTestClient
+
 ---

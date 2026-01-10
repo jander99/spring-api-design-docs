@@ -330,3 +330,19 @@ Security protects your API and your users. This document covered:
 - **Monitoring**: Detect threats (security logging)
 
 Apply these standards consistently across all your APIs.
+
+## Spring Implementation
+
+For Spring Boot implementations of these security patterns:
+
+- **[Spring Security Guide](../../../languages/spring/security/README.md)** - Complete implementation guide covering OAuth2, authorization, CORS, rate limiting, and security testing
+- **[OAuth2 Resource Server](../../../languages/spring/security/oauth2-resource-server.md)** - JWT validation and authentication setup
+- **[Authorization Patterns](../../../languages/spring/security/authorization-patterns.md)** - Resource-based permissions and access control
+- **[CORS and Headers](../../../languages/spring/security/cors-and-headers.md)** - Security headers configuration
+- **[Rate Limiting](../../../languages/spring/security/rate-limiting-and-protection.md)** - Request rate limiting implementation
+
+## gRPC Security
+
+For high-performance internal microservices using gRPC:
+
+- **[gRPC Security](../grpc/security.md)** - TLS, JWT authentication, and authorization patterns for gRPC services

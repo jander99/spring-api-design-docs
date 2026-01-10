@@ -889,6 +889,17 @@ Content-Type: application/xml
 - [Content Types and Structure](../request-response/content-types-and-structure.md): Response format considerations
 - [Performance Standards](./performance-standards.md): Response time optimization with caching strategies
 
+## Spring Implementation
+
+For Spring Boot implementations of HTTP caching patterns:
+
+- **[Spring Configuration](../../../languages/spring/configuration/README.md)** - Configure caching in Spring Boot applications
+- **[Spring HTTP Clients](../../../languages/spring/http-clients/http-client-patterns.md)** - Client-side caching with RestTemplate and WebClient
+
+## gRPC Caching
+
+**Note:** gRPC does not use HTTP caching mechanisms. For gRPC services, implement application-level caching strategies in your service logic.
+
 ## Implementation Notes
 
 When implementing HTTP caching:

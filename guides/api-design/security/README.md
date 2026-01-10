@@ -34,6 +34,9 @@ This file shows you how to secure your API. You'll learn about OAuth 2.1 (draft)
 ### [Input Validation](input-validation.md)
 This file covers how to validate data entering your API. You'll learn how to use JSON Schema, limit payload sizes, and prevent injection attacks.
 
+### [gRPC Security](../grpc/security.md)
+For high-performance internal microservices, learn how gRPC handles security with TLS, JWT metadata, and authorization patterns.
+
 The guide covers:
 - How users prove their identity
 - How to control what users can access

@@ -589,7 +589,7 @@ Check that errors follow RFC 9457 format:
 
 ```java
 @Test
-void shouldReturnRfc7807ErrorResponse_WhenValidationFails() throws Exception {
+void shouldReturnRfc9457ErrorResponse_WhenValidationFails() throws Exception {
     mockMvc.perform(post("/v1/orders")
             .contentType(MediaType.APPLICATION_JSON)
             .content(invalidRequest))
