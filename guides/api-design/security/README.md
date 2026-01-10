@@ -28,8 +28,11 @@ All security patterns in this guide follow current best practices. They help you
 
 ## Files
 
-### [Security Standards.md](security-standards.md)
+### [Security Standards](security-standards.md)
 This file shows you how to secure your API. You'll learn about OAuth 2.1 (draft) and OpenID Connect. These represent current best practices for login and access control.
+
+### [Input Validation](input-validation.md)
+This file covers how to validate data entering your API. You'll learn how to use JSON Schema, limit payload sizes, and prevent injection attacks.
 
 The guide covers:
 - How users prove their identity
