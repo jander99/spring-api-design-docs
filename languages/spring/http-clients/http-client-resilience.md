@@ -2,16 +2,16 @@
 
 > **📖 Reading Guide**
 > 
-> **⏱️ Reading Time:** 15 minutes | **🔴 Level:** Advanced
+> **⏱️ Reading Time:** 18 minutes | **🔴 Level:** Advanced
 > 
-> **📋 Prerequisites:** RestTemplate or WebClient basics, Resilience4j concepts  
+> **📋 Prerequisites:** RestClient, RestTemplate, or WebClient basics; Resilience4j concepts  
 > **🎯 Key Topics:** Circuit breakers, retry logic, rate limiting, bulkhead isolation, timeouts
 > 
 > **📊 Complexity:** Grade 14 • Advanced difficulty
 
 ## Overview
 
-Production HTTP clients require resilience patterns to handle failures gracefully. This guide covers Resilience4j integration with both RestTemplate and WebClient for building fault-tolerant service integrations.
+Production HTTP clients require resilience patterns to handle failures gracefully. This guide covers Resilience4j integration with RestClient, RestTemplate, and WebClient for building fault-tolerant service integrations.
 
 ## Resilience4j Integration
 
@@ -59,7 +59,79 @@ resilience4j:
         minimum-number-of-calls: 10
 ```
 
-### Circuit Breaker with RestTemplate
+### Circuit Breaker with RestClient (Recommended)
+
+RestClient works with Resilience4j using the `Decorators` API for programmatic resilience:
+
+```java
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.decorators.Decorators;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+
+import java.util.function.Supplier;
+
+@Service
+@RequiredArgsConstructor
+public class CircuitBreakerPaymentClient {
+
+    private final RestClient restClient;
+    private final CircuitBreakerRegistry circuitBreakerRegistry;
+
+    public PaymentResponse processPayment(PaymentRequest request) {
+        CircuitBreaker circuitBreaker = 
+            circuitBreakerRegistry.circuitBreaker("paymentService");
+
+        Supplier<PaymentResponse> supplier = () -> restClient
+            .post()
+            .uri("/v1/payments")
+            .body(request)
+            .retrieve()
+            .body(PaymentResponse.class);
+
+        return Decorators.ofSupplier(supplier)
+            .withCircuitBreaker(circuitBreaker)
+            .withFallback(this::paymentFallback)
+            .get();
+    }
+
+    private PaymentResponse paymentFallback(Throwable ex) {
+        log.warn("Payment circuit breaker activated, using fallback", ex);
+        return PaymentResponse.failed("Service temporarily unavailable");
+    }
+}
+```
+
+You can also use annotation-based circuit breakers with RestClient by wrapping the call in a method:
+
+```java
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
+@Service
+@RequiredArgsConstructor
+public class AnnotatedCircuitBreakerClient {
+
+    private final RestClient restClient;
+
+    @CircuitBreaker(name = "paymentService", fallbackMethod = "paymentFallback")
+    public PaymentResponse processPayment(PaymentRequest request) {
+        return restClient
+            .post()
+            .uri("/v1/payments")
+            .body(request)
+            .retrieve()
+            .body(PaymentResponse.class);
+    }
+
+    private PaymentResponse paymentFallback(PaymentRequest request, Exception ex) {
+        log.warn("Payment circuit breaker activated", ex);
+        return PaymentResponse.failed("Service temporarily unavailable");
+    }
+}
+```
+
+### Circuit Breaker with RestTemplate (Legacy)
 
 ```java
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -151,7 +223,68 @@ resilience4j:
         wait-duration: 2s
 ```
 
-### Retry with RestTemplate
+### Retry with RestClient (Recommended)
+
+```java
+import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.retry.RetryRegistry;
+import io.github.resilience4j.decorators.Decorators;
+
+@Service
+@RequiredArgsConstructor
+public class RetryableRestClientPaymentClient {
+
+    private final RestClient restClient;
+    private final RetryRegistry retryRegistry;
+
+    public PaymentResponse processPayment(PaymentRequest request) {
+        Retry retry = retryRegistry.retry("paymentService");
+
+        Supplier<PaymentResponse> supplier = () -> restClient
+            .post()
+            .uri("/v1/payments")
+            .body(request)
+            .retrieve()
+            .body(PaymentResponse.class);
+
+        return Decorators.ofSupplier(supplier)
+            .withRetry(retry)
+            .get();
+    }
+}
+```
+
+For annotation-based retry with RestClient:
+
+```java
+import io.github.resilience4j.retry.annotation.Retry;
+
+@Service
+@RequiredArgsConstructor
+public class AnnotatedRetryClient {
+
+    private final RestClient restClient;
+
+    @Retry(name = "paymentService", fallbackMethod = "paymentFallback")
+    @CircuitBreaker(name = "paymentService")
+    public PaymentResponse processPayment(PaymentRequest request) {
+        log.info("Attempting payment processing");
+        return restClient
+            .post()
+            .uri("/v1/payments")
+            .body(request)
+            .retrieve()
+            .body(PaymentResponse.class);
+    }
+
+    private PaymentResponse paymentFallback(PaymentRequest request, Exception ex) {
+        log.error("All retry attempts failed for payment", ex);
+        return PaymentResponse.failed("Payment failed after retries");
+    }
+}
+```
+
+### Retry with RestTemplate (Legacy)
 
 ```java
 import io.github.resilience4j.retry.annotation.Retry;
@@ -385,7 +518,110 @@ public class BulkheadProtectedClient {
 
 ## Combined Resilience Patterns
 
-### Complete Resilient Client
+### Complete Resilient RestClient (Recommended)
+
+```java
+import io.github.resilience4j.bulkhead.Bulkhead;
+import io.github.resilience4j.bulkhead.BulkheadRegistry;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.decorators.Decorators;
+import io.github.resilience4j.ratelimiter.RateLimiter;
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.retry.RetryRegistry;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+
+import java.util.function.Supplier;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class FullyResilientRestClient {
+
+    private final RestClient restClient;
+    private final CircuitBreakerRegistry circuitBreakerRegistry;
+    private final RetryRegistry retryRegistry;
+    private final RateLimiterRegistry rateLimiterRegistry;
+    private final BulkheadRegistry bulkheadRegistry;
+
+    public PaymentResponse processPayment(PaymentRequest request) {
+        CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker("paymentService");
+        Retry retry = retryRegistry.retry("paymentService");
+        RateLimiter rateLimiter = rateLimiterRegistry.rateLimiter("paymentService");
+        Bulkhead bulkhead = bulkheadRegistry.bulkhead("paymentService");
+
+        Supplier<PaymentResponse> supplier = () -> restClient
+            .post()
+            .uri("/v1/payments")
+            .body(request)
+            .retrieve()
+            .body(PaymentResponse.class);
+
+        return Decorators.ofSupplier(supplier)
+            .withCircuitBreaker(circuitBreaker)
+            .withRetry(retry)
+            .withRateLimiter(rateLimiter)
+            .withBulkhead(bulkhead)
+            .withFallback(ex -> paymentFallback(request, ex))
+            .get();
+    }
+
+    private PaymentResponse paymentFallback(PaymentRequest request, Throwable ex) {
+        log.error("Payment failed with all resilience patterns applied", ex);
+        
+        // Return cached result if available
+        PaymentResponse cached = checkCache(request);
+        if (cached != null) {
+            return cached;
+        }
+        
+        return PaymentResponse.failed("Service temporarily unavailable. Please try again later.");
+    }
+
+    private PaymentResponse checkCache(PaymentRequest request) {
+        // Implementation for cache check
+        return null;
+    }
+}
+```
+
+Alternatively, use annotation-based resilience with RestClient:
+
+```java
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class AnnotatedResilientRestClient {
+
+    private final RestClient restClient;
+
+    @CircuitBreaker(name = "paymentService", fallbackMethod = "paymentFallback")
+    @Retry(name = "paymentService")
+    @RateLimiter(name = "paymentService")
+    @Bulkhead(name = "paymentService")
+    public PaymentResponse processPayment(PaymentRequest request) {
+        log.info("Processing payment with full resilience patterns");
+        
+        return restClient
+            .post()
+            .uri("/v1/payments")
+            .body(request)
+            .retrieve()
+            .body(PaymentResponse.class);
+    }
+
+    private PaymentResponse paymentFallback(PaymentRequest request, Exception ex) {
+        log.error("Payment failed with all resilience patterns applied", ex);
+        return PaymentResponse.failed("Service temporarily unavailable. Please try again later.");
+    }
+}
+```
+
+### Complete Resilient RestTemplate (Legacy)
 
 ```java
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
