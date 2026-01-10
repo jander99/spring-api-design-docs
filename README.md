@@ -129,17 +129,19 @@ Want to contribute? See [Contributing](#contributing).
 | Section | What You'll Learn |
 |---------|-------------------|
 | [🏗️ Project Structure](languages/spring/project-structure/) | DDD packages, MVC vs WebFlux |
+| [🎯 Architecture](languages/spring/architecture/) | Dependency injection, component management |
 | [🎮 Controllers](languages/spring/controllers/) | Request mapping, validation |
 | [⚠️ Error Handling](languages/spring/error-handling/) | Exception hierarchy, RFC 9457 |
 | [🔐 Security](languages/spring/security/) | OAuth 2.1, CORS, rate limiting |
 | [🧪 Testing](languages/spring/testing/) | Unit, integration, contract tests |
-| [⚙️ Configuration](languages/spring/configuration/) | Profiles, observability |
+| [⚙️ Configuration](languages/spring/configuration/) | Profiles, configuration patterns |
+| [📈 Observability](languages/spring/observability/) | Logging, metrics, tracing, health checks |
 
 ---
 
 ## Standards Used
 
-**API Standards**: HTTP/REST, OpenAPI 3.1+, OAuth 2.1 (draft)/OIDC, RFC 9457, JSON Schema
+**API Standards**: HTTP/REST, OpenAPI 3.1+, OAuth 2.1/OIDC, RFC 9457, JSON Schema
 
 ---
 
