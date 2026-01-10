@@ -13,13 +13,13 @@
 
 RestTemplate is Spring's traditional imperative (blocking) HTTP client for making requests to external services. While in maintenance mode, it remains widely used in existing Spring MVC applications.
 
-**Note**: For new projects, prefer WebClient even in non-reactive applications. See [WebClient Guide](./webclient-guide.md) for the modern alternative.
+**Note**: For new synchronous (blocking) projects, prefer the modern [`RestClient`](./restclient-guide.md). Use [`WebClient`](./webclient-guide.md) for reactive or other non-blocking use cases.
 
 ### When to Use RestTemplate
 
 | Use When | Advantages | Disadvantages |
 |----------|------------|---------------|
-| Spring MVC applications, synchronous workflows | Simple API, familiar patterns | Blocking I/O, deprecated in favor of WebClient |
+| Spring MVC applications, synchronous workflows | Simple API, familiar patterns | Blocking I/O, superseded by RestClient for synchronous use and WebClient for reactive use |
 
 ## RestTemplate Configuration
 
@@ -513,6 +513,7 @@ try {
 
 ## Related Documentation
 
+- [RestClient Guide](./restclient-guide.md) - Modern synchronous HTTP client (recommended replacement)
 - [WebClient Guide](./webclient-guide.md) - Modern reactive HTTP client
 - [HTTP Client Resilience](./http-client-resilience.md) - Circuit breakers, retries, rate limiting
 - [HTTP Client Best Practices](../../../guides/api-design/advanced-patterns/http-client-best-practices.md) - Language-agnostic patterns
@@ -522,4 +523,4 @@ try {
 
 ---
 
-**Next Steps**: Review [WebClient Guide](./webclient-guide.md) for the modern reactive alternative, or [HTTP Client Resilience](./http-client-resilience.md) for production-ready resilience patterns.
+**Next Steps**: Review [RestClient Guide](./restclient-guide.md) for the modern synchronous replacement, [WebClient Guide](./webclient-guide.md) for reactive use cases, or [HTTP Client Resilience](./http-client-resilience.md) for production-ready resilience patterns.
