@@ -5,7 +5,7 @@
 > **⏱️ Reading Time:** 25 minutes | **🟡 Level:** College Freshman  
 > **📋 Prerequisites:** Spring Boot basics, DDD familiarity  
 > **🎯 Key Topics:** Modular architecture, event-driven design, module boundaries  
-> **📊 Complexity:** Grade 13 level • 1.2% technical density • fairly difficult
+> **📊 Complexity:** College Freshman level • 1.2% technical density • fairly difficult
 
 ## What is Spring Modulith?
 
@@ -173,6 +173,7 @@ package com.example.shop.order;
 
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -200,6 +201,8 @@ public class OrderManagement {
 package com.example.shop.order.internal;
 
 import org.springframework.stereotype.Component;
+import com.example.shop.order.Order;
+import com.example.shop.order.CreateOrderRequest;
 
 @Component
 class OrderProcessor {
@@ -308,6 +311,9 @@ Now `CustomerService` can access `order.api.OrderManagement` but NOT `order.Orde
 // order/api/OrderManagement.java - Public API
 package com.example.shop.order.api;
 
+import org.springframework.stereotype.Service;
+import java.util.Optional;
+
 @Service
 public class OrderManagement {
     public Order createOrder(CreateOrderRequest request) { /* ... */ }
@@ -333,6 +339,8 @@ package com.example.shop.customer;
 
 import com.example.shop.order.api.OrderManagement;  // ✓ Allowed
 // import com.example.shop.order.Order;              // ✗ Compile error
+import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -793,10 +801,16 @@ For internal async processing without externalization:
 ```java
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.event.TransactionalEventListener;
+import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 class NotificationService {
+    
+    private final EmailService emailService;
     
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -965,6 +979,10 @@ order-service/
 **Before (in monolith):**
 
 ```java
+import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
@@ -980,6 +998,10 @@ public class CustomerService {
 **After (calling microservice):**
 
 ```java
+import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
@@ -997,6 +1019,8 @@ public class CustomerService {
 ```java
 import org.springframework.web.client.RestClient;
 import org.springframework.stereotype.Component;
+import org.springframework.core.ParameterizedTypeReference;
+import java.util.List;
 
 @Component
 public class OrderServiceClient {
@@ -1021,8 +1045,15 @@ public class OrderServiceClient {
 **Before (in monolith):**
 
 ```java
+import org.springframework.stereotype.Component;
+import org.springframework.modulith.events.ApplicationModuleListener;
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 class InventoryEventListener {
+    
+    private final InventoryService inventoryService;
     
     @ApplicationModuleListener
     void on(OrderCompleted event) {
@@ -1034,8 +1065,15 @@ class InventoryEventListener {
 **After (with Kafka):**
 
 ```java
+import org.springframework.stereotype.Component;
+import org.springframework.kafka.annotation.KafkaListener;
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 class InventoryKafkaListener {
+    
+    private final InventoryService inventoryService;
     
     @KafkaListener(topics = "shop.orders.completed")
     void onOrderCompleted(OrderCompletedMessage message) {
@@ -1047,10 +1085,16 @@ class InventoryKafkaListener {
 **Publishing side:**
 
 ```java
+import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.kafka.core.KafkaTemplate;
+
 @Service
 @RequiredArgsConstructor
 public class OrderService {
     
+    private final OrderRepository orderRepository;
     private final KafkaTemplate<String, OrderCompletedMessage> kafka;
     
     @Transactional
@@ -1113,6 +1157,10 @@ Don't extract all modules at once. Follow this pattern:
 Keep both monolith and microservice running during transition:
 
 ```java
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
+import java.util.List;
+
 @Service
 public class CustomerService {
     
@@ -1372,10 +1420,20 @@ public class OrderService {
 
 ```java
 // order/api/OrderDTO.java - Public DTO
+import java.math.BigDecimal;
+
 public record OrderDTO(String id, String status, BigDecimal total) {}
 
 // order/OrderService.java - API using DTO
+import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
 public class OrderService {
+    
+    private final OrderRepository orderRepository;
+    
     public OrderDTO findOrder(OrderId id) {  // ✓ Uses DTO
         var order = orderRepository.findById(id).orElseThrow();
         return new OrderDTO(order.getId().toString(), order.getStatus(), order.getTotal());
