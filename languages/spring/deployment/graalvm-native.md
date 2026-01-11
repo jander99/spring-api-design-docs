@@ -434,6 +434,7 @@ Spring Boot 3.x performs AOT processing at build time to prepare your applicatio
 Most Spring configurations work automatically with AOT:
 
 ```java
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -702,6 +703,7 @@ Spring Boot 3.x provides native testing support to verify your application works
 Standard Spring Boot tests run on the JVM:
 
 ```java
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -778,7 +780,7 @@ mvn -PnativeTest test
 ### Conditional Test Execution
 
 ```java
-import org.springframework.aot.hint.annotation.DisabledInNativeImage;
+import org.junit.jupiter.api.condition.DisabledInNativeImage;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.jupiter.api.Test;
 
@@ -787,7 +789,7 @@ class ConditionalTests {
     
     @Test
     @DisabledInNativeImage  // Skip this test in native mode
-    void jvmOnlyTest() {
+    void jvmOnlyTest() throws ClassNotFoundException {
         // Test that uses features not available in native
         Class<?> clazz = Class.forName("com.example.DynamicClass");
     }
@@ -1048,7 +1050,7 @@ jobs:
 
 ```yaml
 build-native:
-  image: ghcr.io/graalvm/graalvm-ce:latest
+  image: ghcr.io/graalvm/jdk-community:21
   stage: build
   script:
     - ./mvnw -Pnative native:compile -DskipTests
@@ -1064,7 +1066,7 @@ build-native:
     - tags
 
 test-native:
-  image: ghcr.io/graalvm/graalvm-ce:latest
+  image: ghcr.io/graalvm/jdk-community:21
   stage: test
   script:
     - ./mvnw -PnativeTest test
@@ -1279,7 +1281,7 @@ myregistry.io/my-app:1.0.0-native-arm64
 
 - [Spring Boot Configuration](../configuration/README.md)
 - [Testing Standards](../testing/README.md)
-- [Cloud-Native Deployment Patterns](../../guides/architecture/cloud-native-patterns.md)
+- [Event-Driven Architecture](../../guides/architecture/Event-Driven-Architecture.md)
 
 ## External Resources
 
