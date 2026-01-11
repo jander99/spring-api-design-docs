@@ -84,7 +84,14 @@ Each guide shows you how to:
 - Trace requests across services
 - Add health checks
 
-### 🚀 [gRPC](grpc/)
+### 🚀 [Deployment](deployment/)
+**Deploy your API**
+- Compile to native executables with GraalVM
+- Reduce startup time and memory usage
+- Configure AOT processing and reflection hints
+- Build optimized container images
+
+### 🔌 [gRPC](grpc/)
 **Build high-performance internal APIs**
 - Get started with Spring gRPC
 - Configure servers and clients
