@@ -29,9 +29,11 @@ This guide covers Spring Boot architecture patterns. You'll learn how to organiz
 
 ## Core Topics
 
-### Main Guide
+### Main Guides
 
 - **[Dependency Injection and Component Management](dependency-injection-and-component-management.md)**: Learn how Spring connects your code. This guide shows you how to use DI, scan components, and manage configs.
+
+- **[Spring Modulith - Building Modular Monoliths](spring-modulith.md)**: Build well-structured modular applications with clear module boundaries. Learn how to enforce architectural rules, use event-driven communication between modules, and create a path to microservices if needed.
 
 ## Key Principles
 
